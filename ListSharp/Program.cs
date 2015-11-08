@@ -28,7 +28,7 @@ namespace ListSharp
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
             List<string> alllists = new List<string>();
             string code = "public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
-            
+            //creation of variables starts here
             foreach (string singleline in maincode) {
 
 
