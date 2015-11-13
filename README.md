@@ -10,7 +10,7 @@ A language made for the editing of lists and blocks of text without any programm
 
 * made due to the lack of innovation and work done on the automation of such simple tasks.
 
-## example run screenshot
+### Example execution screenshot
 
 ![Alpha 0.0.1](http://puu.sh/ljOng/46381c43b3.png)
 
