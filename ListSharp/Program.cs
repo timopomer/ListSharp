@@ -33,13 +33,7 @@ namespace ListSharp
 
 
 
-                //list variable
-                if (singleline.Substring(0,4) == "LIST")
-                {
-                    _regex = new Regex(@"LIST([^>]*)=");
-                    match = _regex.Match(singleline);
-                    alllists.Add("System.Collections.Generic.List<string> " + match.Groups[1].Value.Trim() + ";" + Environment.NewLine);
-                }
+
 
                 //rows variable
                 if (singleline.Substring(0, 4) == "ROWS")
@@ -148,14 +142,33 @@ namespace ListSharp
 
                         code += varname + " = " + invar + ".Split(new string[] { " + bywhat + " }, System.StringSplitOptions.None);"; //interperted code
                     }
+
+
+                    if (splitline[1].Substring(0, 7) == "EXTRACT") //rowsplit command
+                    {
+                        _regex = new Regex(@"EXTRACT([^>]*)FROM"); //this finds what variable is to be split
+                        match = _regex.Match(splitline[1]);
+                        string collumvar = match.Groups[1].Value.Trim();
+
+                        _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
+                        match = _regex.Match(collumvar);
+                        int collumnum = Convert.ToInt32(match.Groups[1].Value.Trim());
+
+                        _regex = new Regex(@"FROM([^>]*)SPLIT"); //this finds what variable is to be split
+                        match = _regex.Match(splitline[1]);
+                        string whatvar = match.Groups[1].Value.Trim();
+
+                        _regex = new Regex(@"BY\[(.*)\]"); //this finds by what string to split the variable
+                        match = _regex.Match(collumvar);
+                        string bywhat = match.Groups[1].Value.Trim();     
+
+                       // code += varname + " = " + invar + ".Split(new string[] { " + bywhat + " }, System.StringSplitOptions.None);"; //interperted code
+                    }
+
+
                 }
 
-                if (splitline[0].Substring(0, 4) == "LIST")
-                {
-                    _regex = new Regex(@"LIST([^>]*)");
-                    match = _regex.Match(splitline[0]);
-                    //code += match.Groups[1].Value.Trim() + " = ";   
-                }
+
 
                 //show a variable to debug your program
                 if (splitline[0].Substring(0, 4) == "SHOW")
@@ -184,10 +197,6 @@ namespace ListSharp
             code +=  "if (thevar.GetType() == typeof(string[]))"; 
             code +=  Environment.NewLine;
             code += "return arr2str((string[])thevar);"; 
-            code +=  Environment.NewLine; 
-            code +=  "if (thevar.GetType() == typeof(System.Collections.Generic.List<string>))"; 
-            code +=  Environment.NewLine;
-            code += "return arr2str(((System.Collections.Generic.List<string>)thevar).ToArray());";
             code +=  Environment.NewLine;
             code +=  "return \"Show Error\";";
             code +=  Environment.NewLine ;
@@ -220,14 +229,6 @@ namespace ListSharp
             code += "return r;";
             code += Environment.NewLine;
             code += "}";
-/*
-public void makeOutput(object thein)
-{
-string inp = getString(thein);
-output += System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(inp) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
-}
-*/
-
 
 
 
@@ -253,6 +254,8 @@ output += System.Environment.NewLine + "---------------output--------------" + S
             Console.WriteLine("-----------------------");
             Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.NewLine);
             Console.WriteLine("Initializing ListSharp");
+
+            //compiling starts here
 
             using (Microsoft.CSharp.CSharpCodeProvider CodeProv =
             new Microsoft.CSharp.CSharpCodeProvider())
