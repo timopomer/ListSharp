@@ -17,8 +17,7 @@ A language made for the editing of lists and blocks of text without any programm
 
 ## Information about the ListSharp language
 
-### 3 variable types
+### 2 variable types
 * STRG : 0 dimensional string of data,no particular order: used to store raw text
-* ROWS : 1 dimensional array of information: order dependant on the way it is created
-* LIST : 1 dimensional list of information: order from top to bottom and is the only one to be manipulated by a wide selection of functions
+* ROWS : 1 dimensional array of information: order dependant on the way it is created, manipulated by a wide selection of functions
 
