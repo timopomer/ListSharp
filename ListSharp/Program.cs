@@ -33,8 +33,6 @@ namespace ListSharp
 
 
 
-
-
                 //rows variable
                 if (singleline.Substring(0, 4) == "ROWS")
                 {
@@ -144,25 +142,26 @@ namespace ListSharp
                     }
 
 
-                    if (splitline[1].Substring(0, 7) == "EXTRACT") //rowsplit command
+                    if (splitline[1].Substring(0, 7) == "EXTRACT") //extract command
                     {
-                        _regex = new Regex(@"EXTRACT([^>]*)FROM"); //this finds what variable is to be split
+                        _regex = new Regex(@"EXTRACT([^>]*)FROM"); 
                         match = _regex.Match(splitline[1]);
                         string collumvar = match.Groups[1].Value.Trim();
 
-                        _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
+                        _regex = new Regex(@"\[(.*)\]"); //this finds what collum is to be extracted
                         match = _regex.Match(collumvar);
                         int collumnum = Convert.ToInt32(match.Groups[1].Value.Trim());
 
-                        _regex = new Regex(@"FROM([^>]*)SPLIT"); //this finds what variable is to be split
+                        _regex = new Regex(@"FROM([^>]*)SPLIT"); //this finds what variable is to be extracted from
                         match = _regex.Match(splitline[1]);
                         string whatvar = match.Groups[1].Value.Trim();
 
-                        _regex = new Regex(@"BY\[(.*)\]"); //this finds by what string to split the variable
-                        match = _regex.Match(collumvar);
-                        string bywhat = match.Groups[1].Value.Trim();     
+                        _regex = new Regex(@"BY \[(.*)\]"); //this finds by what string to extract the variable
+                        match = _regex.Match(splitline[1]);
+                        string bywhat = match.Groups[1].Value;
 
-                       // code += varname + " = " + invar + ".Split(new string[] { " + bywhat + " }, System.StringSplitOptions.None);"; //interperted code
+
+                        code += varname + " = Extract(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
                     }
 
 
@@ -229,7 +228,28 @@ namespace ListSharp
             code += "return r;";
             code += Environment.NewLine;
             code += "}";
+            code += Environment.NewLine;
+            code += Environment.NewLine;
 
+            code += "public string[] Extract(string[] arr,string bywhat,int collumnum)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "collumnum--;";
+            code += Environment.NewLine;
+            code += "string[] restr = new string[arr.Length];";
+            code += Environment.NewLine;
+            code += "for (int i = 0; i < arr.Length; i++)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "restr[i] = arr[i].Split(new string[] {bywhat}, System.StringSplitOptions.None)[collumnum];";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "return restr;";
+            code += Environment.NewLine;
+            code += "}";
 
 
             code += Environment.NewLine;
