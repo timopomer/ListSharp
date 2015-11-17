@@ -164,6 +164,22 @@ namespace ListSharp
                         code += varname + " = Extract(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
                     }
 
+                    if (splitline[1].Substring(0, 7) == "COMBINE") //extract command
+                    {
+
+                        _regex = new Regex(@"COMBINE\[([^>]*)\]"); //everything between the square brackets "[array,array,array]"
+                        match = _regex.Match(splitline[1]);
+                        string combinearrays = @match.Groups[1].Value.Trim();
+
+                        _regex = new Regex(@"WITH \[(.*)\]"); //this finds by what string to extract the variable
+                        match = _regex.Match(splitline[1]);
+                        string withwhat = match.Groups[1].Value;
+
+
+                        //code += varname + " = Combine(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
+                    }
+
+
 
                 }
 
@@ -250,6 +266,56 @@ namespace ListSharp
             code += "return restr;";
             code += Environment.NewLine;
             code += "}";
+
+            code += Environment.NewLine;
+            code += "public string[] Combine(string[][] srar,string bywhat)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "int max = 0;";
+            code += Environment.NewLine;
+            code += "for (int i = 0; i<srar.Length; i++)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "if (srar[i].Length > max)";
+            code += Environment.NewLine;
+            code += "max = srar[i].Length;";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "string[] tempo = new string[max];";
+            code += Environment.NewLine;
+            code += "string sinline = \"\";";
+            code += Environment.NewLine;
+            code += "for (int i = 0; i < max; i++)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "for (int j = 0; j < srar.Length; j++)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "if (i < srar[j].Length)";
+            code += Environment.NewLine;
+            code += "sinline += srar[j][i];";
+            code += Environment.NewLine;
+            code += "if (j != (srar.Length - 1))";
+            code += Environment.NewLine;
+            code += "sinline += bywhat;";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "tempo[i] = sinline;";
+            code += Environment.NewLine;
+            code += "sinline = \"\";";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "return tempo;";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
 
 
             code += Environment.NewLine;
