@@ -27,7 +27,7 @@ namespace ListSharp
             List<string> maincode = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
             List<string> alllists = new List<string>();
-            string code = "public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
+            string code = "public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string[][] tempstrarr;" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
             //variables initialization starts here:
             foreach (string singleline in maincode) {
 
@@ -120,7 +120,7 @@ namespace ListSharp
                     }
 
                     code += varname + " = temp_contents;"; //set variable to tempoary variable
-
+                    
                 }
 
                 //rows variable type
@@ -175,8 +175,9 @@ namespace ListSharp
                         match = _regex.Match(splitline[1]);
                         string withwhat = match.Groups[1].Value;
 
-
-                        //code += varname + " = Combine(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
+                        code += "tempstrarr = new string[][] {" + combinearrays + "};";
+                        code += Environment.NewLine;
+                        code += varname + " = Combine(tempstrarr," + withwhat + ");"; //interperted code
                     }
 
 
