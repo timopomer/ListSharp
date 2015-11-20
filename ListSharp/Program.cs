@@ -15,15 +15,25 @@ namespace ListSharp
 
         static void Main(string[] args)
         {
+            Boolean debugmode = false;
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+
+            Console.BackgroundColor = ConsoleColor.White;
+
+            Console.Title = "ListSharp Console";
+            Console.Clear();
             Regex _regex;
             Match match;
             string currentdir = Environment.CurrentDirectory;
             string allcode = System.IO.File.ReadAllText(currentdir + "\\ListSharp.ls");
             allcode = allcode.Replace("<here>", currentdir);
-            Console.WriteLine("Original Code \n-----------------------");
-            Console.WriteLine(allcode);
-            Console.WriteLine("-----------------------");
-            Console.WriteLine(Environment.NewLine);
+            if (debugmode == true)
+            {
+                Console.WriteLine("Original Code \n-----------------------");
+                Console.WriteLine(allcode);
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(Environment.NewLine);
+            }
             List<string> maincode = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
             List<string> alllists = new List<string>();
@@ -164,6 +174,8 @@ namespace ListSharp
                         code += varname + " = Extract(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
                     }
 
+
+
                     if (splitline[1].Substring(0, 7) == "COMBINE") //extract command
                     {
 
@@ -186,14 +198,30 @@ namespace ListSharp
 
 
 
-                //show a variable to debug your program
-                if (splitline[0].Substring(0, 4) == "SHOW")
+
+                if (splitline[0].Substring(0, 4) == "SHOW") //show a variable to debug your program
                 {
                         _regex = new Regex(@"([^>]*);");
                         match = _regex.Match(splitline[1]);
                         code += "output = makeOutput(" + match.Groups[1].Value.Trim() + " , output);"; //call makeOutput() on any type of variable the users wants to display
                         code += Environment.NewLine;
                 }
+
+                if (splitline[0].Substring(0, 4) == "OUTP") //output command
+                {
+                    _regex = new Regex(@"([^>]*)HERE"); //everything between the square brackets "[path]"
+                    match = _regex.Match(splitline[1]);
+                    string thevar = @match.Groups[1].Value.Trim();
+
+
+                    _regex = new Regex(@"HERE\[([^>]*)\]"); //everything between the square brackets "[path]"
+                    match = _regex.Match(splitline[1]);
+                    string path = @match.Groups[1].Value.Trim();
+
+                    code += "Write(@\"" + path + "\", " + thevar + ");"; //output the rows to file
+                    code += Environment.NewLine;
+                }
+
                 code += Environment.NewLine;
             }
 
@@ -317,14 +345,39 @@ namespace ListSharp
             code += Environment.NewLine;
             code += "}";
             code += Environment.NewLine;
+            code += Environment.NewLine;
 
+            code += "public void Write(string path, object thevar)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "if (thevar.GetType() == typeof(string))";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "System.IO.File.WriteAllText(path,(string)thevar);";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "if (thevar.GetType() == typeof(string[]))";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "System.IO.File.WriteAllLines(path,(string[])thevar);";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
 
             code += Environment.NewLine;
             code += Environment.NewLine;
             code += Environment.NewLine + "}";
-            Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine);
-            Console.WriteLine("Interperted Code \n-----------------------");
-
+            if (debugmode == true)
+            {
+                Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine);
+                Console.WriteLine("Interperted Code \n-----------------------");
+            }
             int index = 1;
             char[] delimiterChars = { '\n' };
             string[] allLines = code.Split(delimiterChars);
@@ -332,14 +385,17 @@ namespace ListSharp
 
             foreach (string currentLine in allLines)
             {
+                if (debugmode == true)
                 System.Console.WriteLine("Line: " + index + "    " +currentLine);
                 index++;
             }
 
 
-
-            Console.WriteLine("-----------------------");
-            Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.NewLine);
+            if (debugmode == true)
+            {
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.NewLine);
+            }
             Console.WriteLine("Initializing ListSharp");
 
             //compiling starts here
@@ -376,6 +432,7 @@ namespace ListSharp
                  
                  Console.WriteLine(output);
             }
+
             while (true)
             {
                 Thread.Sleep(1000); //sleep forever
