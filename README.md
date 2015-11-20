@@ -21,3 +21,40 @@ A language made for the editing of lists and blocks of text without any programm
 * STRG : 0 dimensional string of data,no particular order: used to store raw text
 * ROWS : 1 dimensional array of information: order dependant on the way it is created, manipulated by a wide selection of functions
 
+### List of functions with explanation
+#### STRG functions:
+
+##### READ
+
+* READ[(STRG)]
+
+reads location put between the 2 square brackets
+
+example usage "READ[<here>\mytextfile.txt]"
+
+#### ROWS functions:
+
+##### ROWSPLIT
+
+* ROWSPLIT (STRG) BY [(STRG)]
+
+creates ROWS variable out of a string by splitting it using the parameter between the 2 square brackets
+
+example usage "ROWSPLIT FULLFILE BY [<newline>]"
+
+##### EXTRACT
+
+* EXTRACT COLLUM[(NUMBER)] FROM (ROWS) SPLIT BY [(STRG)]
+
+splits each line of a ROWS variable into multiple segments by a given parameter and extracts the collum asked for
+
+example usage "EXTRACT COLLUM[1] FROM ALLROWS SPLIT BY [":"]"
+
+##### COMBINE
+
+* COMBINE[ROWS,ROWS] WITH [(STRG)]
+
+combines to ROWS next to each other with a certain string in between the lines
+
+example usage "COMBINE[RIGHTSIDE,LEFTSIDE] WITH ["<>"]"
+
