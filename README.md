@@ -76,4 +76,17 @@ Outputs a variable to a text file
 
 example usage "OUTP = ALLROWS HERE[<here>\output.txt]"
 
+### Special constants
+
+##### newline
+
+`<newline>`
+
+this is the newline constonant that can be used for example to split a list by each row
+
+##### here
+
+`<here>`
+
+this is the current directory constonant that can be used for example to save a file next to the script execution
 
