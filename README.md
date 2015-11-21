@@ -1,4 +1,4 @@
-# ListSharp
+# ListQuack,
 
 A language made for the editing of lists and blocks of text without any programming experience needed to operate it.
 
