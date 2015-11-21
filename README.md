@@ -70,11 +70,11 @@ example usage "SHOW = ALLROWS"
 
 ##### OUTP
 
-`OUTP = (VAR) HERE[(STRG)`
+`OUTP = (VAR) HERE[(STRG)]`
 
 Outputs a variable to a text file
 
-example usage "OUTP = ALLROWS HERE[<here>\output.txt]"
+example usage "OUTP = ALLROWS HERE[`<here>\output.txt]"
 
 ### Special constants
 
