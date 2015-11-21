@@ -30,7 +30,7 @@ A language made for the editing of lists and blocks of text without any programm
 
 reads location put between the 2 square brackets
 
-example usage "READ[<here>\mytextfile.txt]"
+example usage "READ[`<here>`\mytextfile.txt]"
 
 #### ROWS functions:
 
@@ -40,7 +40,7 @@ example usage "READ[<here>\mytextfile.txt]"
 
 creates ROWS variable out of a string by splitting it using the parameter between the 2 square brackets
 
-example usage "ROWSPLIT FULLFILE BY [<newline>]"
+example usage "ROWSPLIT FULLFILE BY [`<newline>`]"
 
 ##### EXTRACT
 
@@ -74,7 +74,7 @@ example usage "SHOW = ALLROWS"
 
 Outputs a variable to a text file
 
-example usage "OUTP = ALLROWS HERE[`<here>\output.txt]"
+example usage "OUTP = ALLROWS HERE[`<here>`\output.txt]"
 
 ### Special constants
 
