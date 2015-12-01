@@ -12,7 +12,7 @@ A language made for the editing of lists and blocks of text without any programm
 
 ### Example execution screenshot
 
-![Alpha 0.0.1](http://puu.sh/ljOng/46381c43b3.png)
+![Alpha 0.0.1](http://puu.sh/ltg6F/e0469ab209.PNG)
 
 
 ## Information about the ListSharp language
@@ -26,25 +26,25 @@ A language made for the editing of lists and blocks of text without any programm
 
 ##### READ
 
-* READ[(STRG)]
+`READ[(STRG)]`
 
 reads location put between the 2 square brackets
 
-example usage "READ[<here>\mytextfile.txt]"
+example usage "READ[`<here>`\mytextfile.txt]"
 
 #### ROWS functions:
 
 ##### ROWSPLIT
 
-* ROWSPLIT (STRG) BY [(STRG)]
+`ROWSPLIT (STRG) BY [(STRG)]`
 
 creates ROWS variable out of a string by splitting it using the parameter between the 2 square brackets
 
-example usage "ROWSPLIT FULLFILE BY [<newline>]"
+example usage "ROWSPLIT FULLFILE BY [`<newline>`]"
 
 ##### EXTRACT
 
-* EXTRACT COLLUM[(NUMBER)] FROM (ROWS) SPLIT BY [(STRG)]
+`EXTRACT COLLUM[(NUMBER)] FROM (ROWS) SPLIT BY [(STRG)]`
 
 splits each line of a ROWS variable into multiple segments by a given parameter and extracts the collum asked for
 
@@ -52,9 +52,41 @@ example usage "EXTRACT COLLUM[1] FROM ALLROWS SPLIT BY [":"]"
 
 ##### COMBINE
 
-* COMBINE[ROWS,ROWS] WITH [(STRG)]
+`COMBINE[ROWS,ROWS] WITH [(STRG)]`
 
 combines to ROWS next to each other with a certain string in between the lines
 
 example usage "COMBINE[RIGHTSIDE,LEFTSIDE] WITH ["<>"]"
+
+#### SPECIAL functions:
+
+##### SHOW
+
+`SHOW = (VAR)`
+
+Shows the variable in the output
+
+example usage "SHOW = ALLROWS"
+
+##### OUTP
+
+`OUTP = (VAR) HERE[(STRG)]`
+
+Outputs a variable to a text file
+
+example usage "OUTP = ALLROWS HERE[`<here>`\output.txt]"
+
+### Special constants
+
+##### newline
+
+`<newline>`
+
+this is the newline constonant that can be used for example to split a list by each row
+
+##### here
+
+`<here>`
+
+this is the current directory constonant that can be used for example to save a file next to the script execution
 
