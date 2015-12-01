@@ -15,7 +15,7 @@ namespace ListSharp
 
         static void Main(string[] args)
         {
-            Boolean debugmode = false;
+            Boolean debugmode = true;
             Console.ForegroundColor = ConsoleColor.DarkCyan;
 
             Console.BackgroundColor = ConsoleColor.White;
@@ -151,6 +151,18 @@ namespace ListSharp
                         code += varname + " = " + invar + ".Split(new string[] { " + bywhat + " }, System.StringSplitOptions.None);"; //interperted code
                     }
 
+                    if (splitline[1].Substring(0, 8) == "GETLINES") //rowsplit command
+                    {
+                        _regex = new Regex(@"GETLINES([^>]*)\["); //this finds what variable is to be split
+                        match = _regex.Match(splitline[1]);
+                        string invar = match.Groups[1].Value.Trim();
+
+                        _regex = new Regex(@"\[(.*)\]"); //this finds what lines of the array to get
+                        match = _regex.Match(splitline[1]);
+                        string bywhat = match.Groups[1].Value.Trim();
+
+                        code += varname + " = getlines(" + invar + ",\"" + bywhat + "\");"; //interperted code
+                    }
 
                     if (splitline[1].Substring(0, 7) == "EXTRACT") //extract command
                     {
@@ -372,7 +384,62 @@ namespace ListSharp
 
             code += Environment.NewLine;
             code += Environment.NewLine;
-            code += Environment.NewLine + "}";
+            code += "public string[] getlines(string[] ins,string lines)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "string[] findrange = lines.Split(',');";
+            code += Environment.NewLine;
+            code += "System.Collections.Generic.List<int> range = new System.Collections.Generic.List<int>();";
+            code += Environment.NewLine;
+            code += "for (int i = 0; i < findrange.Length; i++)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "if (findrange[i].Contains(\"-\"))";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "int start = System.Convert.ToInt32(findrange[i].Split('-')[0]);";
+            code += Environment.NewLine;
+            code += "int end = System.Convert.ToInt32(findrange[i].Split('-')[1]);";
+            code += Environment.NewLine;
+            code += "for (int j = start; j<=end; j++)";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "range.Add(j);";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "else";
+            code += Environment.NewLine;
+            code += "{";
+            code += Environment.NewLine;
+            code += "range.Add(System.Convert.ToInt32(findrange[i]));";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "string[] tempret = new string[range.Count];";
+            code += Environment.NewLine;
+            code += "for (int i = 0; i < range.Count; i++)";
+            code += Environment.NewLine;
+            code += "tempret[i] = range[i].ToString();";
+            code += Environment.NewLine;
+            code += "return tempret;";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+
+            code += Environment.NewLine;
+            code += Environment.NewLine;
+            
             if (debugmode == true)
             {
                 Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine);
