@@ -58,6 +58,14 @@ combines to ROWS next to each other with a certain string in between the lines
 
 example usage "COMBINE[RIGHTSIDE,LEFTSIDE] WITH ["<>"]"
 
+##### GETLINES
+
+`GETLINES (ROWS) [(INT),(INT)-(INT),....];`
+
+takes certain rows form a ROWS variable into another ROWS variable
+
+example usage "GETLINES RIGHTSIDE [1,4-6];"
+
 #### SPECIAL functions:
 
 ##### SHOW
