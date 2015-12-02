@@ -15,6 +15,7 @@ namespace ListSharp
 
         static void Main(string[] args)
         {
+            
             Boolean debugmode = true;
             Console.ForegroundColor = ConsoleColor.DarkCyan;
 
@@ -22,6 +23,7 @@ namespace ListSharp
 
             Console.Title = "ListSharp Console";
             Console.Clear();
+            
             Regex _regex;
             Match match;
             string currentdir = Environment.CurrentDirectory;
@@ -237,205 +239,130 @@ namespace ListSharp
                 code += Environment.NewLine;
             }
 
-            code += "return output;";
-
+            code += Environment.NewLine + "return output;";
+            
+            
             code += Environment.NewLine + "}" + Environment.NewLine;
 
             
-            code += "public string getString(object thevar)";
-            code += Environment.NewLine;
-            code += "{"; 
-            code +=  Environment.NewLine;
-            code +=  "if (thevar.GetType() == typeof(string))"; 
-            code +=  Environment.NewLine;
-            code += "return \"[0]\" + (string)thevar + \"[/0]\";"; 
-            code +=  Environment.NewLine; 
-            code +=  "if (thevar.GetType() == typeof(string[]))"; 
-            code +=  Environment.NewLine;
-            code += "return arr2str((string[])thevar);"; 
-            code +=  Environment.NewLine;
-            code +=  "return \"Show Error\";";
-            code +=  Environment.NewLine ;
-            code +=  "}";
+
+
+
+            code += @"public string getString(object thevar)
+            {
+            if (thevar.GetType() == typeof(string))
+            return ""[0]"" + (string)thevar + ""[/0]"";
+            if (thevar.GetType() == typeof(string[]))
+            return arr2str((string[])thevar);
+            return ""Show Error"";
+            }";
 
             code += Environment.NewLine;
             code += Environment.NewLine;
-            code += "public string makeOutput(object thein,string output)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "output += System.Environment.NewLine + \"---------------output--------------\" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine,\"<newline>\" + System.Environment.NewLine) + System.Environment.NewLine + \"-----------------------------------\" + System.Environment.NewLine;";
-            code += Environment.NewLine;
-            code += "return output;";
-            code += Environment.NewLine;
-            code += "}";
+
+            code += @"public string makeOutput(object thein,string output)
+            {
+            output += System.Environment.NewLine + ""---------------output--------------"" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine,""<newline>"" + System.Environment.NewLine) + System.Environment.NewLine + ""-----------------------------------"" + System.Environment.NewLine;
+            return output;
+            }";
 
             code += Environment.NewLine;
             code += Environment.NewLine;
-            code += "public string arr2str(string[] arr)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "string r = \"\";";
-            code += Environment.NewLine;
-            code += "for (int i = 0; i < arr.Length; i++)";
-            code += Environment.NewLine;
-            code += "r += \"[\" + i + \"]\" + arr[i] + \"[/\" + i + \"]\";";
-            code += Environment.NewLine;
-            code += "return r;";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += Environment.NewLine;
 
-            code += "public string[] Extract(string[] arr,string bywhat,int collumnum)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "collumnum--;";
-            code += Environment.NewLine;
-            code += "string[] restr = new string[arr.Length];";
-            code += Environment.NewLine;
-            code += "for (int i = 0; i < arr.Length; i++)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "restr[i] = arr[i].Split(new string[] {bywhat}, System.StringSplitOptions.None)[collumnum];";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "return restr;";
-            code += Environment.NewLine;
-            code += "}";
-
-            code += Environment.NewLine;
-            code += "public string[] Combine(string[][] srar,string bywhat)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "int max = 0;";
-            code += Environment.NewLine;
-            code += "for (int i = 0; i<srar.Length; i++)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "if (srar[i].Length > max)";
-            code += Environment.NewLine;
-            code += "max = srar[i].Length;";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "string[] tempo = new string[max];";
-            code += Environment.NewLine;
-            code += "string sinline = \"\";";
-            code += Environment.NewLine;
-            code += "for (int i = 0; i < max; i++)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "for (int j = 0; j < srar.Length; j++)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "if (i < srar[j].Length)";
-            code += Environment.NewLine;
-            code += "sinline += srar[j][i];";
-            code += Environment.NewLine;
-            code += "if (j != (srar.Length - 1))";
-            code += Environment.NewLine;
-            code += "sinline += bywhat;";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "tempo[i] = sinline;";
-            code += Environment.NewLine;
-            code += "sinline = \"\";";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "return tempo;";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += Environment.NewLine;
-
-            code += "public void Write(string path, object thevar)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "if (thevar.GetType() == typeof(string))";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "System.IO.File.WriteAllText(path,(string)thevar);";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "if (thevar.GetType() == typeof(string[]))";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "System.IO.File.WriteAllLines(path,(string[])thevar);";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
+            code += @"public string arr2str(string[] arr)
+            {
+            string r = """";
+            for (int i = 0; i < arr.Length; i++)
+            r += ""["" + i + ""]"" + arr[i] + ""["" + i + ""]"";
+            return r;
+            }";
 
             code += Environment.NewLine;
             code += Environment.NewLine;
-            code += "public string[] getlines(string[] ins,string lines)";
+
+            code += @"public string[] Extract(string[] arr,string bywhat,int collumnum)
+            {
+            collumnum--;
+            string[] restr = new string[arr.Length];
+            for (int i = 0; i < arr.Length; i++)
+            {
+            restr[i] = arr[i].Split(new string[] {bywhat}, System.StringSplitOptions.None)[collumnum];
+            }
+            return restr;
+            }";
+
             code += Environment.NewLine;
-            code += "{";
             code += Environment.NewLine;
-            code += "string[] findrange = lines.Split(',');";
+
+            code += @"public string[] Combine(string[][] srar,string bywhat)
+            {
+            int max = 0;
+            for (int i = 0; i<srar.Length; i++)
+            {
+            if (srar[i].Length > max)
+            max = srar[i].Length;
+            }
+            string[] tempo = new string[max];
+            string sinline = """";
+            for (int i = 0; i < max; i++)
+            {
+            for (int j = 0; j < srar.Length; j++)
+            {
+            if (i < srar[j].Length)
+            sinline += srar[j][i];
+            if (j != (srar.Length - 1))
+            sinline += bywhat;
+            }
+            tempo[i] = sinline;
+            sinline = """";
+            }
+            return tempo;
+            }";
+
             code += Environment.NewLine;
-            code += "System.Collections.Generic.List<int> range = new System.Collections.Generic.List<int>();";
             code += Environment.NewLine;
-            code += "for (int i = 0; i < findrange.Length; i++)";
+
+            code += @"public void Write(string path, object thevar)
+            {
+            if (thevar.GetType() == typeof(string))
+            {
+            System.IO.File.WriteAllText(path,(string)thevar);
+            }
+            if (thevar.GetType() == typeof(string[]))
+            {
+            System.IO.File.WriteAllLines(path,(string[])thevar);
+            }
+            }";
+
             code += Environment.NewLine;
-            code += "{";
             code += Environment.NewLine;
-            code += "if (findrange[i].Contains(\"-\"))";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "int start = System.Convert.ToInt32(findrange[i].Split('-')[0]);";
-            code += Environment.NewLine;
-            code += "int end = System.Convert.ToInt32(findrange[i].Split('-')[1]);";
-            code += Environment.NewLine;
-            code += "for (int j = start; j<=end; j++)";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "range.Add(j);";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "else";
-            code += Environment.NewLine;
-            code += "{";
-            code += Environment.NewLine;
-            code += "range.Add(System.Convert.ToInt32(findrange[i]));";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "string[] tempret = new string[range.Count];";
-            code += Environment.NewLine;
-            code += "for (int i = 0; i < range.Count; i++)";
-            code += Environment.NewLine;
-            code += "tempret[i] = range[i].ToString();";
-            code += Environment.NewLine;
-            code += "return tempret;";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
-            code += "}";
-            code += Environment.NewLine;
+
+            code += @"public string[] getlines(string[] ins,string lines)
+            {
+            string[] findrange = lines.Split(',');
+            System.Collections.Generic.List<int> range = new System.Collections.Generic.List<int>();
+            for (int i = 0; i < findrange.Length; i++)
+            {
+            if (findrange[i].Contains(""-""))
+            {
+            int start = System.Convert.ToInt32(findrange[i].Split('-')[0]);
+            int end = System.Convert.ToInt32(findrange[i].Split('-')[1]);
+            for (int j = start; j<=end; j++)
+            {
+            range.Add(j);
+            }
+            }
+            else
+            {
+            range.Add(System.Convert.ToInt32(findrange[i]));
+            }
+            }
+            string[] tempret = new string[range.Count];
+            for (int i = 0; i < range.Count; i++)
+            tempret[i] = range[i].ToString();
+            return tempret;
+            }
+            }";
 
             code += Environment.NewLine;
             code += Environment.NewLine;
@@ -466,16 +393,14 @@ namespace ListSharp
             Console.WriteLine("Initializing ListSharp");
 
             //compiling starts here
+            string[] sources = { code };
+            CompilerParameters parameters = new CompilerParameters();
+            parameters.GenerateInMemory = true;
 
             using (Microsoft.CSharp.CSharpCodeProvider CodeProv =
             new Microsoft.CSharp.CSharpCodeProvider())
             {
-                CompilerResults results = CodeProv.CompileAssemblyFromSource(
-                     new System.CodeDom.Compiler.CompilerParameters()
-                     {
-                         GenerateInMemory = true
-                     },
-                     code);
+                CompilerResults results = CodeProv.CompileAssemblyFromSource(parameters,sources);
                 foreach (CompilerError er in results.Errors)
                 {
                     Console.WriteLine(er.ToString());
