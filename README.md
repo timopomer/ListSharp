@@ -16,6 +16,8 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 
 ## ListSharp Documentation
 
+### With what things in mind ListSharp was made
+
 * made so people without any programming experience can easily operate it.
 
 * made to be intuitive and easy to understand,with a word rich English based syntax.
