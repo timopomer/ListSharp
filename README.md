@@ -12,7 +12,7 @@ A language made for the editing of lists and blocks of text without any programm
 
 ### Example execution screenshot
 
-![Alpha 0.0.1](http://puu.sh/ltg6F/e0469ab209.PNG)
+![Alpha 0.1](http://puu.sh/lSDl6/36a222b8ca.png)
 
 
 ## Information about the ListSharp language
@@ -20,6 +20,9 @@ A language made for the editing of lists and blocks of text without any programm
 ### 2 variable types
 * STRG : 0 dimensional string of data,no particular order: used to store raw text
 * ROWS : 1 dimensional array of information: order dependant on the way it is created, manipulated by a wide selection of functions
+
+### Associates to .ls files
+![File Association](http://puu.sh/lSDir/5497c7ae40.png)
 
 ### List of functions with explanation
 #### STRG functions:
