@@ -12,7 +12,7 @@ A language made for the editing of lists and blocks of text without any programm
 
 ### Example execution screenshot
 
-![Alpha 0.1](http://puu.sh/lSDdH/ffe0e769eb.png)
+![Alpha 0.1](http://puu.sh/lSDl6/36a222b8ca.png)
 
 
 ## Information about the ListSharp language
