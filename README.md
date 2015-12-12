@@ -1,11 +1,15 @@
 <img src="http://puu.sh/lT74D/d0874336f3.png" alt="ListSharp logo" height="70" >
 # ListSharp Programming Language
 
-A language made for the editing of lists and blocks of text without any programming experience needed to operate it.
+**Welcome to Swift!**
+
+ListSharp is a language made for the manipulation of lists of information and other types of blobs of text.
+
+* made so people without any programming experience can easily operate it.
 
 * made to be intuitive and easy to understand,with a word rich English based syntax.
 
-* made in c# and opensource for any future improvements people might want to commit.
+* made in c# and opensource to enable various features and ease of edit for people which what to commit to this project.
 
 * made with ease of installation in mind, without any special dependencies besides .net needed.
 
