@@ -61,14 +61,32 @@ namespace ListSharp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to         public void me()
-        ///        {
-        ///            Console.WriteLine(&quot;heyyyy&quot;);
-        ///        }.
+        ///   Looks up a localized string similar to 			public string getString(object thevar)
+        ///            {
+        ///            if (thevar.GetType() == typeof(string))
+        ///            return &quot;[0]&quot; + (string)thevar + &quot;[/0]&quot;;
+        ///            if (thevar.GetType() == typeof(string[]))
+        ///            return arr2str((string[])thevar);
+        ///            return &quot;Show Error&quot;;
+        ///            }
+        ///			
+        ///			public string makeOutput(object thein,string output)
+        ///            {
+        ///            output += System.Environment.NewLine + &quot;---------------output--------------&quot; + System.Environment.NewLine +  [rest of string was truncated]&quot;;.
         /// </summary>
         public static string externalFunctions {
             get {
                 return ResourceManager.GetString("externalFunctions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon Untitled {
+            get {
+                object obj = ResourceManager.GetObject("Untitled", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

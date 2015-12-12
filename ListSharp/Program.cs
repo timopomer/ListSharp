@@ -8,15 +8,33 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Deployment;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
+using Associations;
 
 namespace ListSharp
 {
     class Program
     {
 
+
         static void Main(string[] args)
         {
-            
+            System.Drawing.Icon theicon = Properties.Resources.Untitled; //the application icon
+
+            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ListSharp"))
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ListSharp");
+            string dpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ListSharp\\theIcon.ico";
+            File.WriteAllBytes(dpath, IconToBytes(theicon)); //writing the icon from resources to a pleace in appdata to refference it later
+
+
+
+            if (IsAdministrator() && args.Length == 0) //if administrator and no .ls file was sent to be interperted
+            SetAssociation(".ls", "ListSharp", Environment.CurrentDirectory + "\\listsharp.exe","ListSharp Script",dpath); //.ls association
+
+
             Boolean debugmode = true;
             Console.ForegroundColor = ConsoleColor.DarkCyan;
 
@@ -27,8 +45,34 @@ namespace ListSharp
             
             Regex _regex;
             Match match;
+
+            if (!IsAdministrator() && args.Length == 0)
+            {
+                Console.WriteLine("Run as admin to associate .ls files");
+                while (true)
+                {
+                    Thread.Sleep(1000); //sleep forever
+                }
+            }
+
+
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Added .ls file extention");
+                while (true)
+                {
+                    Thread.Sleep(1000); //sleep forever
+                }
+            }
             string currentdir = Environment.CurrentDirectory;
-            string allcode = System.IO.File.ReadAllText(currentdir + "\\ListSharp.ls");
+            Console.WriteLine("Script file");
+            foreach (string s in args)
+            {
+                Console.WriteLine(s);
+            }
+            Console.WriteLine("\n");
+            
+            string allcode = System.IO.File.ReadAllText(currentdir + "\\whatever.ls");
             allcode = allcode.Replace("<here>", currentdir);
             if (debugmode == true)
             {
@@ -317,6 +361,47 @@ namespace ListSharp
                 Thread.Sleep(1000); //sleep forever
             }
         }
+
+
+
+
+        public static byte[] IconToBytes(System.Drawing.Icon icon)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                icon.Save(ms);
+                return ms.ToArray();
+            }
+        }
+
+        public static void SetAssociation(string Extension, string KeyName, string OpenWith, string FileDescription,string IconPath)
+        {
+            AF_FileAssociator assoc = new AF_FileAssociator(Extension);
+
+            if (assoc.Exists)
+            assoc.Delete();
+            // Creates a new file association for the .ABC file extension. 
+            // Data is overwritten if it already exists.
+            assoc.Create(KeyName,
+                FileDescription,
+                new ProgramIcon(IconPath),
+                new ExecApplication(OpenWith),
+                new OpenWithList(new string[] { KeyName }));
+
+
+            
+        }
+
+
+
+        public static bool IsAdministrator()
+        {
+            WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal windowsPrincipal = new WindowsPrincipal(windowsIdentity);
+
+            return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
     }
 }
 
