@@ -1,4 +1,5 @@
-# ListSharp
+![ListSharp Title](http://puu.sh/lSKOK/bb385d2f7c.jpg)
+# ListSharp Programming Language
 
 A language made for the editing of lists and blocks of text without any programming experience needed to operate it.
 
