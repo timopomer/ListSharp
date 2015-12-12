@@ -64,15 +64,27 @@ namespace ListSharp
                     Thread.Sleep(1000); //sleep forever
                 }
             }
-            string currentdir = Environment.CurrentDirectory;
+            
+            
             Console.WriteLine("Script file");
+            string scriptfile = "";
             foreach (string s in args)
             {
+                scriptfile = s;
                 Console.WriteLine(s);
             }
+            if (Path.GetExtension(scriptfile) != ".ls")
+            {
+                Console.WriteLine("Added .ls file extention");
+                while (true)
+                {
+                    Thread.Sleep(1000); //sleep forever
+                }
+            }
+            string currentdir = Path.GetDirectoryName(scriptfile);
             Console.WriteLine("\n");
-            
-            string allcode = System.IO.File.ReadAllText(currentdir + "\\whatever.ls");
+
+            string allcode = System.IO.File.ReadAllText(scriptfile);
             allcode = allcode.Replace("<here>", currentdir);
             if (debugmode == true)
             {
