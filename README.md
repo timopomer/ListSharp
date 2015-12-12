@@ -1,4 +1,4 @@
-![ListSharp Title](http://puu.sh/lT6tx/afa094ef2f.png)
+<img src="http://puu.sh/lT74D/d0874336f3.png" alt="ListSharp logo" height="70" >
 # ListSharp Programming Language
 
 A language made for the editing of lists and blocks of text without any programming experience needed to operate it.
