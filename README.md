@@ -50,9 +50,9 @@ example usage "READ[`<here>`\mytextfile.txt]"
 
 ##### ROWSPLIT
 
-`ROWSPLIT (STRG) BY [(STRG)]`
+`ROWSPLIT (STRG) BY [(VAR)]`
 
-creates ROWS variable out of a string by splitting it using the parameter between the 2 square brackets
+creates ROWS variable out of a string or a row by splitting it using the parameter between the 2 square brackets
 
 example usage "ROWSPLIT FULLFILE BY [`<newline>`]"
 
