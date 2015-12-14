@@ -207,7 +207,7 @@ namespace ListSharp
 
                         bywhat = bywhat.Replace("<newline>", "System.Environment.NewLine"); //so you can split by newline by saying the string is <newline>
 
-                        code += varname + " = " + invar + ".Split(new string[] { " + bywhat + " }, System.StringSplitOptions.None);"; //interperted code
+                        code += varname + " = SplitRows(" + invar + "," + bywhat + ");" ; //interperted code
                     }
 
                     if (splitline[1].Substring(0, 8) == "GETLINES") //rowsplit command
@@ -303,7 +303,7 @@ namespace ListSharp
 
 
 
-            code += Properties.Resources.externalFunctions; //here we add all function depndecies
+            code += Properties.Resources.externalFunctions + "}"; //here we add all function depndecies
             
 
             if (debugmode == true)
