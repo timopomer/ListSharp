@@ -100,4 +100,43 @@
             tempret[i] = range[i].ToString();
             return tempret;
             }
+            
+
+            public string[] SplitRows(object thevar,string delimiter)
+		    {
+
+            if (delimiter == "<newline>")
+            delimiter = "\n";
+
+            if (thevar.GetType() == typeof(string))
+            {
+            string temp = (string)thevar;
+            return temp.Split(new string[] { delimiter }, System.StringSplitOptions.None);
             }
+            if (thevar.GetType() == typeof(string[]))
+            {
+            return stringarraysplitter((string[])thevar, delimiter);
+            }
+            return null;
+            }
+
+
+            public string[] stringarraysplitter(string[] arr,string delimiter)
+            {
+            string[][] tempr = new string[arr.Length][];
+            for (int i = 0; i < arr.Length; i++)
+            {
+            tempr[i] = arr[i].Split(new string[] { delimiter }, System.StringSplitOptions.None);
+            }
+            System.Collections.Generic.List<string> templist = new System.Collections.Generic.List<string>();
+            for (int i = 0; i < tempr.Length; i++)
+            {
+            for (int j = 0; j < tempr[i].Length; j++)
+            {
+            templist.Add(tempr[i][j]);
+            }
+            }
+
+            return templist.ToArray();
+            }
+		
