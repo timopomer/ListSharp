@@ -1,21 +1,32 @@
-# ListSharp
+<img src="http://puu.sh/lT74D/d0874336f3.png" alt="ListSharp logo" height="70" >
+# ListSharp Programming Language
 
-A language made for the editing of lists and blocks of text without any programming experience needed to operate it.
+**Welcome to ListSharp!**
 
-* made to be intuitive and easy to understand,with a word rich English based syntax.
+ListSharp is a programming language made in its entirety in c#, with an easy to understand, word-heavy english syntax made to suit the everyday casual kind of person without any knowledge in programming.
 
-* made in c# and opensource for any future improvements people might want to commit.
+The Main Objective of ListSharp is to enable the manipulation of big lists and or blobs of text in an orderly way without learning a programming language,like for example learn Python and maybe get experienced with RegEx JUST to seperate that list of Co-Workers from their birthdays.
 
-* made with ease of installation in mind, without any special dependencies besides .net needed.
 
-* made due to the lack of innovation and work done on the automation of such simple tasks.
 
 ### Example execution screenshot
 
 ![Alpha 0.1](http://puu.sh/lSDl6/36a222b8ca.png)
 
 
-## Information about the ListSharp language
+## ListSharp Documentation
+
+### With what things in mind ListSharp was made
+
+* made so people without any programming experience can easily operate it.
+
+* made to be intuitive and easy to understand,with a word rich English based syntax.
+
+* made in c# and opensource to enable various features and ease of edit for people which what to commit to this project.
+
+* made with ease of installation in mind, without any special dependencies besides .net needed.
+
+* made due to the lack of innovation and work done on the automation of such simple tasks.
 
 ### 2 variable types
 * STRG : 0 dimensional string of data,no particular order: used to store raw text
