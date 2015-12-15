@@ -36,6 +36,17 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
 
 ### List of functions with explanation
+
+#### STRG & ROWS functions:
+
+##### ROWSPLIT
+
+`ROWSPLIT (STRG) BY [(VAR)]`
+
+creates ROWS variable out of a string or a row by splitting it using the parameter between the 2 square brackets
+
+example usage "ROWSPLIT FULLFILE BY [`<newline>`]"
+
 #### STRG functions:
 
 ##### READ
@@ -47,14 +58,6 @@ reads location put between the 2 square brackets
 example usage "READ[`<here>`\mytextfile.txt]"
 
 #### ROWS functions:
-
-##### ROWSPLIT
-
-`ROWSPLIT (STRG) BY [(VAR)]`
-
-creates ROWS variable out of a string or a row by splitting it using the parameter between the 2 square brackets
-
-example usage "ROWSPLIT FULLFILE BY [`<newline>`]"
 
 ##### EXTRACT
 
