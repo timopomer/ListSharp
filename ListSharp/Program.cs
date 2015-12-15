@@ -13,13 +13,14 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Associations;
-
+using System.Windows;
+using System.Windows.Forms;
 namespace ListSharp
 {
     class Program
     {
 
-
+        [STAThread]
         static void Main(string[] args)
         {
             System.Drawing.Icon theicon = Properties.Resources.Untitled; //the application icon
@@ -30,9 +31,6 @@ namespace ListSharp
             File.WriteAllBytes(dpath, IconToBytes(theicon)); //writing the icon from resources to a pleace in appdata to refference it later
 
 
-
-            if (IsAdministrator() && args.Length == 0) //if administrator and no .ls file was sent to be interperted
-            SetAssociation(".ls", "ListSharp", Environment.CurrentDirectory + "\\listsharp.exe","ListSharp Script",dpath); //.ls association
 
 
             Boolean debugmode = true;
@@ -46,19 +44,70 @@ namespace ListSharp
             Regex _regex;
             Match match;
 
-            if (!IsAdministrator() && args.Length == 0)
+            string scriptfile = "";
+            foreach (string s in args)
             {
-                Console.WriteLine("Run as admin to associate .ls files");
-                while (true)
-                {
-                    Thread.Sleep(1000); //sleep forever
-                }
+                scriptfile = s;
             }
 
 
             if (args.Length == 0)
             {
-                Console.WriteLine("Added .ls file extention");
+                Console.WriteLine("No Script file was provided");
+                Console.WriteLine("type 1 to open one or 2 to associate .ls files to this console");
+
+                int choice = Convert.ToInt32(Console.ReadLine());
+
+                if (choice == 1)
+                {
+                        Console.WriteLine("Opening file selection");
+                        OpenFileDialog dialog1 = new OpenFileDialog();
+                        dialog1.Filter = "ListSharp Scripts|*.ls";
+                        DialogResult result = dialog1.ShowDialog();
+                        if (result == DialogResult.OK) // Test result.
+                        {
+                            scriptfile = dialog1.FileName;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Closed Dialog");
+                            while (true)
+                            {
+                                Thread.Sleep(1000); //sleep forever
+                            }
+                        }
+
+
+                }
+
+
+                
+                if (choice == 2)
+                {
+                    if (!IsAdministrator())
+                    {
+                        Console.WriteLine("Run as admin to associate .ls files");
+                        while (true)
+                        {
+                            Thread.Sleep(1000); //sleep forever
+                        }
+                    }
+                    SetAssociation(".ls", "ListSharp", Environment.CurrentDirectory + "\\listsharp.exe", "ListSharp Script", dpath); //.ls association
+                    Console.WriteLine("Associated .ls files to this console");
+                    while (true)
+                    {
+                        Thread.Sleep(1000); //sleep forever
+                    }
+
+
+                }
+            }
+
+
+
+            if (Path.GetExtension(scriptfile) != ".ls")
+            {
+                Console.WriteLine("Script file not from .ls type");
                 while (true)
                 {
                     Thread.Sleep(1000); //sleep forever
@@ -67,20 +116,8 @@ namespace ListSharp
             
             
             Console.WriteLine("Script file");
-            string scriptfile = "";
-            foreach (string s in args)
-            {
-                scriptfile = s;
-                Console.WriteLine(s);
-            }
-            if (Path.GetExtension(scriptfile) != ".ls")
-            {
-                Console.WriteLine("Added .ls file extention");
-                while (true)
-                {
-                    Thread.Sleep(1000); //sleep forever
-                }
-            }
+            Console.WriteLine(scriptfile);
+
             string currentdir = Path.GetDirectoryName(scriptfile);
             Console.WriteLine("\n");
 
