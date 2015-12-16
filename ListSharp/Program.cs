@@ -319,8 +319,26 @@ namespace ListSharp
 
                 }
 
+                if (splitline[0].Substring(0, 4) == "STRG" || splitline[0].Substring(0, 4) == "ROWS")
+                {
+                    string restring = "";
+                    if (splitline[0].Substring(0, 4) == "STRG")
+                        restring = "string";
+                    if (splitline[0].Substring(0, 4) == "ROWS")
+                        restring = "string[]";
+                    if (splitline[1].Substring(0, 7) == "REPLACE")
+                    {
 
+                        _regex = new Regex(@"REPLACE([^\[]*)");
+                        match = _regex.Match(splitline[1]);
+                        string othervar = match.Groups[1].Value.Trim();
 
+                        _regex = new Regex(@"\[(.*)\]");
+                        match = _regex.Match(splitline[1]);
+
+                        code += varname + " = (" + restring + ")replacestrg(" + othervar + "," + match.Groups[1].Value.Trim() + ");";
+                    }
+                }
 
                 if (splitline[0].Substring(0, 4) == "SHOW") //show a variable to debug your program
                 {
