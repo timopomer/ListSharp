@@ -56,6 +56,16 @@ creates ROWS variable out of a string or a row by splitting it using the paramet
 
 example usage "ROWSPLIT FULLFILE BY [`<newline>`]"
 
+##### REPLACE
+
+`REPLACE (VAR)[(STRG),(STRG)]`
+
+repalces a certain string by another string in a rows/strg variable
+
+example usage "REPLACE Mylang["python","ListSharp"]"
+
+
+
 #### STRG functions:
 
 ##### READ
@@ -92,6 +102,8 @@ takes certain rows form a ROWS variable into another ROWS variable
 
 example usage "GETLINES RIGHTSIDE [1,4-6];"
 
+
+
 #### SPECIAL functions:
 
 ##### SHOW
@@ -109,6 +121,8 @@ example usage "SHOW = ALLROWS"
 Outputs a variable to a text file
 
 example usage "OUTP = ALLROWS HERE[`<here>`\output.txt]"
+
+
 
 ### Special constants
 
