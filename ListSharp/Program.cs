@@ -157,6 +157,8 @@ namespace ListSharp
 
             }
 
+
+
             /*
              * since it creates the appropiate code for each variable even if it occurs twice
              * i am making sure there are no duplicate variable initalizations which would break the code
@@ -205,7 +207,7 @@ namespace ListSharp
 
                     if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length-2, 1) == "\"") //check if string simply assigned;
                     {
-                        code += varname + " = " + splitline[1]; //set variable to tempoary variable
+                        code += varname + " = @" + splitline[1]; //set variable to tempoary variable
                     }
 
 
@@ -236,6 +238,15 @@ namespace ListSharp
                 //rows variable type
                 if (splitline[0].Substring(0, 4) == "ROWS")
                 {
+
+                    if (splitline[1].Substring(0, 1) == "{" && splitline[1].Substring(splitline[1].Length - 2, 1) == "}") //check if string simply assigned;
+                    {
+                        code += varname + " = new string[]" + splitline[1]; //set variable to tempoary variable
+
+
+                    }
+
+
                     if (splitline[1].Substring(0, 8) == "ROWSPLIT") //rowsplit command
                     {
                         _regex = new Regex(@"ROWSPLIT([^>]*)BY"); //this finds what variable is to be split
