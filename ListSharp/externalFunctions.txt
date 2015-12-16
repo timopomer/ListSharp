@@ -139,4 +139,25 @@
 
             return templist.ToArray();
             }
-		
+
+
+		    public object replacestrg(object ob,string remove1,string remove2)
+            {
+            if (ob.GetType() == typeof(string))
+            {
+            string st = (string)ob;
+            return st.Replace(remove1,remove2);
+            }
+
+            if (ob.GetType() == typeof(string[]))
+            {
+            string[] starr = (string[])ob;
+            for (int i = 0; i<starr.Length; i++)
+            {
+            starr[i] = starr[i].Replace(remove1, remove2);
+            }
+            return starr;
+            }
+
+            return null;
+            }
