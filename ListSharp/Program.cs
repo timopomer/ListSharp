@@ -152,7 +152,7 @@ namespace ListSharp
                 {
                     _regex = new Regex(@"STRG([^>]*)=");
                     match = _regex.Match(singleline);
-                    alllists.Add("string " + match.Groups[1].Value.Trim() + ";" + Environment.NewLine);
+                    alllists.Add("string " + match.Groups[1].Value.Trim() + " = \"\";" + Environment.NewLine);
                 }
 
             }
@@ -203,6 +203,10 @@ namespace ListSharp
                 if (splitline[0].Substring(0, 4) == "STRG")
                 {
 
+                    if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length-2, 1) == "\"") //check if string simply assigned;
+                    {
+                        code += varname + " = " + splitline[1]; //set variable to tempoary variable
+                    }
 
 
                     if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
@@ -222,11 +226,11 @@ namespace ListSharp
                         }
                         code += "temp_contents = System.IO.File.ReadAllText(@\"" + path + "\");"; //create the reading file code in interperted form that is read into a tempoary variable
                         code += Environment.NewLine;
-
+                        code += varname + " = temp_contents;"; //set variable to tempoary variable
+                    
                     }
 
-                    code += varname + " = temp_contents;"; //set variable to tempoary variable
-                    
+
                 }
 
                 //rows variable type
