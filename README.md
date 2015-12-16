@@ -19,14 +19,18 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 ### With what things in mind ListSharp was made
 
 * made so people without any programming experience can easily operate it.
-
 * made to be intuitive and easy to understand,with a word rich English based syntax.
-
 * made in c# and opensource to enable various features and ease of edit for people which what to commit to this project.
-
 * made with ease of installation in mind, without any special dependencies besides .net needed.
-
 * made due to the lack of innovation and work done on the automation of such simple tasks.
+
+### How ListSharp is different
+
+* ListSharp does not need the initializatiion of variables. you can start using all variables you want to as if they exist and assign them values to your liking
+* ListSharp is an expandable platform of useful functions for the manipulation of text. want to remove all entries in a rows variable that contains a certain string? a single function will do that for you, no need to study the code or understand how its done.. its like magic.
+* ListSharp does not need editing programs to code in, notpad will do!
+* ListSharp is extremely easy to understand the logic behind, because it has the logic of a 6 year old. writing ListSharp code is like explaining a computer what to do.
+* ListSharp functions are logically named, you will  appreciate the the word rich syntax when it all comes together.
 
 ### 2 variable types
 * STRG : 0 dimensional string of data,no particular order: used to store raw text
@@ -34,6 +38,11 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 
 ### Associates to .ls files
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
+
+### Follows coding standarts for the creation of variables
+`STRG MYSTRG = "I love";`
+
+`ROWS MYLIST = {"My Listsharp",@"<here>"};`
 
 ### List of functions with explanation
 
