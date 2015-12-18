@@ -27,10 +27,13 @@
             public string[] Extract(string[] arr,string bywhat,int collumnum)
             {
             collumnum--;
+            string[] temp;
             string[] restr = new string[arr.Length];
             for (int i = 0; i < arr.Length; i++)
             {
-            restr[i] = arr[i].Split(new string[] {bywhat}, System.StringSplitOptions.None)[collumnum];
+            temp = arr[i].Split(new string[] {bywhat}, System.StringSplitOptions.None);
+            if (temp.Length > collumnum)
+            restr[i] = temp[collumnum];
             }
             return restr;
             }
