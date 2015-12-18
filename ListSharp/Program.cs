@@ -178,7 +178,7 @@ namespace ListSharp
 
 
                 string[] splitline = singleline.Split(new char[] { '=' }, 2); //splitting the line of "variable = evaluated string later to be parsed
-                splitline[1] = splitline[1].Substring(1);
+                
 
                 if (splitline[0].Substring(0, 2) == "//") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
                 {
@@ -187,7 +187,7 @@ namespace ListSharp
                     continue;
                 }
 
-
+                splitline[1] = splitline[1].Substring(1);
                 if (splitline[0].Length < 4 || splitline[1].Length < 3) //checking that there is not too short/impossible line to break the interperter
                 {
                     Console.WriteLine("ListSharp exception: Line: " + line + " invalid");
@@ -205,9 +205,9 @@ namespace ListSharp
                 if (splitline[0].Substring(0, 4) == "STRG")
                 {
 
-                    if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length-2, 1) == "\"") //check if string simply assigned;
+                    if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length-1, 1) == "\"") //check if string simply assigned;
                     {
-                        code += varname + " = @" + splitline[1]; //set variable to tempoary variable
+                        code += varname + " = @" + splitline[1] + ";"; //set variable to tempoary variable
                     }
 
 
@@ -239,9 +239,9 @@ namespace ListSharp
                 if (splitline[0].Substring(0, 4) == "ROWS")
                 {
 
-                    if (splitline[1].Substring(0, 1) == "{" && splitline[1].Substring(splitline[1].Length - 2, 1) == "}") //check if string simply assigned;
+                    if (splitline[1].Substring(0, 1) == "{" && splitline[1].Substring(splitline[1].Length - 1, 1) == "}") //check if string simply assigned;
                     {
-                        code += varname + " = new string[]" + splitline[1]; //set variable to tempoary variable
+                        code += varname + " = new string[]" + splitline[1] + ";"; //set variable to tempoary variable
 
 
                     }
@@ -329,22 +329,19 @@ namespace ListSharp
                     if (splitline[1].Substring(0, 7) == "REPLACE")
                     {
 
-                        _regex = new Regex(@"REPLACE([^\[]*)");
-                        match = _regex.Match(splitline[1]);
-                        string othervar = match.Groups[1].Value.Trim();
+
 
                         _regex = new Regex(@"\[(.*)\]");
                         match = _regex.Match(splitline[1]);
 
-                        code += varname + " = (" + restring + ")replacestrg(" + othervar + "," + match.Groups[1].Value.Trim() + ");";
+                        code += varname + " = (" + restring + ")replacestrg(" + varname + "," + match.Groups[1].Value.Trim() + ");";
                     }
                 }
 
                 if (splitline[0].Substring(0, 4) == "SHOW") //show a variable to debug your program
                 {
-                        _regex = new Regex(@"([^>]*);");
-                        match = _regex.Match(splitline[1]);
-                        code += "output = makeOutput(" + match.Groups[1].Value.Trim() + " , output);"; //call makeOutput() on any type of variable the users wants to display
+
+                        code += "output = makeOutput(" + splitline[1] + " , output);"; //call makeOutput() on any type of variable the users wants to display
                         code += Environment.NewLine;
                 }
 
