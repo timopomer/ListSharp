@@ -8,7 +8,6 @@ ListSharp is a programming language made in its entirety in c#, with an easy to 
 The Main Objective of ListSharp is to enable the manipulation of big lists and or blobs of text in an orderly way without learning a programming language,like for example learn Python and maybe get experienced with RegEx JUST to seperate that list of Co-Workers from their birthdays.
 
 
-
 ### Example execution screenshot
 
 ![Alpha 0.1](http://puu.sh/lSDl6/36a222b8ca.png)
@@ -40,9 +39,9 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
 
 ### Follows coding standarts for the creation of variables
-`STRG MYSTRG = "I love";`
+`STRG MYSTRG = "I love"`
 
-`ROWS MYLIST = {"My Listsharp",@"<here>"};`
+`ROWS MYLIST = {"My Listsharp",@"<here>"}`
 
 ### List of functions with explanation
 
@@ -55,6 +54,18 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 creates ROWS variable out of a string or a row by splitting it using the parameter between the 2 square brackets
 
 example usage "ROWSPLIT FULLFILE BY [`<newline>`]"
+___
+
+##### REPLACE
+
+`REPLACE (VAR)[(STRG),(STRG)]`
+
+repalces a certain string by another string in a rows/strg variable
+
+example usage "REPLACE Mylang["python","ListSharp"]"
+
+___
+
 
 #### STRG functions:
 
@@ -66,6 +77,8 @@ reads location put between the 2 square brackets
 
 example usage "READ[`<here>`\mytextfile.txt]"
 
+___
+
 #### ROWS functions:
 
 ##### EXTRACT
@@ -76,6 +89,8 @@ splits each line of a ROWS variable into multiple segments by a given parameter 
 
 example usage "EXTRACT COLLUM[1] FROM ALLROWS SPLIT BY [":"]"
 
+___
+
 ##### COMBINE
 
 `COMBINE[ROWS,ROWS] WITH [(STRG)]`
@@ -84,13 +99,17 @@ combines to ROWS next to each other with a certain string in between the lines
 
 example usage "COMBINE[RIGHTSIDE,LEFTSIDE] WITH ["<>"]"
 
+___
+
 ##### GETLINES
 
-`GETLINES (ROWS) [(INT),(INT)-(INT),....];`
+`GETLINES (ROWS) [(INT),(INT)-(INT),....]`
 
 takes certain rows form a ROWS variable into another ROWS variable
 
-example usage "GETLINES RIGHTSIDE [1,4-6];"
+example usage "GETLINES RIGHTSIDE [1,4-6]"
+
+___
 
 #### SPECIAL functions:
 
@@ -102,6 +121,8 @@ Shows the variable in the output
 
 example usage "SHOW = ALLROWS"
 
+___
+
 ##### OUTP
 
 `OUTP = (VAR) HERE[(STRG)]`
@@ -109,6 +130,8 @@ example usage "SHOW = ALLROWS"
 Outputs a variable to a text file
 
 example usage "OUTP = ALLROWS HERE[`<here>`\output.txt]"
+
+___
 
 ### Special constants
 
