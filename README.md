@@ -138,6 +138,7 @@ Shows a variable in the output
 ###### *example usage:*
 ```
 SHOW = ALLROWS
+SHOW = "We can write what we want here"
 ```
 ___
 
