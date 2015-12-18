@@ -53,17 +53,25 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 
 creates ROWS variable out of a string or a row by splitting it using the parameter between the 2 square brackets
 
-example usage "ROWSPLIT FULLFILE BY [`<newline>`]"
+
+###### *example usage:*
+```
+ROWS AllLines = ROWSPLIT FileContents BY ["`<newline>`"]
+ROWS DotSplit = ROWSPLIT AllLines BY ["."]
+```
 ___
 
 ##### REPLACE
 
-`REPLACE (VAR)[(STRG),(STRG)]`
+`REPLACE[(STRG),(STRG)]`
 
 repalces a certain string by another string in a rows/strg variable
 
-example usage "REPLACE Mylang["python","ListSharp"]"
-
+###### *example usage:*
+```
+SRTG Mylang = REPLACE["python","ListSharp"]
+ROWS Mylangs = REPLACE["python","ListSharp"]
+```
 ___
 
 
@@ -75,30 +83,36 @@ ___
 
 reads location put between the 2 square brackets
 
-example usage "READ[`<here>`\mytextfile.txt]"
-
+###### *example usage:*
+```
+SRTG FileContents = READ[`<here>`\mytextfile.txt]
+```
 ___
 
 #### ROWS functions:
 
 ##### EXTRACT
 
-`EXTRACT COLLUM[(NUMBER)] FROM (ROWS) SPLIT BY [(STRG)]`
+`EXTRACT COLLUM[(INT)] FROM (ROWS) SPLIT BY [(STRG)]`
 
 splits each line of a ROWS variable into multiple segments by a given parameter and extracts the collum asked for
 
-example usage "EXTRACT COLLUM[1] FROM ALLROWS SPLIT BY [":"]"
-
+###### *example usage:*
+```
+ROWS LeftSide = EXTRACT COLLUM[1] FROM ALLROWS SPLIT BY [":"]
+```
 ___
 
 ##### COMBINE
 
 `COMBINE[ROWS,ROWS] WITH [(STRG)]`
 
-combines to ROWS next to each other with a certain string in between the lines
+combines two ROWS next to each other with a certain string in between the lines
 
-example usage "COMBINE[RIGHTSIDE,LEFTSIDE] WITH ["<>"]"
-
+###### *example usage:*
+```
+ROWS BothSides = COMBINE[RIGHTSIDE,LEFTSIDE] WITH ["<>"]
+```
 ___
 
 ##### GETLINES
@@ -107,8 +121,10 @@ ___
 
 takes certain rows form a ROWS variable into another ROWS variable
 
-example usage "GETLINES RIGHTSIDE [1,4-6]"
-
+###### *example usage:*
+```
+ROWS BestLines = GETLINES RIGHTSIDE [1,4-6]
+```
 ___
 
 #### SPECIAL functions:
@@ -117,10 +133,12 @@ ___
 
 `SHOW = (VAR)`
 
-Shows the variable in the output
+Shows a variable in the output
 
-example usage "SHOW = ALLROWS"
-
+###### *example usage:*
+```
+SHOW = ALLROWS
+```
 ___
 
 ##### OUTP
@@ -129,8 +147,10 @@ ___
 
 Outputs a variable to a text file
 
-example usage "OUTP = ALLROWS HERE[`<here>`\output.txt]"
-
+###### *example usage:*
+```
+OUTP = ALLROWS HERE[`<here>`\output.txt]
+```
 ___
 
 ### Special constants
