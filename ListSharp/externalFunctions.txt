@@ -100,7 +100,7 @@
             }
             string[] tempret = new string[range.Count];
             for (int i = 0; i < range.Count; i++)
-            tempret[i] = range[i].ToString();
+            tempret[i] = ins[range[i]];
             return tempret;
             }
             
