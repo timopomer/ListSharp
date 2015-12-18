@@ -142,7 +142,7 @@ namespace ListSharp
                 //rows variable
                 if (singleline.Substring(0, 4) == "ROWS")
                 {
-                    _regex = new Regex(@"ROWS([^>]*)=");
+                    _regex = new Regex(@"ROWS([^=]*)");
                     match = _regex.Match(singleline);
                     alllists.Add("string[] " + match.Groups[1].Value.Trim() + ";" + Environment.NewLine);
                 }
@@ -150,7 +150,7 @@ namespace ListSharp
                 //strg variable
                 if (singleline.Substring(0, 4) == "STRG")
                 {
-                    _regex = new Regex(@"STRG([^>]*)=");
+                    _regex = new Regex(@"STRG([^=]*)");
                     match = _regex.Match(singleline);
                     alllists.Add("string " + match.Groups[1].Value.Trim() + " = \"\";" + Environment.NewLine);
                 }
@@ -216,7 +216,7 @@ namespace ListSharp
                         _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
                         match = _regex.Match(splitline[1]);
                         string path = @match.Groups[1].Value.Trim();
-
+                        if (path.Contains("\""))
                         if (!File.Exists(path)) //checking that the file is readable
                         {
                             Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
@@ -226,7 +226,8 @@ namespace ListSharp
                                 Thread.Sleep(1000); //sleep forever
                             }
                         }
-                        code += "temp_contents = System.IO.File.ReadAllText(@\"" + path + "\");"; //create the reading file code in interperted form that is read into a tempoary variable
+                        
+                        code += "temp_contents = System.IO.File.ReadAllText(@" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
                         code += Environment.NewLine;
                         code += varname + " = temp_contents;"; //set variable to tempoary variable
                     
@@ -302,7 +303,7 @@ namespace ListSharp
                     if (splitline[1].Substring(0, 7) == "COMBINE") //extract command
                     {
 
-                        _regex = new Regex(@"COMBINE\[([^>]*)\]"); //everything between the square brackets "[array,array,array]"
+                        _regex = new Regex(@"COMBINE\[([^>]*?)\]"); //everything between the square brackets "[array,array,array]"
                         match = _regex.Match(splitline[1]);
                         string combinearrays = @match.Groups[1].Value.Trim();
 
@@ -356,7 +357,7 @@ namespace ListSharp
                     match = _regex.Match(splitline[1]);
                     string path = @match.Groups[1].Value.Trim();
 
-                    code += "Write(@\"" + path + "\", " + thevar + ");"; //output the rows to file
+                    code += "Write(@" + path + ", " + thevar + ");"; //output the rows to file
                     code += Environment.NewLine;
                 }
 
