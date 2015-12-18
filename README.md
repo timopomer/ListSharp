@@ -39,9 +39,9 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
 
 ### Follows coding standarts for the creation of variables
-`STRG MYSTRG = "I love";`
+`STRG MYSTRG = "I love"`
 
-`ROWS MYLIST = {"My Listsharp",@"<here>"};`
+`ROWS MYLIST = {"My Listsharp",@"<here>"}`
 
 ### List of functions with explanation
 
@@ -103,11 +103,11 @@ ___
 
 ##### GETLINES
 
-`GETLINES (ROWS) [(INT),(INT)-(INT),....];`
+`GETLINES (ROWS) [(INT),(INT)-(INT),....]`
 
 takes certain rows form a ROWS variable into another ROWS variable
 
-example usage "GETLINES RIGHTSIDE [1,4-6];"
+example usage "GETLINES RIGHTSIDE [1,4-6]"
 
 ___
 
