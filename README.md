@@ -56,7 +56,7 @@ creates ROWS variable out of a string or a row by splitting it using the paramet
 
 ###### *example usage:*
 ```
-ROWS AllLines = ROWSPLIT FileContents BY ["`<newline>`"]
+ROWS AllLines = ROWSPLIT FileContents BY ["<newline>"]
 ROWS DotSplit = ROWSPLIT AllLines BY ["."]
 ```
 ___
@@ -85,7 +85,7 @@ reads location put between the 2 square brackets
 
 ###### *example usage:*
 ```
-SRTG FileContents = READ[`<here>`\mytextfile.txt]
+SRTG FileContents = READ[<here>\mytextfile.txt]
 ```
 ___
 
@@ -150,7 +150,7 @@ Outputs a variable to a text file
 
 ###### *example usage:*
 ```
-OUTP = ALLROWS HERE[`<here>`\output.txt]
+OUTP = ALLROWS HERE[<here>\output.txt]
 ```
 ___
 
