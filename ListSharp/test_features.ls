@@ -1,3 +1,6 @@
+#ShowDebuggingInformation: false
+
+
 //part1
 
 STRG MYSTRG = "<here>"
