@@ -123,13 +123,7 @@ namespace ListSharp
 
             string allcode = System.IO.File.ReadAllText(scriptfile);
             allcode = allcode.Replace("<here>", currentdir);
-            if (debugmode == true)
-            {
-                Console.WriteLine("Original Code \n-----------------------");
-                Console.WriteLine(allcode);
-                Console.WriteLine("-----------------------");
-                Console.WriteLine(Environment.NewLine);
-            }
+
             List<string> maincode = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
             List<string> alllists = new List<string>();
@@ -155,9 +149,27 @@ namespace ListSharp
                     alllists.Add("string " + match.Groups[1].Value.Trim() + " = \"\";" + Environment.NewLine);
                 }
 
+                if (singleline.Substring(0, 1) == "#") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
+                {
+                    if (singleline.Contains("ShowDebuggingInformation"))
+                    {
+                        if (singleline.Substring(singleline.Length - 4, 4) == "true")
+                            debugmode = true;
+                        else
+                            debugmode = false;
+                    }
+                    continue;
+                }
+
             }
 
-
+            if (debugmode == true)
+            {
+                Console.WriteLine("Original Code \n-----------------------");
+                Console.WriteLine(allcode);
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(Environment.NewLine);
+            }
 
             /*
              * since it creates the appropiate code for each variable even if it occurs twice
@@ -183,6 +195,13 @@ namespace ListSharp
                 if (splitline[0].Substring(0, 2) == "//") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
                 {
                     code += "//skipped";
+                    code += Environment.NewLine;
+                    continue;
+                }
+
+                if (splitline[0].Substring(0, 1) == "#") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
+                {
+                    code += "//command executed";
                     code += Environment.NewLine;
                     continue;
                 }
@@ -216,7 +235,7 @@ namespace ListSharp
                         _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
                         match = _regex.Match(splitline[1]);
                         string path = @match.Groups[1].Value.Trim();
-                        Console.WriteLine(path);
+
                         if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
                         {
 
