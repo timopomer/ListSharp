@@ -216,14 +216,18 @@ namespace ListSharp
                         _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
                         match = _regex.Match(splitline[1]);
                         string path = @match.Groups[1].Value.Trim();
-                        if (path.Contains("\""))
-                        if (!File.Exists(path)) //checking that the file is readable
+                        Console.WriteLine(path);
+                        if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
                         {
-                            Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
 
-                            while (true)
+                            if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
                             {
-                                Thread.Sleep(1000); //sleep forever
+                                Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
+
+                                while (true)
+                                {
+                                    Thread.Sleep(1000); //sleep forever
+                                }
                             }
                         }
                         
