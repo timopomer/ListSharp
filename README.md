@@ -161,10 +161,20 @@ ___
 `<newline>`
 
 this is the newline constonant that can be used for example to split a list by each row
-
+___
 ##### here
 
 `<here>`
 
 this is the current directory constonant that can be used for example to save a file next to the script execution
+___
+### Launching arguments
 
+##### #ShowDebuggingInformation
+
+```
+#ShowDebuggingInformation: false
+#ShowDebuggingInformation: true
+```
+
+Enables or disables the showing of debugging information in the output of the console like the interperted c# code
