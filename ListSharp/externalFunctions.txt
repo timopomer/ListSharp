@@ -1,166 +1,136 @@
-﻿			public string getString(object thevar)
-            {
-            if (thevar.GetType() == typeof(string))
-            return "[0]" + (string)thevar + "[/0]";
-            if (thevar.GetType() == typeof(string[]))
-            return arr2str((string[])thevar);
-            return "Show Error";
-            }
-			
-			public string makeOutput(object thein,string output)
-            {
-            output += System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine,"<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
-            return output;
-            }
-			
-			
-			public string arr2str(string[] arr)
-            {
-            string r = "";
-            for (int i = 0; i < arr.Length; i++)
-            r += "[" + i + "]" + arr[i] + "[" + i + "]\n";
-            return r;
-            }
+﻿			public string getString(object thevar) {
+				if (thevar.GetType() == typeof(string)) return "[0]" + (string) thevar + "[/0]";
+				if (thevar.GetType() == typeof(string[])) return arr2str((string[]) thevar);
+				return "Show Error";
+			}
+
+			public string makeOutput(object thein, string output) {
+				output += System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine, "<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
+				return output;
+			}
+
+
+			public string arr2str(string[] arr) {
+				string r = "";
+				for (int i = 0; i < arr.Length; i++)
+				r += "[" + i + "]" + arr[i] + "[" + i + "]\n";
+				return r;
+			}
 
 
 
-            public string[] Extract(string[] arr,string bywhat,int collumnum)
-            {
-            collumnum--;
-            string[] temp;
-            string[] restr = new string[arr.Length];
-            for (int i = 0; i < arr.Length; i++)
-            {
-            temp = arr[i].Split(new string[] {bywhat}, System.StringSplitOptions.None);
-            if (temp.Length > collumnum)
-            restr[i] = temp[collumnum];
-            }
-            return restr;
-            }
+			public string[] Extract(string[] arr, string bywhat, int collumnum) {
+				collumnum--;
+				string[] temp;
+				string[] restr = new string[arr.Length];
+				for (int i = 0; i < arr.Length; i++) {
+					temp = arr[i].Split(new string[] {
+						bywhat
+					}, System.StringSplitOptions.None);
+					if (temp.Length > collumnum) restr[i] = temp[collumnum];
+				}
+				return restr;
+			}
 
 
-            public string[] Combine(string[][] srar,string bywhat)
-            {
-            int max = 0;
-            for (int i = 0; i<srar.Length; i++)
-            {
-            if (srar[i].Length > max)
-            max = srar[i].Length;
-            }
-            string[] tempo = new string[max];
-            string sinline = "";
-            for (int i = 0; i < max; i++)
-            {
-            for (int j = 0; j < srar.Length; j++)
-            {
-            if (i < srar[j].Length)
-            sinline += srar[j][i];
-            if (j != (srar.Length - 1))
-            sinline += bywhat;
-            }
-            tempo[i] = sinline;
-            sinline = "";
-            }
-            return tempo;
-            }
+			public string[] Combine(string[][] srar, string bywhat) {
+				int max = 0;
+				for (int i = 0; i < srar.Length; i++) {
+					if (srar[i].Length > max) max = srar[i].Length;
+				}
+				string[] tempo = new string[max];
+				string sinline = "";
+				for (int i = 0; i < max; i++) {
+					for (int j = 0; j < srar.Length; j++) {
+						if (i < srar[j].Length) sinline += srar[j][i];
+						if (j != (srar.Length - 1)) sinline += bywhat;
+					}
+					tempo[i] = sinline;
+					sinline = "";
+				}
+				return tempo;
+			}
 
-            public void Write(string path, object thevar)
-            {
-            if (thevar.GetType() == typeof(string))
-            {
-            System.IO.File.WriteAllText(path,(string)thevar);
-            }
-            if (thevar.GetType() == typeof(string[]))
-            {
-            System.IO.File.WriteAllLines(path,(string[])thevar);
-            }
-            }
+			public void Write(string path, object thevar) {
+				if (thevar.GetType() == typeof(string)) {
+					System.IO.File.WriteAllText(path, (string) thevar);
+				}
+				if (thevar.GetType() == typeof(string[])) {
+					System.IO.File.WriteAllLines(path, (string[]) thevar);
+				}
+			}
 
 
 
-            public string[] getlines(string[] ins,string lines)
-            {
-            string[] findrange = lines.Split(',');
-            System.Collections.Generic.List<int> range = new System.Collections.Generic.List<int>();
-            for (int i = 0; i < findrange.Length; i++)
-            {
-            if (findrange[i].Contains("-"))
-            {
-            int start = System.Convert.ToInt32(findrange[i].Split('-')[0]);
-            int end = System.Convert.ToInt32(findrange[i].Split('-')[1]);
-            for (int j = start; j<=end; j++)
-            {
-            range.Add(j);
-            }
-            }
-            else
-            {
-            range.Add(System.Convert.ToInt32(findrange[i]));
-            }
-            }
-            string[] tempret = new string[range.Count];
-            for (int i = 0; i < range.Count; i++)
-            tempret[i] = ins[range[i]];
-            return tempret;
-            }
-            
-
-            public string[] SplitRows(object thevar,string delimiter)
-		    {
-
-            if (delimiter == "<newline>")
-            delimiter = "\n";
-
-            if (thevar.GetType() == typeof(string))
-            {
-            string temp = (string)thevar;
-            return temp.Split(new string[] { delimiter }, System.StringSplitOptions.None);
-            }
-            if (thevar.GetType() == typeof(string[]))
-            {
-            return stringarraysplitter((string[])thevar, delimiter);
-            }
-            return null;
-            }
+			public string[] getlines(string[] ins, string lines) {
+				string[] findrange = lines.Split(',');
+				System.Collections.Generic.List < int > range = new System.Collections.Generic.List < int > ();
+				for (int i = 0; i < findrange.Length; i++) {
+					if (findrange[i].Contains("-")) {
+						int start = System.Convert.ToInt32(findrange[i].Split('-')[0]);
+						int end = System.Convert.ToInt32(findrange[i].Split('-')[1]);
+						for (int j = start; j <= end; j++) {
+							range.Add(j);
+						}
+					} else {
+						range.Add(System.Convert.ToInt32(findrange[i]));
+					}
+				}
+				string[] tempret = new string[range.Count];
+				for (int i = 0; i < range.Count; i++)
+				tempret[i] = ins[range[i]];
+				return tempret;
+			}
 
 
-            public string[] stringarraysplitter(string[] arr,string delimiter)
-            {
-            string[][] tempr = new string[arr.Length][];
-            for (int i = 0; i < arr.Length; i++)
-            {
-            tempr[i] = arr[i].Split(new string[] { delimiter }, System.StringSplitOptions.None);
-            }
-            System.Collections.Generic.List<string> templist = new System.Collections.Generic.List<string>();
-            for (int i = 0; i < tempr.Length; i++)
-            {
-            for (int j = 0; j < tempr[i].Length; j++)
-            {
-            templist.Add(tempr[i][j]);
-            }
-            }
+			public string[] SplitRows(object thevar, string delimiter) {
 
-            return templist.ToArray();
-            }
+				if (delimiter == "<newline>") delimiter = "\n";
+
+				if (thevar.GetType() == typeof(string)) {
+					string temp = (string) thevar;
+					return temp.Split(new string[] {
+						delimiter
+					}, System.StringSplitOptions.None);
+				}
+				if (thevar.GetType() == typeof(string[])) {
+					return stringarraysplitter((string[]) thevar, delimiter);
+				}
+				return null;
+			}
 
 
-		    public object replacestrg(object ob,string remove1,string remove2)
-            {
-            if (ob.GetType() == typeof(string))
-            {
-            string st = (string)ob;
-            return st.Replace(remove1,remove2);
-            }
+			public string[] stringarraysplitter(string[] arr, string delimiter) {
+				string[][] tempr = new string[arr.Length][];
+				for (int i = 0; i < arr.Length; i++) {
+					tempr[i] = arr[i].Split(new string[] {
+						delimiter
+					}, System.StringSplitOptions.None);
+				}
+				System.Collections.Generic.List < string > templist = new System.Collections.Generic.List < string > ();
+				for (int i = 0; i < tempr.Length; i++) {
+					for (int j = 0; j < tempr[i].Length; j++) {
+						templist.Add(tempr[i][j]);
+					}
+				}
 
-            if (ob.GetType() == typeof(string[]))
-            {
-            string[] starr = (string[])ob;
-            for (int i = 0; i<starr.Length; i++)
-            {
-            starr[i] = starr[i].Replace(remove1, remove2);
-            }
-            return starr;
-            }
+				return templist.ToArray();
+			}
 
-            return null;
-            }
+
+			public object replacestrg(object ob, string remove1, string remove2) {
+				if (ob.GetType() == typeof(string)) {
+					string st = (string) ob;
+					return st.Replace(remove1, remove2);
+				}
+
+				if (ob.GetType() == typeof(string[])) {
+					string[] starr = (string[]) ob;
+					for (int i = 0; i < starr.Length; i++) {
+						starr[i] = starr[i].Replace(remove1, remove2);
+					}
+					return starr;
+				}
+
+				return null;
+			}
