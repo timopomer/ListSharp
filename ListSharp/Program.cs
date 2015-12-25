@@ -19,7 +19,7 @@ namespace ListSharp
 {
     class Program
     {
-
+        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES" };
         [STAThread]
         static void Main(string[] args)
         {
@@ -31,7 +31,7 @@ namespace ListSharp
             File.WriteAllBytes(dpath, IconToBytes(theicon)); //writing the icon from resources to a pleace in appdata to refference it later
 
 
-
+            
 
             Boolean debugmode = true;
             Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -201,13 +201,13 @@ namespace ListSharp
 
                 if (splitline[0].Substring(0, 1) == "#") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
                 {
-                    code += "//command executed";
+                    code += "//command executed: " + splitline[0];
                     code += Environment.NewLine;
                     continue;
                 }
 
                 splitline[1] = splitline[1].Substring(1);
-                if (splitline[0].Length < 4 || splitline[1].Length < 3) //checking that there is not too short/impossible line to break the interperter
+                if (splitline[0].Length < 4) //checking that there is not too short/impossible line to break the interperter
                 {
                     Console.WriteLine("ListSharp exception: Line: " + line + " invalid");
                     while(true)
@@ -227,9 +227,12 @@ namespace ListSharp
                     if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length-1, 1) == "\"") //check if string simply assigned;
                     {
                         code += varname + " = @" + splitline[1] + ";"; //set variable to tempoary variable
+                        code += Environment.NewLine;
+                        continue;
                     }
 
 
+                    if (isCommand(splitline[1]))
                     if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
                     {
                         _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
@@ -266,11 +269,13 @@ namespace ListSharp
                     if (splitline[1].Substring(0, 1) == "{" && splitline[1].Substring(splitline[1].Length - 1, 1) == "}") //check if string simply assigned;
                     {
                         code += varname + " = new string[]" + splitline[1] + ";"; //set variable to tempoary variable
-
-
+                        code += Environment.NewLine;
+                        continue;
                     }
 
 
+
+                    if (isCommand(splitline[1]))
                     if (splitline[1].Substring(0, 8) == "ROWSPLIT") //rowsplit command
                     {
                         _regex = new Regex(@"ROWSPLIT([^>]*)BY"); //this finds what variable is to be split
@@ -286,6 +291,7 @@ namespace ListSharp
                         code += varname + " = SplitRows(" + invar + "," + bywhat + ");" ; //interperted code
                     }
 
+                    if (isCommand(splitline[1]))
                     if (splitline[1].Substring(0, 8) == "GETLINES") //rowsplit command
                     {
                         _regex = new Regex(@"GETLINES([^>]*)\["); //this finds what variable is to be split
@@ -299,6 +305,7 @@ namespace ListSharp
                         code += varname + " = getlines(" + invar + ",\"" + bywhat + "\");"; //interperted code
                     }
 
+                    if (isCommand(splitline[1]))
                     if (splitline[1].Substring(0, 7) == "EXTRACT") //extract command
                     {
                         _regex = new Regex(@"EXTRACT([^>]*)FROM"); 
@@ -322,7 +329,7 @@ namespace ListSharp
                     }
 
 
-
+                    if (isCommand(splitline[1]))
                     if (splitline[1].Substring(0, 7) == "COMBINE") //extract command
                     {
 
@@ -343,8 +350,19 @@ namespace ListSharp
 
                 }
 
+
                 if (splitline[0].Substring(0, 4) == "STRG" || splitline[0].Substring(0, 4) == "ROWS")
                 {
+                    
+                    if (!isCommand(splitline[1]))
+                    {
+                        code += varname + " = " + splitline[1] + ";"; //set variable to tempoary variable
+                        code += Environment.NewLine;
+                        continue;
+                    }
+                        
+
+
                     string restring = "";
                     if (splitline[0].Substring(0, 4) == "STRG")
                         restring = "string";
@@ -352,8 +370,6 @@ namespace ListSharp
                         restring = "string[]";
                     if (splitline[1].Substring(0, 7) == "REPLACE")
                     {
-
-
 
                         _regex = new Regex(@"\[(.*)\]");
                         match = _regex.Match(splitline[1]);
@@ -466,7 +482,16 @@ namespace ListSharp
         }
 
 
-
+        public static bool isCommand(string inp)
+        {
+            for (int i = 0; i<allcommands.Count(); i++)
+            {
+                if (inp.Length >= allcommands[i].Length)
+                    if (inp.Substring(0, allcommands[i].Length) == allcommands[i])
+                        return true;
+            }
+            return false;
+        }
 
         public static byte[] IconToBytes(System.Drawing.Icon icon)
         {
