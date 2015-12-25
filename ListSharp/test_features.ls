@@ -18,11 +18,11 @@ STRG ThisCode = READ[ThisCodePath]
 SHOW = ThisCode
 ROWS SplitCode = ROWSPLIT ThisCode BY [<newline>]
 SHOW = SplitCode
-ROWS LEFTSIDE = EXTRACT COLLUM[1] FROM SplitCode SPLIT BY ["="]
-ROWS RIGHTSIDE = EXTRACT COLLUM[2] FROM SplitCode SPLIT BY ["="]
+ROWS RIGHTSIDE = EXTRACT COLLUM[1] FROM SplitCode SPLIT BY ["="]
+ROWS LEFTSIDE = EXTRACT COLLUM[2] FROM SplitCode SPLIT BY ["="]
 SHOW = RIGHTSIDE
 SHOW = LEFTSIDE
-ROWS OGCODE = COMBINE[LEFTSIDE,RIGHTSIDE] WITH [" = "]
+ROWS OGCODE = COMBINE[RIGHTSIDE,LEFTSIDE] WITH ["="]
 SHOW = OGCODE
 
 //part3
@@ -31,4 +31,16 @@ ROWS BestLines = GETLINES OGCODE [2,4-6]
 SHOW = BestLines
 OUTP = BestLines HERE["<here>\output.txt"]
 
-SHOW = "Everything should be done now"
+//part4
+
+STRG a = "My favorite language is:"
+STRG b = " ListSharp!"
+STRG Message = a+b
+ROWS rowitup = {"todays message:",Message,"-------------------------------"}
+SHOW = Message
+SHOW = rowitup
+
+
+
+
+SHOW = "If this compiled,were in luck! \n Everything should be golden"
