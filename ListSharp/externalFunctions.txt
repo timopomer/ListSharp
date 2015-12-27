@@ -126,3 +126,20 @@
 
 				return null;
 			}
+
+        public string[] Add(string[] ogarr,object[] toadd)
+        {
+
+            var results = new System.Collections.Generic.List<string>();
+            results.AddRange(ogarr);
+
+            for (int i = 0; i < toadd.Length; i++)
+            {
+                if (toadd[i].GetType() == typeof(string[]))
+                    results.AddRange((string[])toadd[i]);
+                else
+                    results.Add((string)toadd[i]);
+            }
+
+                return results.ToArray();
+        }
