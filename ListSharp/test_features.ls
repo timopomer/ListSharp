@@ -36,8 +36,8 @@ OUTP = BestLines HERE["<here>\output.txt"]
 STRG a = "My favorite language is:"
 STRG b = " ListSharp!"
 STRG Message = a+b
-ROWS rowitup = {"todays message:",Message,"-------------------------------"}
-SHOW = Message
+ROWS rowitup = {"todays message:"}
+ROWS rowitup = ADD[Message,"-------------------------------"] TO rowitup
 SHOW = rowitup
 
 
