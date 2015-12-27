@@ -19,7 +19,7 @@ namespace ListSharp
 {
     class Program
     {
-        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES" };
+        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES","ADD" };
         [STAThread]
         static void Main(string[] args)
         {
@@ -127,7 +127,7 @@ namespace ListSharp
             List<string> maincode = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
             List<string> alllists = new List<string>();
-            string code = "public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string[][] tempstrarr;" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
+            string code = "public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
             //variables initialization starts here:
             foreach (string singleline in maincode) {
 
@@ -306,6 +306,20 @@ namespace ListSharp
                     }
 
                     if (isCommand(splitline[1]))
+                        if (splitline[1].Substring(0, 3) == "ADD") //rowsplit command
+                        {
+                            _regex = new Regex(@"TO([^>]*)"); //this finds what variable is to be split
+                            match = _regex.Match(splitline[1]);
+                            string invar = match.Groups[1].Value.Trim();
+
+                            _regex = new Regex(@"\[(.*)\]"); //this finds what lines of the array to get
+                            match = _regex.Match(splitline[1]);
+                            string bywhat = match.Groups[1].Value.Trim();
+
+                            code += varname + " = Add(" + invar + ",new object[] {" + bywhat + "});"; //interperted code
+                        }
+
+                    if (isCommand(splitline[1]))
                     if (splitline[1].Substring(0, 7) == "EXTRACT") //extract command
                     {
                         _regex = new Regex(@"EXTRACT([^>]*)FROM"); 
@@ -341,9 +355,7 @@ namespace ListSharp
                         match = _regex.Match(splitline[1]);
                         string withwhat = match.Groups[1].Value;
 
-                        code += "tempstrarr = new string[][] {" + combinearrays + "};";
-                        code += Environment.NewLine;
-                        code += varname + " = Combine(tempstrarr," + withwhat + ");"; //interperted code
+                        code += varname + " = Combine(new string[][] {" + combinearrays + "}," + withwhat + ");"; //interperted code
                     }
 
 
