@@ -292,7 +292,7 @@ namespace ListSharp
 
                         bywhat = bywhat.Replace("<newline>", "System.Environment.NewLine"); //so you can split by newline by saying the string is <newline>
 
-                        code += varname + " = SplitRows(" + invar + "," + bywhat + ");" ; //interperted code
+                        code += varname + " = ROWSPLIT_F(" + invar + "," + bywhat + ");"; //interperted code
                     }
 
                     if (isCommand(splitline[1]))
@@ -306,7 +306,7 @@ namespace ListSharp
                         match = _regex.Match(splitline[1]);
                         string bywhat = match.Groups[1].Value.Trim();
 
-                        code += varname + " = getlines(" + invar + ",\"" + bywhat + "\");"; //interperted code
+                        code += varname + " = GETLINES_F(" + invar + ",\"" + bywhat + "\");"; //interperted code
                     }
 
                     if (isCommand(splitline[1]))
@@ -320,7 +320,7 @@ namespace ListSharp
                             match = _regex.Match(splitline[1]);
                             string bywhat = match.Groups[1].Value.Trim();
 
-                            code += varname + " = Add(" + invar + ",new object[] {" + bywhat + "});"; //interperted code
+                            code += varname + " = ADD_F(" + invar + ",new object[] {" + bywhat + "});"; //interperted code
                         }
 
                     if (isCommand(splitline[1]))
@@ -343,7 +343,7 @@ namespace ListSharp
                         string bywhat = match.Groups[1].Value;
 
 
-                        code += varname + " = Extract(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
+                        code += varname + " = EXTRACT_F(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
                     }
 
 
@@ -359,7 +359,7 @@ namespace ListSharp
                         match = _regex.Match(splitline[1]);
                         string withwhat = match.Groups[1].Value;
 
-                        code += varname + " = Combine(new string[][] {" + combinearrays + "}," + withwhat + ");"; //interperted code
+                        code += varname + " = COMBINE_F(new string[][] {" + combinearrays + "}," + withwhat + ");"; //interperted code
                     }
 
 
@@ -394,7 +394,7 @@ namespace ListSharp
                         match = _regex.Match(splitline[1]);
                         string whatvar = match.Groups[1].Value.Trim();
 
-                        code += varname + " = (" + restring + ")replacestrg(" + whatvar + "," + withwhat + ");";
+                        code += varname + " = (" + restring + ")REPLACE_F(" + whatvar + "," + withwhat + ");";
                     }
                 }
 
@@ -413,7 +413,7 @@ namespace ListSharp
                             code += "output += \"Listing " + ver + "\";";
                             code += Environment.NewLine;
 
-                            code += "output = makeOutput(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                            code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
                             code += Environment.NewLine;
                         }
                     }
@@ -431,7 +431,7 @@ namespace ListSharp
                             code += "output += \"Listing " + ver + "\";";
                             code += Environment.NewLine;
 
-                            code += "output = makeOutput(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                            code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
                             code += Environment.NewLine;
                         }
                     }
@@ -449,7 +449,7 @@ namespace ListSharp
                                 code += "output += \"Listing " + ver + "\";";
                                 code += Environment.NewLine;
 
-                                code += "output = makeOutput(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
                                 code += Environment.NewLine;
                             }
 
@@ -458,13 +458,13 @@ namespace ListSharp
                                 code += "output += \"Listing " + ver + "\";";
                                 code += Environment.NewLine;
 
-                                code += "output = makeOutput(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
                                 code += Environment.NewLine;
                             }
                         }
                         else
                         {
-                            code += "output = makeOutput(" + splitline[1] + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                            code += "output = SHOW_F(" + splitline[1] + " , output);"; //call makeOutput() on any type of variable the users wants to display
                             code += Environment.NewLine;
                         }
                 }
@@ -480,7 +480,7 @@ namespace ListSharp
                     match = _regex.Match(splitline[1]);
                     string path = @match.Groups[1].Value.Trim();
 
-                    code += "Write(@" + path + ", " + thevar + ");"; //output the rows to file
+                    code += "OUTP_F(@" + path + ", " + thevar + ");"; //output the rows to file
                     code += Environment.NewLine;
                 }
 

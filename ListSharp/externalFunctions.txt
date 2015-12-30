@@ -4,7 +4,7 @@
 				return "Show Error";
 			}
 
-			public string makeOutput(object thein, string output) {
+			public string SHOW_F(object thein, string output) {
 				output += System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine, "<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
 				return output;
 			}
@@ -19,7 +19,7 @@
 
 
 
-			public string[] Extract(string[] arr, string bywhat, int collumnum) {
+			public string[] EXTRACT_F(string[] arr, string bywhat, int collumnum) {
 				collumnum--;
 				string[] temp;
 				string[] restr = new string[arr.Length];
@@ -33,7 +33,7 @@
 			}
 
 
-			public string[] Combine(string[][] srar, string bywhat) {
+			public string[] COMBINE_F(string[][] srar, string bywhat) {
 				int max = 0;
 				for (int i = 0; i < srar.Length; i++) {
 					if (srar[i].Length > max) max = srar[i].Length;
@@ -51,7 +51,7 @@
 				return tempo;
 			}
 
-			public void Write(string path, object thevar) {
+			public void OUTP_F(string path, object thevar) {
 				if (thevar.GetType() == typeof(string)) {
 					System.IO.File.WriteAllText(path, (string) thevar);
 				}
@@ -62,7 +62,7 @@
 
 
 
-			public string[] getlines(string[] ins, string lines) {
+			public string[] GETLINES_F(string[] ins, string lines) {
 				string[] findrange = lines.Split(',');
 				System.Collections.Generic.List < int > range = new System.Collections.Generic.List < int > ();
 				for (int i = 0; i < findrange.Length; i++) {
@@ -83,7 +83,7 @@
 			}
 
 
-			public string[] SplitRows(object thevar, string delimiter) {
+			public string[] ROWSPLIT_F(object thevar, string delimiter) {
 
 				if (delimiter == "<newline>") delimiter = "\n";
 
@@ -110,7 +110,7 @@
 			}
 
 
-			public object replacestrg(object ob, string remove1, string remove2) {
+			public object REPLACE_F(object ob, string remove1, string remove2) {
 				if (ob.GetType() == typeof(string)) {
 					string st = (string) ob;
 					return st.Replace(remove1, remove2);
@@ -127,7 +127,7 @@
 				return null;
 			}
 
-        public string[] Add(string[] ogarr,object[] toadd)
+        public string[] ADD_F(string[] ogarr,object[] toadd)
         {
 
             var results = new System.Collections.Generic.List<string>();
