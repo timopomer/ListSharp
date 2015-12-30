@@ -51,7 +51,7 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 
 ##### ROWSPLIT
 
-`ROWSPLIT (STRG) BY [(VAR)]`
+`ROWSPLIT (VAR) BY [(VAR)]`
 
 creates ROWS variable out of a string or a row by splitting it using the parameter between the 2 square brackets
 
