@@ -38,10 +38,12 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 ### Associates to .ls files
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
 
-### Follows coding standarts for the creation of variables
+### Follows coding standarts for the creation/addition of variables
 `STRG MYSTRG = "I love"`
 
 `ROWS MYLIST = {"My Listsharp",@"<here>"}`
+
+`STRG MYSTRGS = MYSTRG+" you"`
 
 ### List of functions with explanation
 
@@ -126,6 +128,19 @@ takes certain rows form a ROWS variable into another ROWS variable
 ROWS BestLines = GETLINES RIGHTSIDE [1,4-6]
 ```
 ___
+
+##### ADD
+
+`ADD[(VAR),(VAR),....] TO ROWS`
+
+adds ROWS/STRG variables to a single ROWS variable
+
+###### *example usage:*
+```
+ROWS AllMyCompliments = ADD["Handsome person",morecompliments] TO AllMyCompliments
+```
+___
+
 
 #### SPECIAL functions:
 
