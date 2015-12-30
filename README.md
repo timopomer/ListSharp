@@ -148,12 +148,13 @@ ___
 
 `SHOW = (VAR)`
 
-Shows a variable in the output
+Shows a variable in the output,or all the variables of a certain type by showing ALL/ROWS/STRG
 
 ###### *example usage:*
 ```
 SHOW = ALLROWS
 SHOW = "We can write what we want here"
+SHOW = "ALL"
 ```
 ___
 
