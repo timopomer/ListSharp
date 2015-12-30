@@ -5,7 +5,7 @@
 
 STRG MYSTRG = "<here>"
 ROWS MYLIST = {@MYSTRG,"1234:abcd"}
-ROWS MYLIST = REPLACE["\\",":"]
+ROWS MYLIST = REPLACE["\\",":"] IN MYLIST
 SHOW = "Im going to show you some tricks"
 SHOW = MYLIST
 ROWS MYLIST = ROWSPLIT MYLIST BY [":"]
