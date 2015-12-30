@@ -65,14 +65,14 @@ ___
 
 ##### REPLACE
 
-`REPLACE[(STRG),(STRG)]`
+`REPLACE[(STRG),(STRG)] IN (VAR)`
 
 repalces a certain string by another string in a rows/strg variable
 
 ###### *example usage:*
 ```
-SRTG Mylang = REPLACE["python","ListSharp"]
-ROWS Mylangs = REPLACE["python","ListSharp"]
+SRTG Mylang = REPLACE["python","ListSharp"] IN somestrg
+ROWS Mylangs = REPLACE["python","ListSharp"] IN somerows
 ```
 ___
 
