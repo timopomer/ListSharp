@@ -129,6 +129,8 @@ namespace ListSharp
             List<string> alllists = new List<string>();
             string code = "public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
             //variables initialization starts here:
+            List<string> allRowsVariables = new List<string>();
+            List<string> allStrgVariables = new List<string>();
             foreach (string singleline in maincode) {
 
 
@@ -139,6 +141,7 @@ namespace ListSharp
                     _regex = new Regex(@"ROWS([^=]*)");
                     match = _regex.Match(singleline);
                     alllists.Add("string[] " + match.Groups[1].Value.Trim() + ";" + Environment.NewLine);
+                    allRowsVariables.Add(match.Groups[1].Value.Trim());
                 }
 
                 //strg variable
@@ -147,6 +150,7 @@ namespace ListSharp
                     _regex = new Regex(@"STRG([^=]*)");
                     match = _regex.Match(singleline);
                     alllists.Add("string " + match.Groups[1].Value.Trim() + " = \"\";" + Environment.NewLine);
+                    allStrgVariables.Add(match.Groups[1].Value.Trim());
                 }
 
                 if (singleline.Substring(0, 1) == "#") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
@@ -385,16 +389,84 @@ namespace ListSharp
 
                         _regex = new Regex(@"\[(.*)\]");
                         match = _regex.Match(splitline[1]);
+                        string withwhat = match.Groups[1].Value.Trim();
+                        _regex = new Regex(@"IN([^>]*)"); //this finds by what string to extract the variable
+                        match = _regex.Match(splitline[1]);
+                        string whatvar = match.Groups[1].Value.Trim();
 
-                        code += varname + " = (" + restring + ")replacestrg(" + varname + "," + match.Groups[1].Value.Trim() + ");";
+                        code += varname + " = (" + restring + ")replacestrg(" + whatvar + "," + withwhat + ");";
                     }
                 }
 
                 if (splitline[0].Substring(0, 4) == "SHOW") //show a variable to debug your program
                 {
-
-                        code += "output = makeOutput(" + splitline[1] + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                    if (splitline[1] == "STRG")
+                    {
                         code += Environment.NewLine;
+                        code += "output += System.Environment.NewLine;";
+                        code += "output += \"Listing all STRG variables\";";
+                        code += Environment.NewLine;
+                        code += "output += System.Environment.NewLine;";
+                        code += Environment.NewLine;
+                        foreach (string ver in allStrgVariables)
+                        {
+                            code += "output += \"Listing " + ver + "\";";
+                            code += Environment.NewLine;
+
+                            code += "output = makeOutput(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                            code += Environment.NewLine;
+                        }
+                    }
+                    else
+                    if (splitline[1] == "ROWS")
+                    {
+                        code += Environment.NewLine;
+                        code += "output += System.Environment.NewLine;";
+                        code += "output += \"Listing all ROWS variables\";";
+                        code += Environment.NewLine;
+                        code += "output += System.Environment.NewLine;";
+                        code += Environment.NewLine;
+                        foreach (string ver in allRowsVariables)
+                        {
+                            code += "output += \"Listing " + ver + "\";";
+                            code += Environment.NewLine;
+
+                            code += "output = makeOutput(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                            code += Environment.NewLine;
+                        }
+                    }
+                    else
+                        if (splitline[1] == "ALL")
+                        {
+                            code += Environment.NewLine;
+                            code += "output += System.Environment.NewLine;";
+                            code += "output += \"Listing all variables\";";
+                            code += Environment.NewLine;
+                            code += "output += System.Environment.NewLine;";
+                            code += Environment.NewLine;
+                            foreach (string ver in allStrgVariables)
+                            {
+                                code += "output += \"Listing " + ver + "\";";
+                                code += Environment.NewLine;
+
+                                code += "output = makeOutput(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += Environment.NewLine;
+                            }
+
+                            foreach (string ver in allRowsVariables)
+                            {
+                                code += "output += \"Listing " + ver + "\";";
+                                code += Environment.NewLine;
+
+                                code += "output = makeOutput(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += Environment.NewLine;
+                            }
+                        }
+                        else
+                        {
+                            code += "output = makeOutput(" + splitline[1] + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                            code += Environment.NewLine;
+                        }
                 }
 
                 if (splitline[0].Substring(0, 4) == "OUTP") //output command
