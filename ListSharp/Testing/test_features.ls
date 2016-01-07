@@ -2,7 +2,7 @@
 
 
 //part1
-
+//comments should work
 STRG MYSTRG = "<here>"
 ROWS MYLIST = {@MYSTRG,"1234:abcd"}
 ROWS MYLIST = REPLACE["\\",":"] IN MYLIST
