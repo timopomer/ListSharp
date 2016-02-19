@@ -1,3 +1,4 @@
+#ShowDebuggingInformation: false
 //demo showing how show variables
 SHOW = "This is a simple show"
 STRG toshow = "SHOW!"

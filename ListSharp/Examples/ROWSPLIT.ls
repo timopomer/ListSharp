@@ -1,3 +1,4 @@
+#ShowDebuggingInformation: false
 //demo showing how to split a STRG or a ROWS variable by something
 STRG teststring = "1:2a3:4"
 ROWS testrows = ROWSPLIT teststring BY [":"]
