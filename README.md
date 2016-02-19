@@ -1,4 +1,5 @@
-<img src="http://puu.sh/lT74D/d0874336f3.png" alt="ListSharp logo" height="70" >
+<img src="http://yoram.de/listsharp.svg" alt="ListSharp logo" height="70" >
+
 # ListSharp Programming Language
 
 **Welcome to ListSharp!**
