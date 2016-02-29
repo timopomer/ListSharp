@@ -88,7 +88,7 @@ reads location put between the 2 square brackets
 
 ###### *example usage:*
 ```
-SRTG FileContents = READ[<here>\mytextfile.txt]
+SRTG FileContents = READ["<here>\mytextfile.txt"]
 ```
 ___
 
