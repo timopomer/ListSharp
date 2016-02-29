@@ -167,7 +167,7 @@ Outputs a variable to a text file
 
 ###### *example usage:*
 ```
-OUTP = ALLROWS HERE[<here>\output.txt]
+OUTP = ALLROWS HERE["<here>\output.txt"]
 ```
 ___
 
