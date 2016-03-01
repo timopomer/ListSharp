@@ -140,7 +140,7 @@ namespace ListSharp
                 {
                     _regex = new Regex(@"ROWS([^=]*)");
                     match = _regex.Match(singleline);
-                    alllists.Add("string[] " + match.Groups[1].Value.Trim() + ";" + Environment.NewLine);
+                    alllists.Add("string[] " + match.Groups[1].Value.Trim() + " = { };" + Environment.NewLine);
                     allRowsVariables.Add(match.Groups[1].Value.Trim());
                 }
 
