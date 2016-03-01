@@ -40,12 +40,11 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
 
 ### Follows c# standarts for the creation/addition of variables
-`STRG MYSTRG = "I love"`
-
-`ROWS MYLIST = {"My Listsharp",@"<here>"}`
-
-`STRG MYSTRGS = MYSTRG+" you"`
-
+```
+STRG MYSTRG = "I love"
+ROWS MYLIST = {"My Listsharp",@"<here>"}
+STRG MYSTRGS = MYSTRG+" you"
+```
 yet innovates where as you dont need to declare a variable to use it, it exists the moment you try to access it
 
 for example
