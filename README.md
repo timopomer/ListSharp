@@ -46,9 +46,10 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 
 `STRG MYSTRGS = MYSTRG+" you"`
 
-yet innovates where as you dont need to declare a variable to use it, it exists the moment you try to access it.
+yet innovates where as you dont need to declare a variable to use it, it exists the moment you try to access it
+
+for example
 ```
-//for example
 ROWS c = ADD["a","b"] TO c
-//c exists (since you add 2 STRG's to it, but is also created in the same line
 ```
+c exists when you try to add 2 STRG's to it, even tho its declaraition should in theory only happen after you did that -> all variable names exist as empty placeholders before their use
