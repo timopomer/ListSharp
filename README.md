@@ -39,159 +39,16 @@ The Main Objective of ListSharp is to enable the manipulation of big lists and o
 ### Associates to .ls files
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
 
-### Follows coding standarts for the creation/addition of variables
-`STRG MYSTRG = "I love"`
-
-`ROWS MYLIST = {"My Listsharp",@"<here>"}`
-
-`STRG MYSTRGS = MYSTRG+" you"`
-
-### List of functions with explanation
-
-#### STRG & ROWS functions:
-
-##### ROWSPLIT
-
-`ROWSPLIT (VAR) BY [(VAR)]`
-
-creates ROWS variable out of a string or a row by splitting it using the parameter between the 2 square brackets
-
-
-###### *example usage:*
+### Follows c# standarts for the creation/addition of variables
 ```
-ROWS AllLines = ROWSPLIT FileContents BY ["<newline>"]
-ROWS DotSplit = ROWSPLIT AllLines BY ["."]
+STRG MYSTRG = "I love"
+ROWS MYLIST = {"My Listsharp",@"<here>"}
+STRG MYSTRGS = MYSTRG+" you"
 ```
-___
+yet innovates where as you dont need to declare a variable to use it, it exists the moment you try to access it
 
-##### REPLACE
-
-`REPLACE[(STRG),(STRG)] IN (VAR)`
-
-repalces a certain string by another string in a rows/strg variable
-
-###### *example usage:*
+for example
 ```
-SRTG Mylang = REPLACE["python","ListSharp"] IN somestrg
-ROWS Mylangs = REPLACE["python","ListSharp"] IN somerows
+ROWS c = ADD["a","b"] TO c
 ```
-___
-
-
-#### STRG functions:
-
-##### READ
-
-`READ[(STRG)]`
-
-reads location put between the 2 square brackets
-
-###### *example usage:*
-```
-SRTG FileContents = READ["<here>\mytextfile.txt"]
-```
-___
-
-#### ROWS functions:
-
-##### EXTRACT
-
-`EXTRACT COLLUM[(INT)] FROM (ROWS) SPLIT BY [(STRG)]`
-
-splits each line of a ROWS variable into multiple segments by a given parameter and extracts the collum asked for
-
-###### *example usage:*
-```
-ROWS LeftSide = EXTRACT COLLUM[1] FROM ALLROWS SPLIT BY [":"]
-```
-___
-
-##### COMBINE
-
-`COMBINE[ROWS,ROWS] WITH [(STRG)]`
-
-combines two ROWS next to each other with a certain string in between the lines
-
-###### *example usage:*
-```
-ROWS BothSides = COMBINE[RIGHTSIDE,LEFTSIDE] WITH ["<>"]
-```
-___
-
-##### GETLINES
-
-`GETLINES (ROWS) [(INT),(INT)-(INT),....]`
-
-takes certain rows form a ROWS variable into another ROWS variable
-
-###### *example usage:*
-```
-ROWS BestLines = GETLINES RIGHTSIDE [1,4-6]
-```
-___
-
-##### ADD
-
-`ADD[(VAR),(VAR),....] TO ROWS`
-
-adds ROWS/STRG variables to a single ROWS variable
-
-###### *example usage:*
-```
-ROWS AllMyCompliments = ADD["Handsome person",morecompliments] TO AllMyCompliments
-```
-___
-
-
-#### SPECIAL functions:
-
-##### SHOW
-
-`SHOW = (VAR)`
-
-Shows a variable in the output,or all the variables of a certain type by showing ALL/ROWS/STRG
-
-###### *example usage:*
-```
-SHOW = ALLROWS
-SHOW = "We can write what we want here"
-SHOW = "ALL"
-```
-___
-
-##### OUTP
-
-`OUTP = (VAR) HERE[(STRG)]`
-
-Outputs a variable to a text file
-
-###### *example usage:*
-```
-OUTP = ALLROWS HERE["<here>\output.txt"]
-```
-___
-
-### Special constants
-
-##### newline
-
-`<newline>`
-
-this is the newline constonant that can be used for example to split a list by each row
-___
-##### here
-
-`<here>`
-
-this is the current directory constonant that can be used for example to save a file next to the script execution
-___
-### Launching arguments
-
-##### #ShowDebuggingInformation
-
-```
-#ShowDebuggingInformation: false
-#ShowDebuggingInformation: true
-```
-
-Enables or disables the showing of debugging information in the output of the console like the interperted c# code
+c exists when you try to add 2 STRG's to it, even tho its declaraition should in theory only happen after you did that -> all variable names exist as empty placeholders before their use
