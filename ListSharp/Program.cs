@@ -55,7 +55,6 @@ namespace ListSharp
             {
                 Console.WriteLine("No Script file was provided");
                 Console.WriteLine("type 1 to open one or 2 to associate .ls files to this console");
-
                 int choice = Convert.ToInt32(Console.ReadLine());
 
                 if (choice == 1)
@@ -122,7 +121,8 @@ namespace ListSharp
             Console.WriteLine("\n");
 
             string allcode = System.IO.File.ReadAllText(scriptfile);
-            allcode = allcode.Replace("<here>", currentdir);
+            allcode = allcode.Replace("<here>", "@\""+currentdir+"\"");
+            allcode = allcode.Replace("<newline>", "System.Environment.NewLine"); //so you can split by newline by saying the string is <newline>
 
             List<string> maincode = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
@@ -243,6 +243,7 @@ namespace ListSharp
                         match = _regex.Match(splitline[1]);
                         string path = @match.Groups[1].Value.Trim();
 
+                        
                         if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
                         {
 
@@ -257,7 +258,8 @@ namespace ListSharp
                             }
                         }
                         
-                        code += "temp_contents = System.IO.File.ReadAllText(@" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+                        
+                        code += "temp_contents = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
                         code += Environment.NewLine;
                         code += varname + " = temp_contents;"; //set variable to tempoary variable
                     
@@ -290,7 +292,6 @@ namespace ListSharp
                         match = _regex.Match(splitline[1]);
                         string bywhat = match.Groups[1].Value.Trim();
 
-                        bywhat = bywhat.Replace("<newline>", "System.Environment.NewLine"); //so you can split by newline by saying the string is <newline>
 
                         code += varname + " = ROWSPLIT_F(" + invar + "," + bywhat + ");"; //interperted code
                     }
