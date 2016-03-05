@@ -481,7 +481,7 @@ namespace ListSharp
                     match = _regex.Match(splitline[1]);
                     string path = @match.Groups[1].Value.Trim();
 
-                    code += "OUTP_F(@" + path + ", " + thevar + ");"; //output the rows to file
+                    code += "OUTP_F(" + path + ", " + thevar + ");"; //output the rows to file
                     code += Environment.NewLine;
                 }
 

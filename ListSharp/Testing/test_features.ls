@@ -1,10 +1,10 @@
-#ShowDebuggingInformation: false
+#ShowDebuggingInformation: true
 
 
 //part1
 //comments should work
-STRG MYSTRG = "<here>"
-ROWS MYLIST = {@MYSTRG,"1234:abcd"}
+STRG MYSTRG = <here>
+ROWS MYLIST = {MYSTRG,"1234:abcd"}
 ROWS MYLIST = REPLACE["\\",":"] IN MYLIST
 SHOW = "Im going to show you some tricks"
 SHOW = MYLIST
@@ -13,7 +13,7 @@ SHOW = MYLIST
 
 //part2
 
-STRG ThisCodePath = "<here>\test_features.ls"
+STRG ThisCodePath = <here>+@"\test_features.ls"
 STRG ThisCode = READ[ThisCodePath]
 SHOW = ThisCode
 ROWS SplitCode = ROWSPLIT ThisCode BY [<newline>]
@@ -29,7 +29,7 @@ SHOW = OGCODE
 
 ROWS BestLines = GETLINES OGCODE [2,4-6]
 SHOW = BestLines
-OUTP = BestLines HERE["<here>\output.txt"]
+OUTP = BestLines HERE[<here>+@"\output.txt"]
 
 //part4
 
