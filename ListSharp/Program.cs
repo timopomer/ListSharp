@@ -80,6 +80,8 @@ namespace ListSharp
                 }
 
 
+
+
                 
                 if (choice == 2)
                 {
@@ -121,11 +123,32 @@ namespace ListSharp
             Console.WriteLine("\n");
 
             string allcode = System.IO.File.ReadAllText(scriptfile);
-            allcode = allcode.Replace("<here>", "@\""+currentdir+"\"");
+
+            allcode = allcode.Replace("<here>", "@\"" + currentdir + "\"");
             allcode = allcode.Replace("<newline>", "System.Environment.NewLine"); //so you can split by newline by saying the string is <newline>
 
-            List<string> maincode = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
+
+            string[] codeLines = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+            for (int i = 0; i < codeLines.Length; i++)
+            {
+                codeLines[i] = removePreWhitespace(codeLines[i]);
+                
+                if (codeLines[i].Contains('='))
+                    codeLines[i] = removePreEqualsAndAfter(codeLines[i]);
+                 
+            }
+                
+
+
+
+
+
+
+            List<string> maincode = codeLines.ToList();
+
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
+
             List<string> alllists = new List<string>();
             string code = "public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
             //variables initialization starts here:
@@ -134,6 +157,7 @@ namespace ListSharp
             foreach (string singleline in maincode) {
 
 
+                
 
                 //rows variable
                 if (singleline.Substring(0, 4) == "ROWS")
@@ -170,7 +194,8 @@ namespace ListSharp
             if (debugmode == true)
             {
                 Console.WriteLine("Original Code \n-----------------------");
-                Console.WriteLine(allcode);
+                foreach (string l in maincode)
+                Console.WriteLine(l);
                 Console.WriteLine("-----------------------");
                 Console.WriteLine(Environment.NewLine);
             }
@@ -194,7 +219,7 @@ namespace ListSharp
 
 
                 string[] splitline = singleline.Split(new char[] { '=' }, 2); //splitting the line of "variable = evaluated string later to be parsed
-                
+
 
                 if (splitline[0].Substring(0, 2) == "//") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
                 {
@@ -222,7 +247,8 @@ namespace ListSharp
                 }
 
 
-                string varname = splitline[0].Substring(4).Trim(); //the first 4 characters will always be the variable type ex: strg,rows,list
+                string varname = splitline[0].Substring(4).Trim(); //the first 4 characters will always be the variable type ex: strg,rows
+                //string vartype = splitline[0].Substring(4).Trim();
 
                 //strg variable type
                 if (splitline[0].Substring(0, 4) == "STRG")
@@ -577,6 +603,44 @@ namespace ListSharp
             }
             return false;
         }
+
+        public static string removePreWhitespace(string line)
+        {
+            int firstCharIndex = 0;
+
+            foreach (char c in line)
+            {
+                if (c == ' ')
+                    firstCharIndex++;
+                else
+                    break;
+            }
+            return line.Substring(firstCharIndex);
+        }
+
+        public static string removeAfterWhitespace(string line)
+        {
+            while (line.Substring(line.Length - 1) == " ")
+                line = line.Substring(0,line.Length - 1);
+
+            return line;
+        }
+
+        public static string removePreEqualsAndAfter(string line)
+        {
+            int firstEqualsIndex = line.IndexOf("=");
+
+            string part_1 = line.Substring(0, firstEqualsIndex);
+
+            string part_2 = line.Substring(firstEqualsIndex+1);
+
+            part_1 = removeAfterWhitespace(part_1);
+            part_2 = removePreWhitespace(part_2);
+
+            return part_1 + " = " + part_2;
+
+        }
+
 
         public static byte[] IconToBytes(System.Drawing.Icon icon)
         {
