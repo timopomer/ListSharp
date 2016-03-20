@@ -143,3 +143,55 @@
 
                 return results.ToArray();
         }
+
+
+        public string DOWNLOAD_F(string url)
+        {
+        using (WebClient client = new WebClient())
+        {
+            return client.DownloadString(url);
+        }
+        }
+
+
+        public string[] FILTER_F(string[] rows,string mode,string param)
+        {
+            var temp = new System.Collections.Generic.List<string>();
+            bool b_contains = (mode == "CONTAINS");
+            bool b_containsnot = (mode == "CONTAINSNOT");
+            bool b_is = (mode == "IS");
+            bool b_isnot = (mode == "ISNOT");
+
+            foreach (string s in rows)
+            {
+                if (b_contains)
+                {
+                    if (s.Contains(param))
+                        temp.Add(s);
+                }
+
+                if (b_containsnot)
+                {
+                    if (!s.Contains(param))
+                        temp.Add(s);
+                }
+
+                if (b_is)
+                {
+                    if (s.Equals(param))
+                        temp.Add(s);
+                }
+
+                if (b_isnot)
+                {
+                    if (!s.Equals(param))
+                        temp.Add(s);
+                }
+            }
+
+            return temp.ToArray();
+        }
+
+
+
+

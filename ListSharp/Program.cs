@@ -19,7 +19,7 @@ namespace ListSharp
 {
     class Program
     {
-        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES","ADD" };
+        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES" , "ADD" , "DOWNLOAD" , "FILTER"};
         [STAThread]
         static void Main(string[] args)
         {
@@ -145,12 +145,16 @@ namespace ListSharp
 
 
 
+
+
+
+            
             List<string> maincode = codeLines.ToList();
 
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
 
             List<string> alllists = new List<string>();
-            string code = "public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
+            string code = "using System.Net;" + Environment.NewLine + " public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
             //variables initialization starts here:
             List<string> allRowsVariables = new List<string>();
             List<string> allStrgVariables = new List<string>();
@@ -248,10 +252,10 @@ namespace ListSharp
 
 
                 string varname = splitline[0].Substring(4).Trim(); //the first 4 characters will always be the variable type ex: strg,rows
-                //string vartype = splitline[0].Substring(4).Trim();
+                string vartype = splitline[0].Substring(0, 4);
 
                 //strg variable type
-                if (splitline[0].Substring(0, 4) == "STRG")
+                if (vartype == "STRG")
                 {
 
                     if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length-1, 1) == "\"") //check if string simply assigned;
@@ -291,11 +295,58 @@ namespace ListSharp
                     
                     }
 
+                    if (isCommand(splitline[1]))
+                    if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
+                    {
+                        _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
+                        match = _regex.Match(splitline[1]);
+                        string path = @match.Groups[1].Value.Trim();
+
+                        
+                        if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
+                        {
+
+                            if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
+                            {
+                                Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
+
+                                while (true)
+                                {
+                                    Thread.Sleep(1000); //sleep forever
+                                }
+                            }
+                        }
+                        
+                        
+                        code += "temp_contents = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+                        code += Environment.NewLine;
+                        code += varname + " = temp_contents;"; //set variable to tempoary variable
+                    
+                    }
+
+
+                    if (isCommand(splitline[1]))
+                    if (splitline[1].Substring(0, 8) == "DOWNLOAD") //read text file into code command is called "read"
+                    {
+                        _regex = new Regex(@"DOWNLOAD\[([^>]*)\]"); //everything between the square brackets "[path]"
+                        match = _regex.Match(splitline[1]);
+                        string path = @match.Groups[1].Value.Trim();
+
+
+
+                        code += "temp_contents = DOWNLOAD_F(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+                        code += Environment.NewLine;
+                        code += varname + " = temp_contents;"; //set variable to tempoary variable
+                    
+                    }
+
+                    
+
 
                 }
 
                 //rows variable type
-                if (splitline[0].Substring(0, 4) == "ROWS")
+                if (vartype == "ROWS")
                 {
 
                     if (splitline[1].Substring(0, 1) == "{" && splitline[1].Substring(splitline[1].Length - 1, 1) == "}") //check if string simply assigned;
@@ -321,6 +372,37 @@ namespace ListSharp
 
                         code += varname + " = ROWSPLIT_F(" + invar + "," + bywhat + ");"; //interperted code
                     }
+
+                    if (isCommand(splitline[1]))
+                    if (splitline[1].Substring(0, 6) == "FILTER") //filter command
+                    {
+                        _regex = new Regex(@"FILTER([^>]*)IF"); //this finds what variable is to be split
+                        match = _regex.Match(splitline[1]);
+                        string invar = match.Groups[1].Value.Trim();
+
+
+                        _regex = new Regex(@"IF([^>]*)\["); //this finds what variable is to be split
+                        match = _regex.Match(splitline[1]);
+                        string mode = match.Groups[1].Value.Trim();
+
+
+                        _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
+                        match = _regex.Match(splitline[1]);
+                        string param = match.Groups[1].Value.Trim();
+
+                        if (mode != "CONTAINS" && mode != "CONTAINSNOT" && mode != "IS" && mode != "ISNOT")
+                        {
+                            Console.WriteLine("ListSharp exception: Filter mode does not exist, aborting operation\nadditional information: mode:\"" + mode + "\"");
+
+                                while (true)
+                                {
+                                    Thread.Sleep(1000); //sleep forever
+                                }
+                        }
+                        code += varname + " = FILTER_F(" + invar + ",\"" + mode + "\"," + param + ");"; //interperted code
+                    }
+
+                    
 
                     if (isCommand(splitline[1]))
                     if (splitline[1].Substring(0, 8) == "GETLINES") //rowsplit command
@@ -556,7 +638,7 @@ namespace ListSharp
             CompilerParameters parameters = new CompilerParameters();
             parameters.GenerateInMemory = true;
 
-
+            parameters.ReferencedAssemblies.Add("System.dll");
             
             using (Microsoft.CSharp.CSharpCodeProvider CodeProv =
             new Microsoft.CSharp.CSharpCodeProvider())
