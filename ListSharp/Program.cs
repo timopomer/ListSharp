@@ -19,7 +19,7 @@ namespace ListSharp
 {
     class Program
     {
-        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES" , "ADD" , "DOWNLOAD" , "FILTER"};
+        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES", "ADD", "DOWNLOAD", "FILTER", "GETBETWEEN" };
         [STAThread]
         static void Main(string[] args)
         {
@@ -154,14 +154,15 @@ namespace ListSharp
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
 
             List<string> alllists = new List<string>();
-            string code = "using System.Net;" + Environment.NewLine + " public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine + "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
+            string code = "using System.Net;" + Environment.NewLine + " public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine +  "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
             //variables initialization starts here:
             List<string> allRowsVariables = new List<string>();
             List<string> allStrgVariables = new List<string>();
             foreach (string singleline in maincode) {
 
 
-                
+                if (singleline.Length < 4)
+                    continue;
 
                 //rows variable
                 if (singleline.Substring(0, 4) == "ROWS")
@@ -235,6 +236,13 @@ namespace ListSharp
                 if (splitline[0].Substring(0, 1) == "#") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
                 {
                     code += "//command executed: " + splitline[0];
+                    code += Environment.NewLine;
+                    continue;
+                }
+
+                if (splitline[0].Substring(0, 2) == "/*" || splitline[0].Substring(0, 2) == "*/") //to see if the code is commented out so it does net get into the final code
+                {
+                    code += splitline[0];
                     code += Environment.NewLine;
                     continue;
                 }
@@ -402,7 +410,7 @@ namespace ListSharp
                         code += varname + " = FILTER_F(" + invar + ",\"" + mode + "\"," + param + ");"; //interperted code
                     }
 
-                    
+
 
                     if (isCommand(splitline[1]))
                     if (splitline[1].Substring(0, 8) == "GETLINES") //rowsplit command
@@ -493,6 +501,31 @@ namespace ListSharp
                         restring = "string";
                     if (splitline[0].Substring(0, 4) == "ROWS")
                         restring = "string[]";
+
+
+
+                        if (splitline[1].Substring(0, 10) == "GETBETWEEN") //filter command
+                        {
+                            _regex = new Regex(@"GETBETWEEN(.*?)\["); //this finds what variable is to be split
+                            match = _regex.Match(splitline[1]);
+                            string invar = match.Groups[1].Value.Trim();
+
+
+                            _regex = new Regex(@"\[(.*)\] AND"); //this finds what variable is to be split
+                            match = _regex.Match(splitline[1]);
+                            string start = match.Groups[1].Value.Trim();
+
+
+                            _regex = new Regex(@"AND \[(.*)\]"); //this finds by what string to split the variable
+                            match = _regex.Match(splitline[1]);
+                            string end = match.Groups[1].Value.Trim();
+
+
+                            code += varname + " = (" + restring + ")GETBETWEEN_F(" + invar + "," + start + "," + end + ");"; //interperted code
+                        }
+
+
+
                     if (splitline[1].Substring(0, 7) == "REPLACE")
                     {
 
@@ -664,7 +697,6 @@ namespace ListSharp
                  var obj = Activator.CreateInstance(type);
 
                  var output = type.GetMethod("Execute").Invoke(obj, new object[] { });
-
                  Console.WriteLine(output);
             }
 
