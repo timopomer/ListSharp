@@ -19,7 +19,7 @@ namespace ListSharp
 {
     class Program
     {
-        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES", "ADD", "DOWNLOAD", "FILTER", "GETBETWEEN" };
+        public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES", "ADD", "DOWNLOAD", "FILTER", "GETBETWEEN", "GETRANGE" };
         [STAThread]
         static void Main(string[] args)
         {
@@ -524,7 +524,25 @@ namespace ListSharp
                             code += varname + " = (" + restring + ")GETBETWEEN_F(" + invar + "," + start + "," + end + ");"; //interperted code
                         }
 
+                        if (splitline[1].Substring(0, 8) == "GETRANGE") //getrange command
+                        {
+                            _regex = new Regex(@"GETRANGE(.*?)FROM \["); //this finds what variable is to be split
+                            match = _regex.Match(splitline[1]);
+                            string invar = match.Groups[1].Value.Trim();
 
+
+                            _regex = new Regex(@"FROM \[(.*)\] TO"); //find starting index
+                            match = _regex.Match(splitline[1]);
+                            string start = match.Groups[1].Value.Trim();
+
+
+                            _regex = new Regex(@"TO \[(.*)\]"); //find end index
+                            match = _regex.Match(splitline[1]);
+                            string end = match.Groups[1].Value.Trim();
+
+
+                            code += varname + " = (" + restring + ")GETRANGE_F(" + invar + "," + start + "," + end + ");"; //interperted code
+                        }
 
                     if (splitline[1].Substring(0, 7) == "REPLACE")
                     {

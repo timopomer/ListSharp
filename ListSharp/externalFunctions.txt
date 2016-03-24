@@ -192,6 +192,68 @@
             return temp.ToArray();
         }
 
+        public static object GETRANGE_F(object ob, int start, int end)
+        {
+            start--;
+
+            if (start < 0)
+                start = 0;
+
+            if (end <= start)
+                return "";
+
+
+
+            string[] rows = new string[0];
+            if (ob.GetType() == typeof(string))
+            {
+                string s = (string)ob;
+                rows = new string[] { s };
+            }
+
+            if (ob.GetType() == typeof(string[]))
+            {
+                rows = (string[])ob;
+            }
+
+
+            var temp = new System.Collections.Generic.List<string>();
+
+            int actualstart;
+            int actualend;
+
+
+
+            foreach (string s in rows)
+            {
+
+            actualstart = start;
+            actualend = end;
+
+            if (start > s.Length - 1)
+            {
+                temp.Add("");
+                continue;
+            }
+
+            if (end > s.Length - 1)
+                actualend = s.Length-1;
+
+
+
+            temp.Add(s.Substring(actualstart, actualend-actualstart));
+
+
+            }
+
+            if (ob.GetType() == typeof(string))
+            {
+                return temp.ToArray()[0];
+            }
+
+            return temp.ToArray();
+        }
+
         public static object GETBETWEEN_F(object ob,string start,string end)
         {
         string[] rows = new string[0];
