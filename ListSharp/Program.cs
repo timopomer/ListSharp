@@ -125,7 +125,7 @@ namespace ListSharp
             string allcode = System.IO.File.ReadAllText(scriptfile);
 
             allcode = allcode.Replace("<here>", "@\"" + currentdir + "\"");
-            allcode = allcode.Replace("<newline>", "System.Environment.NewLine"); //so you can split by newline by saying the string is <newline>
+            allcode = allcode.Replace("<newline>", "\"\\n\""); //so you can split by newline by saying the string is <newline>
 
 
             string[] codeLines = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
@@ -389,7 +389,7 @@ namespace ListSharp
                         string invar = match.Groups[1].Value.Trim();
 
 
-                        _regex = new Regex(@"IF([^>]*)\["); //this finds what variable is to be split
+                        _regex = new Regex(@"IF(.*?)\["); //this finds what variable is to be split
                         match = _regex.Match(splitline[1]);
                         string mode = match.Groups[1].Value.Trim();
 
