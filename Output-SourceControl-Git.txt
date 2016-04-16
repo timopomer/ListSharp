@@ -1,0 +1,2 @@
+﻿A new Git repository has been created for you in C:\Users\timop\Desktop\VSProjects\ListSharp.
+Opening repository: C:\Users\timop\Desktop\VSProjects\ListSharp.
