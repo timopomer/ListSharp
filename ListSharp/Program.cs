@@ -20,9 +20,12 @@ namespace ListSharp
     class Program
     {
         public static string[] allcommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES", "ADD", "DOWNLOAD", "FILTER", "GETBETWEEN", "GETRANGE" };
+        
         [STAThread]
         static void Main(string[] args)
         {
+            #region defining variables
+
             System.Drawing.Icon theicon = Properties.Resources.Untitled; //the application icon
 
             if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ListSharp"))
@@ -31,8 +34,7 @@ namespace ListSharp
             File.WriteAllBytes(dpath, IconToBytes(theicon)); //writing the icon from resources to a pleace in appdata to refference it later
 
 
-            
-
+            List<string> maincode;
             Boolean debugmode = true;
             Console.ForegroundColor = ConsoleColor.DarkCyan;
 
@@ -40,18 +42,17 @@ namespace ListSharp
 
             Console.Title = "ListSharp Console";
             Console.Clear();
-            
+
             Regex _regex;
             Match match;
 
-            string scriptfile = "";
-            foreach (string s in args)
-            {
-                scriptfile = s;
-            }
+            #endregion
 
 
-            if (args.Length == 0)
+            #region setting up workspace
+            IO.setScriptFile(args);
+
+            if (IO.scriptfile == "")
             {
                 Console.WriteLine("No Script file was provided");
                 Console.WriteLine("type 1 to open one or 2 to associate .ls files to this console");
@@ -59,22 +60,22 @@ namespace ListSharp
 
                 if (choice == 1)
                 {
-                        Console.WriteLine("Opening file selection");
-                        OpenFileDialog dialog1 = new OpenFileDialog();
-                        dialog1.Filter = "ListSharp Scripts|*.ls";
-                        DialogResult result = dialog1.ShowDialog();
-                        if (result == DialogResult.OK) // Test result.
+                    Console.WriteLine("Opening file selection");
+                    OpenFileDialog dialog1 = new OpenFileDialog();
+                    dialog1.Filter = "ListSharp Scripts|*.ls";
+                    DialogResult result = dialog1.ShowDialog();
+                    if (result == DialogResult.OK) // Test result.
+                    {
+                        IO.scriptfile = dialog1.FileName;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Closed Dialog");
+                        while (true)
                         {
-                            scriptfile = dialog1.FileName;
+                            Thread.Sleep(1000); //sleep forever
                         }
-                        else
-                        {
-                            Console.WriteLine("Closed Dialog");
-                            while (true)
-                            {
-                                Thread.Sleep(1000); //sleep forever
-                            }
-                        }
+                    }
 
 
                 }
@@ -82,7 +83,7 @@ namespace ListSharp
 
 
 
-                
+
                 if (choice == 2)
                 {
                     if (!IsAdministrator())
@@ -106,7 +107,7 @@ namespace ListSharp
 
 
 
-            if (Path.GetExtension(scriptfile) != ".ls")
+            if (Path.GetExtension(IO.scriptfile) != ".ls")
             {
                 Console.WriteLine("Script file not from .ls type");
                 while (true)
@@ -114,51 +115,45 @@ namespace ListSharp
                     Thread.Sleep(1000); //sleep forever
                 }
             }
-            
-            
-            Console.WriteLine("Script file");
-            Console.WriteLine(scriptfile);
 
-            string currentdir = Path.GetDirectoryName(scriptfile);
+            IO.setScriptLocation();
+            baseDefinitions.initialize();
+            /* script file location intialized and validity checked */
+
+            #endregion
+
+            #region getting and cleaning up code
+
+            Console.WriteLine("Script file");
+            Console.WriteLine(IO.scriptfile);
             Console.WriteLine("\n");
 
-            string allcode = System.IO.File.ReadAllText(scriptfile);
-
-            allcode = allcode.Replace("<here>", "@\"" + currentdir + "\"");
-            allcode = allcode.Replace("<newline>", "\"\\n\""); //so you can split by newline by saying the string is <newline>
 
 
-            string[] codeLines = allcode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string allcode = IO.getFullCode();
 
-            for (int i = 0; i < codeLines.Length; i++)
-            {
-                codeLines[i] = removePreWhitespace(codeLines[i]);
-                
-                if (codeLines[i].Contains('='))
-                    codeLines[i] = removePreEqualsAndAfter(codeLines[i]);
-                 
-            }
-                
-
-
-
-
-
-
-
-
-
-            
-            List<string> maincode = codeLines.ToList();
-
+            /* cleaning up code */
+            maincode = allcode.preProcessCode().replaceConstants();
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
 
+            #endregion
+
+
             List<string> alllists = new List<string>();
-            string code = "using System.Net;" + Environment.NewLine + " public class MainClass" + Environment.NewLine + "{ " + Environment.NewLine + "public string Execute()" + Environment.NewLine + "{" + Environment.NewLine +  "string temp_contents = \"\";" + Environment.NewLine + "string output = \"\";" + Environment.NewLine;
+            string code =
+            @"using System.Net;
+            public class MainClass
+            { 
+            public string Execute()
+            {
+            string temp_contents = """";
+            string output = """";
+            ";
             //variables initialization starts here:
             List<string> allRowsVariables = new List<string>();
             List<string> allStrgVariables = new List<string>();
-            foreach (string singleline in maincode) {
+            foreach (string singleline in maincode)
+            {
 
 
                 if (singleline.Length < 4)
@@ -200,7 +195,7 @@ namespace ListSharp
             {
                 Console.WriteLine("Original Code \n-----------------------");
                 foreach (string l in maincode)
-                Console.WriteLine(l);
+                    Console.WriteLine(l);
                 Console.WriteLine("-----------------------");
                 Console.WriteLine(Environment.NewLine);
             }
@@ -225,6 +220,19 @@ namespace ListSharp
 
                 string[] splitline = singleline.Split(new char[] { '=' }, 2); //splitting the line of "variable = evaluated string later to be parsed
 
+                if (splitline[0].Substring(0, 1) == "{") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
+                {
+                    code += "{";
+                    code += Environment.NewLine;
+                    continue;
+                }
+
+                if (splitline[0].Substring(0, 1) == "}") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
+                {
+                    code += "}";
+                    code += Environment.NewLine;
+                    continue;
+                }
 
                 if (splitline[0].Substring(0, 2) == "//") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
                 {
@@ -247,260 +255,294 @@ namespace ListSharp
                     continue;
                 }
 
-                splitline[1] = splitline[1].Substring(1);
+
                 if (splitline[0].Length < 4) //checking that there is not too short/impossible line to break the interperter
                 {
                     Console.WriteLine("ListSharp exception: Line: " + line + " invalid");
-                    while(true)
+                    while (true)
                     {
                         Thread.Sleep(1000);
                     }
-                    
+
                 }
 
 
                 string varname = splitline[0].Substring(4).Trim(); //the first 4 characters will always be the variable type ex: strg,rows
                 string vartype = splitline[0].Substring(0, 4);
+                
 
-                //strg variable type
-                if (vartype == "STRG")
+
+                
+
+
+
+                if (splitline[0].Substring(0, 1) == "[" && splitline[0].Substring(splitline[0].Length-1, 1) == "]")
                 {
-
-                    if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length-1, 1) == "\"") //check if string simply assigned;
+                    string workingon = splitline[0].Substring(1, splitline[0].Length - 2);//everything between the square brackets "[]"
+                    if (workingon.Substring(0, 7) == "FOREACH")
                     {
-                        code += varname + " = @" + splitline[1] + ";"; //set variable to tempoary variable
-                        code += Environment.NewLine;
-                        continue;
+                        _regex = new Regex(@"IN (.*)AS "); 
+                        match = _regex.Match(workingon);
+                        string rowsvar = @match.Groups[1].Value.Trim();
+
+                        _regex = new Regex(@"AS (.*)"); 
+                        match = _regex.Match(workingon);
+                        string stringvarname = @match.Groups[1].Value.Trim();
+                        code += "foreach (string " + stringvarname + " in " + rowsvar + ")";
                     }
 
-
-                    if (isCommand(splitline[1]))
-                    if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
-                    {
-                        _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
-                        match = _regex.Match(splitline[1]);
-                        string path = @match.Groups[1].Value.Trim();
-
-                        
-                        if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
-                        {
-
-                            if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
-                            {
-                                Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
-
-                                while (true)
-                                {
-                                    Thread.Sleep(1000); //sleep forever
-                                }
-                            }
-                        }
-                        
-                        
-                        code += "temp_contents = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
-                        code += Environment.NewLine;
-                        code += varname + " = temp_contents;"; //set variable to tempoary variable
-                    
-                    }
-
-                    if (isCommand(splitline[1]))
-                    if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
-                    {
-                        _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
-                        match = _regex.Match(splitline[1]);
-                        string path = @match.Groups[1].Value.Trim();
-
-                        
-                        if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
-                        {
-
-                            if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
-                            {
-                                Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
-
-                                while (true)
-                                {
-                                    Thread.Sleep(1000); //sleep forever
-                                }
-                            }
-                        }
-                        
-                        
-                        code += "temp_contents = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
-                        code += Environment.NewLine;
-                        code += varname + " = temp_contents;"; //set variable to tempoary variable
-                    
-                    }
-
-
-                    if (isCommand(splitline[1]))
-                    if (splitline[1].Substring(0, 8) == "DOWNLOAD") //read text file into code command is called "read"
-                    {
-                        _regex = new Regex(@"DOWNLOAD\[([^>]*)\]"); //everything between the square brackets "[path]"
-                        match = _regex.Match(splitline[1]);
-                        string path = @match.Groups[1].Value.Trim();
-
-
-
-                        code += "temp_contents = DOWNLOAD_F(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
-                        code += Environment.NewLine;
-                        code += varname + " = temp_contents;"; //set variable to tempoary variable
-                    
-                    }
-
-                    
-
-
-                }
-
-                //rows variable type
-                if (vartype == "ROWS")
-                {
-
-                    if (splitline[1].Substring(0, 1) == "{" && splitline[1].Substring(splitline[1].Length - 1, 1) == "}") //check if string simply assigned;
-                    {
-                        code += varname + " = new string[]" + splitline[1] + ";"; //set variable to tempoary variable
-                        code += Environment.NewLine;
-                        continue;
-                    }
-
-
-
-                    if (isCommand(splitline[1]))
-                    if (splitline[1].Substring(0, 8) == "ROWSPLIT") //rowsplit command
-                    {
-                        _regex = new Regex(@"ROWSPLIT([^>]*)BY"); //this finds what variable is to be split
-                        match = _regex.Match(splitline[1]);
-                        string invar = match.Groups[1].Value.Trim();
-
-                        _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
-                        match = _regex.Match(splitline[1]);
-                        string bywhat = match.Groups[1].Value.Trim();
-
-
-                        code += varname + " = ROWSPLIT_F(" + invar + "," + bywhat + ");"; //interperted code
-                    }
-
-                    if (isCommand(splitline[1]))
-                    if (splitline[1].Substring(0, 6) == "FILTER") //filter command
-                    {
-                        _regex = new Regex(@"FILTER([^>]*)IF"); //this finds what variable is to be split
-                        match = _regex.Match(splitline[1]);
-                        string invar = match.Groups[1].Value.Trim();
-
-
-                        _regex = new Regex(@"IF(.*?)\["); //this finds what variable is to be split
-                        match = _regex.Match(splitline[1]);
-                        string mode = match.Groups[1].Value.Trim();
-
-
-                        _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
-                        match = _regex.Match(splitline[1]);
-                        string param = match.Groups[1].Value.Trim();
-
-                        if (mode != "CONTAINS" && mode != "CONTAINSNOT" && mode != "IS" && mode != "ISNOT")
-                        {
-                            Console.WriteLine("ListSharp exception: Filter mode does not exist, aborting operation\nadditional information: mode:\"" + mode + "\"");
-
-                                while (true)
-                                {
-                                    Thread.Sleep(1000); //sleep forever
-                                }
-                        }
-                        code += varname + " = FILTER_F(" + invar + ",\"" + mode + "\"," + param + ");"; //interperted code
-                    }
-
-
-
-                    if (isCommand(splitline[1]))
-                    if (splitline[1].Substring(0, 8) == "GETLINES") //rowsplit command
-                    {
-                        _regex = new Regex(@"GETLINES([^>]*)\["); //this finds what variable is to be split
-                        match = _regex.Match(splitline[1]);
-                        string invar = match.Groups[1].Value.Trim();
-
-                        _regex = new Regex(@"\[(.*)\]"); //this finds what lines of the array to get
-                        match = _regex.Match(splitline[1]);
-                        string bywhat = match.Groups[1].Value.Trim();
-
-                        code += varname + " = GETLINES_F(" + invar + ",\"" + bywhat + "\");"; //interperted code
-                    }
-
-                    if (isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 3) == "ADD") //rowsplit command
-                        {
-                            _regex = new Regex(@"TO([^>]*)"); //this finds what variable is to be split
-                            match = _regex.Match(splitline[1]);
-                            string invar = match.Groups[1].Value.Trim();
-
-                            _regex = new Regex(@"\[(.*)\]"); //this finds what lines of the array to get
-                            match = _regex.Match(splitline[1]);
-                            string bywhat = match.Groups[1].Value.Trim();
-
-                            code += varname + " = ADD_F(" + invar + ",new object[] {" + bywhat + "});"; //interperted code
-                        }
-
-                    if (isCommand(splitline[1]))
-                    if (splitline[1].Substring(0, 7) == "EXTRACT") //extract command
-                    {
-                        _regex = new Regex(@"EXTRACT([^>]*)FROM"); 
-                        match = _regex.Match(splitline[1]);
-                        string collumvar = match.Groups[1].Value.Trim();
-
-                        _regex = new Regex(@"\[(.*)\]"); //this finds what collum is to be extracted
-                        match = _regex.Match(collumvar);
-                        int collumnum = Convert.ToInt32(match.Groups[1].Value.Trim());
-
-                        _regex = new Regex(@"FROM([^>]*)SPLIT"); //this finds what variable is to be extracted from
-                        match = _regex.Match(splitline[1]);
-                        string whatvar = match.Groups[1].Value.Trim();
-
-                        _regex = new Regex(@"BY \[(.*)\]"); //this finds by what string to extract the variable
-                        match = _regex.Match(splitline[1]);
-                        string bywhat = match.Groups[1].Value;
-
-
-                        code += varname + " = EXTRACT_F(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
-                    }
-
-
-                    if (isCommand(splitline[1]))
-                    if (splitline[1].Substring(0, 7) == "COMBINE") //extract command
-                    {
-
-                        _regex = new Regex(@"COMBINE\[([^>]*?)\]"); //everything between the square brackets "[array,array,array]"
-                        match = _regex.Match(splitline[1]);
-                        string combinearrays = @match.Groups[1].Value.Trim();
-
-                        _regex = new Regex(@"WITH \[(.*)\]"); //this finds by what string to extract the variable
-                        match = _regex.Match(splitline[1]);
-                        string withwhat = match.Groups[1].Value;
-
-                        code += varname + " = COMBINE_F(new string[][] {" + combinearrays + "}," + withwhat + ");"; //interperted code
-                    }
-
-
-
+                    code += Environment.NewLine;
+                    continue;
                 }
 
 
-                if (splitline[0].Substring(0, 4) == "STRG" || splitline[0].Substring(0, 4) == "ROWS")
+        
+
+                
+
+                if (singleline.Contains("="))
                 {
-                    
-                    if (!isCommand(splitline[1]))
+
+                    splitline[1] = splitline[1].Substring(1);
+                    //strg variable type
+                    if (vartype == "STRG")
                     {
-                        code += varname + " = " + splitline[1] + ";"; //set variable to tempoary variable
-                        code += Environment.NewLine;
-                        continue;
-                    }
+
+                        if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length - 1, 1) == "\"") //check if string simply assigned;
+                        {
+                            code += varname + " = @" + splitline[1] + ";"; //set variable to tempoary variable
+                            code += Environment.NewLine;
+                            continue;
+                        }
+
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
+                            {
+                                _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
+                                match = _regex.Match(splitline[1]);
+                                string path = @match.Groups[1].Value.Trim();
+
+
+                                if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
+                                {
+
+                                    if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
+                                    {
+                                        Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
+
+                                        while (true)
+                                        {
+                                            Thread.Sleep(1000); //sleep forever
+                                        }
+                                    }
+                                }
+
+
+                                code += "temp_contents = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+                                code += Environment.NewLine;
+                                code += varname + " = temp_contents;"; //set variable to tempoary variable
+
+                            }
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
+                            {
+                                _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
+                                match = _regex.Match(splitline[1]);
+                                string path = @match.Groups[1].Value.Trim();
+
+
+                                if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
+                                {
+
+                                    if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
+                                    {
+                                        Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
+
+                                        while (true)
+                                        {
+                                            Thread.Sleep(1000); //sleep forever
+                                        }
+                                    }
+                                }
+
+
+                                code += "temp_contents = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+                                code += Environment.NewLine;
+                                code += varname + " = temp_contents;"; //set variable to tempoary variable
+
+                            }
+
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 8) == "DOWNLOAD") //read text file into code command is called "read"
+                            {
+                                _regex = new Regex(@"DOWNLOAD\[([^>]*)\]"); //everything between the square brackets "[path]"
+                                match = _regex.Match(splitline[1]);
+                                string path = @match.Groups[1].Value.Trim();
+
+
+
+                                code += "temp_contents = DOWNLOAD_F(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+                                code += Environment.NewLine;
+                                code += varname + " = temp_contents;"; //set variable to tempoary variable
+
+                            }
+
                         
 
 
-                    string restring = "";
-                    if (splitline[0].Substring(0, 4) == "STRG")
-                        restring = "string";
-                    if (splitline[0].Substring(0, 4) == "ROWS")
-                        restring = "string[]";
+                    }
+
+                    //rows variable type
+                    if (vartype == "ROWS")
+                    {
+
+                        if (splitline[1].Substring(0, 1) == "{" && splitline[1].Substring(splitline[1].Length - 1, 1) == "}") //check if string simply assigned;
+                        {
+                            code += varname + " = new string[]" + splitline[1] + ";"; //set variable to tempoary variable
+                            code += Environment.NewLine;
+                            continue;
+                        }
+
+
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 8) == "ROWSPLIT") //rowsplit command
+                            {
+                                _regex = new Regex(@"ROWSPLIT([^>]*)BY"); //this finds what variable is to be split
+                                match = _regex.Match(splitline[1]);
+                                string invar = match.Groups[1].Value.Trim();
+
+                                _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
+                                match = _regex.Match(splitline[1]);
+                                string bywhat = match.Groups[1].Value.Trim();
+
+
+                                code += varname + " = ROWSPLIT_F(" + invar + "," + bywhat + ");"; //interperted code
+                            }
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 6) == "FILTER") //filter command
+                            {
+                                _regex = new Regex(@"FILTER([^>]*)IF"); //this finds what variable is to be split
+                                match = _regex.Match(splitline[1]);
+                                string invar = match.Groups[1].Value.Trim();
+
+
+                                _regex = new Regex(@"IF(.*?)\["); //this finds what variable is to be split
+                                match = _regex.Match(splitline[1]);
+                                string mode = match.Groups[1].Value.Trim();
+
+
+                                _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
+                                match = _regex.Match(splitline[1]);
+                                string param = match.Groups[1].Value.Trim();
+
+                                if (mode != "CONTAINS" && mode != "CONTAINSNOT" && mode != "IS" && mode != "ISNOT")
+                                {
+                                    Console.WriteLine("ListSharp exception: Filter mode does not exist, aborting operation\nadditional information: mode:\"" + mode + "\"");
+
+                                    while (true)
+                                    {
+                                        Thread.Sleep(1000); //sleep forever
+                                    }
+                                }
+                                code += varname + " = FILTER_F(" + invar + ",\"" + mode + "\"," + param + ");"; //interperted code
+                            }
+
+
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 8) == "GETLINES") //rowsplit command
+                            {
+                                _regex = new Regex(@"GETLINES([^>]*)\["); //this finds what variable is to be split
+                                match = _regex.Match(splitline[1]);
+                                string invar = match.Groups[1].Value.Trim();
+
+                                _regex = new Regex(@"\[(.*)\]"); //this finds what lines of the array to get
+                                match = _regex.Match(splitline[1]);
+                                string bywhat = match.Groups[1].Value.Trim();
+
+                                code += varname + " = GETLINES_F(" + invar + ",\"" + bywhat + "\");"; //interperted code
+                            }
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 3) == "ADD") //rowsplit command
+                            {
+                                _regex = new Regex(@"TO([^>]*)"); //this finds what variable is to be split
+                                match = _regex.Match(splitline[1]);
+                                string invar = match.Groups[1].Value.Trim();
+
+                                _regex = new Regex(@"\[(.*)\]"); //this finds what lines of the array to get
+                                match = _regex.Match(splitline[1]);
+                                string bywhat = match.Groups[1].Value.Trim();
+
+                                code += varname + " = ADD_F(" + invar + ",new object[] {" + bywhat + "});"; //interperted code
+                            }
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 7) == "EXTRACT") //extract command
+                            {
+                                _regex = new Regex(@"EXTRACT([^>]*)FROM");
+                                match = _regex.Match(splitline[1]);
+                                string collumvar = match.Groups[1].Value.Trim();
+
+                                _regex = new Regex(@"\[(.*)\]"); //this finds what collum is to be extracted
+                                match = _regex.Match(collumvar);
+                                int collumnum = Convert.ToInt32(match.Groups[1].Value.Trim());
+
+                                _regex = new Regex(@"FROM([^>]*)SPLIT"); //this finds what variable is to be extracted from
+                                match = _regex.Match(splitline[1]);
+                                string whatvar = match.Groups[1].Value.Trim();
+
+                                _regex = new Regex(@"BY \[(.*)\]"); //this finds by what string to extract the variable
+                                match = _regex.Match(splitline[1]);
+                                string bywhat = match.Groups[1].Value;
+
+
+                                code += varname + " = EXTRACT_F(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
+                            }
+
+
+                        if (isCommand(splitline[1]))
+                            if (splitline[1].Substring(0, 7) == "COMBINE") //extract command
+                            {
+
+                                _regex = new Regex(@"COMBINE\[([^>]*?)\]"); //everything between the square brackets "[array,array,array]"
+                                match = _regex.Match(splitline[1]);
+                                string combinearrays = @match.Groups[1].Value.Trim();
+
+                                _regex = new Regex(@"WITH \[(.*)\]"); //this finds by what string to extract the variable
+                                match = _regex.Match(splitline[1]);
+                                string withwhat = match.Groups[1].Value;
+
+                                code += varname + " = COMBINE_F(new string[][] {" + combinearrays + "}," + withwhat + ");"; //interperted code
+                            }
+
+
+
+                    }
+
+
+                    if (splitline[0].Substring(0, 4) == "STRG" || splitline[0].Substring(0, 4) == "ROWS")
+                    {
+
+                        if (!isCommand(splitline[1]))
+                        {
+                            code += varname + " = " + splitline[1] + ";"; //set variable to tempoary variable
+                            code += Environment.NewLine;
+                            continue;
+                        }
+
+
+
+                        string restring = "";
+                        if (splitline[0].Substring(0, 4) == "STRG")
+                            restring = "string";
+                        if (splitline[0].Substring(0, 4) == "ROWS")
+                            restring = "string[]";
 
 
 
@@ -544,59 +586,59 @@ namespace ListSharp
                             code += varname + " = (" + restring + ")GETRANGE_F(" + invar + "," + start + "," + end + ");"; //interperted code
                         }
 
-                    if (splitline[1].Substring(0, 7) == "REPLACE")
-                    {
-
-                        _regex = new Regex(@"\[(.*)\]");
-                        match = _regex.Match(splitline[1]);
-                        string withwhat = match.Groups[1].Value.Trim();
-                        _regex = new Regex(@"IN([^>]*)"); //this finds by what string to extract the variable
-                        match = _regex.Match(splitline[1]);
-                        string whatvar = match.Groups[1].Value.Trim();
-
-                        code += varname + " = (" + restring + ")REPLACE_F(" + whatvar + "," + withwhat + ");";
-                    }
-                }
-
-                if (splitline[0].Substring(0, 4) == "SHOW") //show a variable to debug your program
-                {
-                    if (splitline[1] == "STRG")
-                    {
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += "output += \"Listing all STRG variables\";";
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += Environment.NewLine;
-                        foreach (string ver in allStrgVariables)
+                        if (splitline[1].Substring(0, 7) == "REPLACE")
                         {
-                            code += "output += \"Listing " + ver + "\";";
-                            code += Environment.NewLine;
 
-                            code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
-                            code += Environment.NewLine;
+                            _regex = new Regex(@"\[(.*)\]");
+                            match = _regex.Match(splitline[1]);
+                            string withwhat = match.Groups[1].Value.Trim();
+                            _regex = new Regex(@"IN([^>]*)"); //this finds by what string to extract the variable
+                            match = _regex.Match(splitline[1]);
+                            string whatvar = match.Groups[1].Value.Trim();
+
+                            code += varname + " = (" + restring + ")REPLACE_F(" + whatvar + "," + withwhat + ");";
                         }
                     }
-                    else
-                    if (splitline[1] == "ROWS")
-                    {
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += "output += \"Listing all ROWS variables\";";
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += Environment.NewLine;
-                        foreach (string ver in allRowsVariables)
-                        {
-                            code += "output += \"Listing " + ver + "\";";
-                            code += Environment.NewLine;
 
-                            code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                    if (splitline[0].Substring(0, 4) == "SHOW") //show a variable to debug your program
+                    {
+                        if (splitline[1] == "STRG")
+                        {
                             code += Environment.NewLine;
+                            code += "output += System.Environment.NewLine;";
+                            code += "output += \"Listing all STRG variables\";";
+                            code += Environment.NewLine;
+                            code += "output += System.Environment.NewLine;";
+                            code += Environment.NewLine;
+                            foreach (string ver in allStrgVariables)
+                            {
+                                code += "output += \"Listing " + ver + "\";";
+                                code += Environment.NewLine;
+
+                                code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += Environment.NewLine;
+                            }
                         }
-                    }
-                    else
-                        if (splitline[1] == "ALL")
+                        else
+                        if (splitline[1] == "ROWS")
+                        {
+                            code += Environment.NewLine;
+                            code += "output += System.Environment.NewLine;";
+                            code += "output += \"Listing all ROWS variables\";";
+                            code += Environment.NewLine;
+                            code += "output += System.Environment.NewLine;";
+                            code += Environment.NewLine;
+                            foreach (string ver in allRowsVariables)
+                            {
+                                code += "output += \"Listing " + ver + "\";";
+                                code += Environment.NewLine;
+
+                                code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += Environment.NewLine;
+                            }
+                        }
+                        else
+                            if (splitline[1] == "ALL")
                         {
                             code += Environment.NewLine;
                             code += "output += System.Environment.NewLine;";
@@ -627,35 +669,37 @@ namespace ListSharp
                             code += "output = SHOW_F(" + splitline[1] + " , output);"; //call makeOutput() on any type of variable the users wants to display
                             code += Environment.NewLine;
                         }
-                }
+                    }
 
-                if (splitline[0].Substring(0, 4) == "OUTP") //output command
-                {
-                    _regex = new Regex(@"([^>]*)HERE"); //everything between the square brackets "[path]"
-                    match = _regex.Match(splitline[1]);
-                    string thevar = @match.Groups[1].Value.Trim();
+                    if (splitline[0].Substring(0, 4) == "OUTP") //output command
+                    {
+                        _regex = new Regex(@"([^>]*)HERE"); //everything between the square brackets "[path]"
+                        match = _regex.Match(splitline[1]);
+                        string thevar = @match.Groups[1].Value.Trim();
 
 
-                    _regex = new Regex(@"HERE\[([^>]*)\]"); //everything between the square brackets "[path]"
-                    match = _regex.Match(splitline[1]);
-                    string path = @match.Groups[1].Value.Trim();
+                        _regex = new Regex(@"HERE\[([^>]*)\]"); //everything between the square brackets "[path]"
+                        match = _regex.Match(splitline[1]);
+                        string path = @match.Groups[1].Value.Trim();
 
-                    code += "OUTP_F(" + path + ", " + thevar + ");"; //output the rows to file
+                        code += "OUTP_F(" + path + ", " + thevar + ");"; //output the rows to file
+                        code += Environment.NewLine;
+                    }
+
                     code += Environment.NewLine;
                 }
 
-                code += Environment.NewLine;
             }
 
             code += Environment.NewLine + "return output;";
-            
-            
+
+
             code += Environment.NewLine + "}" + Environment.NewLine;
 
 
 
             code += Properties.Resources.externalFunctions + "}"; //here we add all function depndecies
-            
+
 
             if (debugmode == true)
             {
@@ -665,12 +709,12 @@ namespace ListSharp
             int index = 1;
             char[] delimiterChars = { '\n' };
             string[] allLines = code.Split(delimiterChars);
-            
+
 
             foreach (string currentLine in allLines)
             {
                 if (debugmode == true)
-                System.Console.WriteLine("Line: " + index + "    " +currentLine);
+                    System.Console.WriteLine("Line: " + index + "    " + currentLine);
                 index++;
             }
 
@@ -690,11 +734,11 @@ namespace ListSharp
             parameters.GenerateInMemory = true;
 
             parameters.ReferencedAssemblies.Add("System.dll");
-            
+
             using (Microsoft.CSharp.CSharpCodeProvider CodeProv =
             new Microsoft.CSharp.CSharpCodeProvider())
             {
-                CompilerResults results = CodeProv.CompileAssemblyFromSource(parameters,sources);
+                CompilerResults results = CodeProv.CompileAssemblyFromSource(parameters, sources);
                 foreach (CompilerError er in results.Errors)
                 {
                     Console.WriteLine(er.ToString());
@@ -709,13 +753,13 @@ namespace ListSharp
                 }
 
 
-                 
-                 var type = results.CompiledAssembly.GetType("MainClass");
 
-                 var obj = Activator.CreateInstance(type);
+                var type = results.CompiledAssembly.GetType("MainClass");
 
-                 var output = type.GetMethod("Execute").Invoke(obj, new object[] { });
-                 Console.WriteLine(output);
+                var obj = Activator.CreateInstance(type);
+
+                var output = type.GetMethod("Execute").Invoke(obj, new object[] { });
+                Console.WriteLine(output);
             }
 
             while (true)
@@ -727,7 +771,7 @@ namespace ListSharp
 
         public static bool isCommand(string inp)
         {
-            for (int i = 0; i<allcommands.Count(); i++)
+            for (int i = 0; i < allcommands.Count(); i++)
             {
                 if (inp.Length >= allcommands[i].Length)
                     if (inp.Substring(0, allcommands[i].Length) == allcommands[i])
@@ -736,42 +780,6 @@ namespace ListSharp
             return false;
         }
 
-        public static string removePreWhitespace(string line)
-        {
-            int firstCharIndex = 0;
-
-            foreach (char c in line)
-            {
-                if (c == ' ')
-                    firstCharIndex++;
-                else
-                    break;
-            }
-            return line.Substring(firstCharIndex);
-        }
-
-        public static string removeAfterWhitespace(string line)
-        {
-            while (line.Substring(line.Length - 1) == " ")
-                line = line.Substring(0,line.Length - 1);
-
-            return line;
-        }
-
-        public static string removePreEqualsAndAfter(string line)
-        {
-            int firstEqualsIndex = line.IndexOf("=");
-
-            string part_1 = line.Substring(0, firstEqualsIndex);
-
-            string part_2 = line.Substring(firstEqualsIndex+1);
-
-            part_1 = removeAfterWhitespace(part_1);
-            part_2 = removePreWhitespace(part_2);
-
-            return part_1 + " = " + part_2;
-
-        }
 
 
         public static byte[] IconToBytes(System.Drawing.Icon icon)
@@ -783,12 +791,12 @@ namespace ListSharp
             }
         }
 
-        public static void SetAssociation(string Extension, string KeyName, string OpenWith, string FileDescription,string IconPath)
+        public static void SetAssociation(string Extension, string KeyName, string OpenWith, string FileDescription, string IconPath)
         {
             AF_FileAssociator assoc = new AF_FileAssociator(Extension);
 
             if (assoc.Exists)
-            assoc.Delete();
+                assoc.Delete();
             // Creates a new file association for the .ABC file extension. 
             // Data is overwritten if it already exists.
             assoc.Create(KeyName,
@@ -798,7 +806,7 @@ namespace ListSharp
                 new OpenWithList(new string[] { KeyName }));
 
 
-            
+
         }
 
 
