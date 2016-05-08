@@ -35,7 +35,7 @@ namespace ListSharp
 
 
             List<string> maincode;
-            Boolean debugmode = true;
+
             Console.ForegroundColor = ConsoleColor.DarkCyan;
 
             Console.BackgroundColor = ConsoleColor.White;
@@ -133,13 +133,14 @@ namespace ListSharp
             string allcode = IO.getFullCode();
 
             /* cleaning up code */
-            maincode = allcode.preProcessCode().replaceConstants();
+            maincode = allcode.preProcessCode();
+            maincode = maincode.replaceConstants();
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
 
             #endregion
 
 
-            List<string> alllists = new List<string>();
+            
             string code =
             @"using System.Net;
             public class MainClass
@@ -150,48 +151,21 @@ namespace ListSharp
             string output = """";
             ";
             //variables initialization starts here:
-            List<string> allRowsVariables = new List<string>();
-            List<string> allStrgVariables = new List<string>();
-            foreach (string singleline in maincode)
-            {
+            
 
 
-                if (singleline.Length < 4)
-                    continue;
 
-                //rows variable
-                if (singleline.Substring(0, 4) == "ROWS")
-                {
-                    _regex = new Regex(@"ROWS([^=]*)");
-                    match = _regex.Match(singleline);
-                    alllists.Add("string[] " + match.Groups[1].Value.Trim() + " = { };" + Environment.NewLine);
-                    allRowsVariables.Add(match.Groups[1].Value.Trim());
-                }
+            /*
+             * since it creates the appropiate code for each variable even if it occurs twice
+             * i am making sure there are no duplicate variable initalizations which would break the code
+             */
 
-                //strg variable
-                if (singleline.Substring(0, 4) == "STRG")
-                {
-                    _regex = new Regex(@"STRG([^=]*)");
-                    match = _regex.Match(singleline);
-                    alllists.Add("string " + match.Groups[1].Value.Trim() + " = \"\";" + Environment.NewLine);
-                    allStrgVariables.Add(match.Groups[1].Value.Trim());
-                }
+            launchArguments.initializeArguments(maincode);
+            List<string> initializers = memory.InitializeVariables(maincode);
 
-                if (singleline.Substring(0, 1) == "#") //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
-                {
-                    if (singleline.Contains("ShowDebuggingInformation"))
-                    {
-                        if (singleline.Substring(singleline.Length - 4, 4) == "true")
-                            debugmode = true;
-                        else
-                            debugmode = false;
-                    }
-                    continue;
-                }
 
-            }
 
-            if (debugmode == true)
+            if (launchArguments.debugmode)
             {
                 Console.WriteLine("Original Code \n-----------------------");
                 foreach (string l in maincode)
@@ -200,16 +174,13 @@ namespace ListSharp
                 Console.WriteLine(Environment.NewLine);
             }
 
-            /*
-             * since it creates the appropiate code for each variable even if it occurs twice
-             * i am making sure there are no duplicate variable initalizations which would break the code
-             */
-            alllists = alllists.Distinct().ToList<string>();
-            foreach (string temp_string in alllists)
-            {
-                code += temp_string;
-            }
 
+
+            foreach (string temp_string in initializers)
+            {
+                code += temp_string + Environment.NewLine;
+            }
+            /* initializing all variables the script needs */
             int line = 0;
             foreach (string singleline in maincode)
             {
@@ -270,10 +241,6 @@ namespace ListSharp
                 string varname = splitline[0].Substring(4).Trim(); //the first 4 characters will always be the variable type ex: strg,rows
                 string vartype = splitline[0].Substring(0, 4);
                 
-
-
-                
-
 
 
                 if (splitline[0].Substring(0, 1) == "[" && splitline[0].Substring(splitline[0].Length-1, 1) == "]")
@@ -610,12 +577,12 @@ namespace ListSharp
                             code += Environment.NewLine;
                             code += "output += System.Environment.NewLine;";
                             code += Environment.NewLine;
-                            foreach (string ver in allStrgVariables)
+                            foreach (Variable ver in memory.variables["STRG"])
                             {
-                                code += "output += \"Listing " + ver + "\";";
+                                code += "output += \"Listing " + ver.name + "\";";
                                 code += Environment.NewLine;
 
-                                code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += "output = SHOW_F(" + ver.name + " , output);"; //call makeOutput() on any type of variable the users wants to display
                                 code += Environment.NewLine;
                             }
                         }
@@ -628,12 +595,12 @@ namespace ListSharp
                             code += Environment.NewLine;
                             code += "output += System.Environment.NewLine;";
                             code += Environment.NewLine;
-                            foreach (string ver in allRowsVariables)
+                            foreach (Variable ver in memory.variables["ROWS"])
                             {
-                                code += "output += \"Listing " + ver + "\";";
+                                code += "output += \"Listing " + ver.name + "\";";
                                 code += Environment.NewLine;
 
-                                code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += "output = SHOW_F(" + ver.name + " , output);"; //call makeOutput() on any type of variable the users wants to display
                                 code += Environment.NewLine;
                             }
                         }
@@ -646,21 +613,21 @@ namespace ListSharp
                             code += Environment.NewLine;
                             code += "output += System.Environment.NewLine;";
                             code += Environment.NewLine;
-                            foreach (string ver in allStrgVariables)
+                            foreach (Variable ver in memory.variables["STRG"])
                             {
-                                code += "output += \"Listing " + ver + "\";";
+                                code += "output += \"Listing " + ver.name + "\";";
                                 code += Environment.NewLine;
 
-                                code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += "output = SHOW_F(" + ver.name + " , output);"; //call makeOutput() on any type of variable the users wants to display
                                 code += Environment.NewLine;
                             }
 
-                            foreach (string ver in allRowsVariables)
+                            foreach (Variable ver in memory.variables["ROWS"])
                             {
-                                code += "output += \"Listing " + ver + "\";";
+                                code += "output += \"Listing " + ver.name + "\";";
                                 code += Environment.NewLine;
 
-                                code += "output = SHOW_F(" + ver + " , output);"; //call makeOutput() on any type of variable the users wants to display
+                                code += "output = SHOW_F(" + ver.name + " , output);"; //call makeOutput() on any type of variable the users wants to display
                                 code += Environment.NewLine;
                             }
                         }
