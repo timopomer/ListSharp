@@ -78,6 +78,7 @@
     <Compile Include="AF_FileAssociations.cs" />
     <Compile Include="baseDefinitions.cs" />
     <Compile Include="codeProcessing.cs" />
+    <Compile Include="debug.cs" />
     <Compile Include="IO.cs" />
     <Compile Include="launchArguments.cs" />
     <Compile Include="memory.cs" />
@@ -90,6 +91,7 @@
     </Compile>
     <Compile Include="replacePair.cs" />
     <Compile Include="ROWS.cs" />
+    <Compile Include="specifications.cs" />
     <Compile Include="STRG.cs" />
     <Compile Include="Variable.cs" />
   </ItemGroup>
