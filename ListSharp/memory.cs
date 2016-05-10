@@ -13,6 +13,7 @@ namespace ListSharp
 
         public static List<string> InitializeVariables(List<string> maincode)
         {
+
             variables = new Dictionary<string, Variable[]>();
             Regex rowsRegex = new Regex(@"ROWS([^=]*)");
             Regex strgRegex = new Regex(@"STRG([^=]*)");
@@ -24,11 +25,11 @@ namespace ListSharp
             Match match;
             foreach (string singleline in maincode)
             {
-                if (singleline.Length < 4)
-                    continue;
+
+
 
                 //rows variable
-                if (singleline.Substring(0, 4) == "ROWS")
+                if (singleline.StartsWith("ROWS"))
                 {
                     match = rowsRegex.Match(singleline);
                     variableInitializers.Add("string[] " + match.Groups[1].Value.Trim() + " = { };");
@@ -36,7 +37,7 @@ namespace ListSharp
                 }
 
                 //strg variable
-                if (singleline.Substring(0, 4) == "STRG")
+                if (singleline.StartsWith("STRG"))
                 {      
                     match = strgRegex.Match(singleline);
                     variableInitializers.Add("string " + match.Groups[1].Value.Trim() + " = \"\";");

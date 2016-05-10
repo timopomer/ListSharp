@@ -8,6 +8,7 @@ namespace ListSharp
 {
     public static class specifications
     {
+        /*
         public static string[] existingCommands = { "ROWSPLIT", "REPLACE", "READ", "EXTRACT", "COMBINE", "GETLINES", "ADD", "DOWNLOAD", "FILTER", "GETBETWEEN", "GETRANGE" };
 
         public static bool isCommand(string inp)
@@ -20,5 +21,6 @@ namespace ListSharp
             }
             return false;
         }
+        */ //absolutely useless right now! 
     }
 }

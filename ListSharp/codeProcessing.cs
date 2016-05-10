@@ -71,7 +71,7 @@ namespace ListSharp
                 return processExpression(line,line_num);
             }
 
-            debug.throwException("Line: " + line_num + " invalid", debug.importance.Fatal);
+            debug.throwException("Line: " + line_num + " invalid Operator", debug.importance.Fatal);
 
             return "";
         }
@@ -86,9 +86,151 @@ namespace ListSharp
                 return "foreach (string " + gc[2].Value + " in " + gc[1].Value + ")";
             }
 
-            debug.throwException("Line: " + line_num + " invalid", debug.importance.Fatal);
+            debug.throwException("Line: " + line_num + " invalid Expression", debug.importance.Fatal);
 
             return "";
+        }
+
+        public static string processStrg(string line,int line_num,STRG strgVar)
+        {
+
+            if (line.StartsWith("\"") && line.EndsWith("\"")) //check if string simply assigned;
+            {
+                return strgVar.name + " = @" + line + ";";
+            }
+
+
+
+            if (line.StartsWith("READ")) //read text file into code command is called "read"
+            {
+                string path = new Regex(@"READ\[([^>]*)\]").Match(line).Groups[1].Value.Trim(); //everything between the square brackets "[path]"
+
+                if (path.StartsWith("\"") && path.EndsWith("\"")) //if the path is a literal string we can check if it exists before compilation
+                if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
+                {
+                debug.throwException("File: " + path + " does not exist before compilation", debug.importance.Regular);
+                }
+
+                return strgVar.name + " = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+            }
+
+
+            if (line.StartsWith("DOWNLOAD")) //read text file into code command is called "read"
+            {
+                string path = new Regex(@"DOWNLOAD\[([^>]*)\]").Match(line).Groups[1].Value.Trim(); //everything between the square brackets "[path]"
+                return strgVar.name +  " = DOWNLOAD_F(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+            }
+
+
+            return processVariableIndependant(line,line_num,strgVar);
+        }
+
+        public static string processRows(string line, int line_num, ROWS rowsVar)
+        {
+        
+            if (line.StartsWith("{") && line.EndsWith("}")) //check if string simply assigned;
+            {
+                return rowsVar.name + " = new string[]" + line + ";";
+            }
+
+            if (line.StartsWith("ROWSPLIT")) //rowsplit command
+            {
+                GroupCollection gc = new Regex(@"ROWSPLIT ([^>]*) BY \[(.*)\]").Match(line).Groups;
+                return rowsVar.name + " = ROWSPLIT_F(" + gc[1].Value + "," + gc[2].Value + ");"; //interperted code
+            }
+
+            if (line.StartsWith("FILTER")) //filter command
+            {
+                GroupCollection gc = new Regex(@"FILTER ([^>]*) IF (.*?) \[(.*)\]").Match(line).Groups;
+
+                if (!new string[] {"CONTAINS","CONTAINSNOT","IS","ISNOT"}.Contains(gc[2].Value))
+                {
+                     debug.throwException("Filter mode \"" + gc[2].Value + "\" does not exist", debug.importance.Fatal);
+                }
+
+                return rowsVar.name + " = FILTER_F(" + gc[1].Value + ",\"" + gc[2].Value + "\"," + gc[3].Value + ");"; //interperted code
+            }
+
+
+            if (line.StartsWith("GETLINES")) //getlines command
+            {
+                GroupCollection gc = new Regex(@"GETLINES ([^>]*) \[(.*)\]").Match(line).Groups;
+                return rowsVar.name + " = GETLINES_F(" + gc[1].Value + ",\"" + gc[2].Value + "\");"; //interperted code
+            }
+
+            if (line.StartsWith("ADD")) //rowsplit command
+            {
+                GroupCollection gc = new Regex(@"\[(.*)\] TO ([^>]*)").Match(line).Groups;
+                return rowsVar.name + " = ADD_F(" + gc[2].Value + ",new object[] {" + gc[1].Value + "});"; //interperted code
+            }
+
+            if (line.StartsWith("EXTRACT")) //extract command
+            {
+                GroupCollection gc = new Regex(@"EXTRACT COLLUM\[([^>]*)\] FROM (.*?) SPLIT BY \[(.*)\]").Match(line).Groups;
+                int collumnum = 0;
+                try
+                {
+                    collumnum = Convert.ToInt32(gc[1].Value);
+                }
+                catch
+                {
+                    debug.throwException("Could not turn \"" + gc[1].Value + "\" into number in extract command", debug.importance.Fatal);
+                }
+                return rowsVar.name + " = EXTRACT_F(" + gc[2].Value + "," + gc[3].Value + "," + collumnum + ");"; //interperted code
+            }
+
+            if (line.StartsWith("COMBINE")) //extract command
+            {
+                GroupCollection gc = new Regex(@"COMBINE\[([^>]*?)\] WITH \[(.*)\]").Match(line).Groups;
+                return rowsVar.name + " = COMBINE_F(new string[][] {" + gc[1].Value + "}," + gc[2].Value + ");"; //interperted code
+            }
+
+            return processVariableIndependant(line, line_num, rowsVar);
+        }
+
+        public static string processVariableIndependant(string line, int line_num, Variable inpVar)
+        {
+
+            string cast = inpVar is STRG ? "string" : "string[]";
+
+            if (line.StartsWith("GETBETWEEN")) //filter command
+            {
+                GroupCollection gc = new Regex(@"GETBETWEEN (.*?) \[(.*)\] AND \[(.*)\]").Match(line).Groups;
+                return inpVar.name + " = (" + cast + ")GETBETWEEN_F(" + gc[1].Value + "," + gc[2].Value + "," + gc[3].Value + ");"; //interperted code
+            }
+
+            if (line.StartsWith("GETRANGE")) //getrange command
+            {
+                GroupCollection gc = new Regex(@"GETRANGE (.*?) FROM \[(.*)\] TO \[(.*)\]").Match(line).Groups;
+                return inpVar.name + " = (" + cast + ")GETRANGE_F(" + gc[1].Value + "," + gc[2].Value + "," + gc[3].Value + ");"; //interperted code
+            }
+
+            if (line.StartsWith("REPLACE"))
+            {
+                GroupCollection gc = new Regex(@"\[(.*)\] IN ([^>]*)").Match(line).Groups;
+                return inpVar.name + " = (" + cast + ")REPLACE_F(" + gc[2].Value + "," + gc[1].Value + ");";
+            }
+            
+            
+            if (inpVar is STRG)
+            {
+                if (memory.variables["STRG"].Where(p => p.name == line).ToArray().Length > 0)
+                    return inpVar.name + " = " + line + ";";
+                else
+                    debug.throwException("Variable: " + line + " wasnt defined yet", debug.importance.Fatal);
+
+            }
+            if (inpVar is ROWS)
+            {
+                if (memory.variables["ROWS"].Where(p => p.name == line).ToArray().Length > 0)
+                    return inpVar.name + " = " + line + ";";
+                else
+                    debug.throwException("Variable: " + line + " wasnt defined yet", debug.importance.Fatal);
+            }
+
+            debug.throwException("Line: " + line_num + " invalid command", debug.importance.Fatal);
+
+            return ""; //this never happens
         }
 
 
@@ -98,13 +240,22 @@ namespace ListSharp
                 return processOperators(line, line_num);
 
 
+            string[] splitline = line.Split(new char[] { '=' }, 2); //splitting the line of "variable = evaluated string later to be parsed
+            string varname = splitline[0].Substring(4).Trim(); //the first 4 characters will always be the variable type ex: strg,rows
+            string vartype = splitline[0].Substring(0, 4);
+            splitline[1] = splitline[1].Substring(1);
 
+            if (vartype == "STRG")
+                return processStrg(splitline[1], line_num, new STRG(varname));
+
+
+            if (vartype == "ROWS")
+                return processRows(splitline[1], line_num, new ROWS(varname));
 
 
             Regex _regex;
             Match match;
             string code = "";
-            string[] splitline = line.Split(new char[] { '=' }, 2); //splitting the line of "variable = evaluated string later to be parsed
 
 
 
@@ -113,317 +264,7 @@ namespace ListSharp
 
 
 
-            string varname = splitline[0].Substring(4).Trim(); //the first 4 characters will always be the variable type ex: strg,rows
-            string vartype = splitline[0].Substring(0, 4);
 
-
-
-
-
-
-
-
-
-
-            if (line.Contains("="))
-            {
-
-                splitline[1] = splitline[1].Substring(1);
-                //strg variable type
-                if (vartype == "STRG")
-                {
-
-                    if (splitline[1].Substring(0, 1) == "\"" && splitline[1].Substring(splitline[1].Length - 1, 1) == "\"") //check if string simply assigned;
-                    {
-                        code += varname + " = @" + splitline[1] + ";"; //set variable to tempoary variable
-                        code += Environment.NewLine;
-                        return code;
-                    }
-
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
-                        {
-                            _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
-                            match = _regex.Match(splitline[1]);
-                            string path = @match.Groups[1].Value.Trim();
-
-
-                            if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
-                            {
-
-                                if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
-                                {
-                                    Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
-
-                                    while (true)
-                                    {
-                                        Thread.Sleep(1000); //sleep forever
-                                    }
-                                }
-                            }
-
-
-                            code += "temp_contents = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
-                            code += Environment.NewLine;
-                            code += varname + " = temp_contents;"; //set variable to tempoary variable
-
-                        }
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 4) == "READ") //read text file into code command is called "read"
-                        {
-                            _regex = new Regex(@"READ\[([^>]*)\]"); //everything between the square brackets "[path]"
-                            match = _regex.Match(splitline[1]);
-                            string path = @match.Groups[1].Value.Trim();
-
-
-                            if (path.Substring(0, 1) == "\"" && path.Substring(path.Length - 1, 1) == "\"")
-                            {
-                                  
-                                if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
-                                {
-                                    Console.WriteLine("ListSharp exception: File does not exist, aborting operation\nadditional information: File:\"" + path + "\"");
-
-                                    while (true)
-                                    {
-                                        Thread.Sleep(1000); //sleep forever
-                                    }
-                                }
-                            }
-
-
-                            code += "temp_contents = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
-                            code += Environment.NewLine;
-                            code += varname + " = temp_contents;"; //set variable to tempoary variable
-
-                        }
-
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 8) == "DOWNLOAD") //read text file into code command is called "read"
-                        {
-                            _regex = new Regex(@"DOWNLOAD\[([^>]*)\]"); //everything between the square brackets "[path]"
-                            match = _regex.Match(splitline[1]);
-                            string path = @match.Groups[1].Value.Trim();
-
-
-
-                            code += "temp_contents = DOWNLOAD_F(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
-                            code += Environment.NewLine;
-                            code += varname + " = temp_contents;"; //set variable to tempoary variable
-
-                        }
-
-
-
-
-                }
-
-                //rows variable type
-                if (vartype == "ROWS")
-                {
-
-                    if (splitline[1].Substring(0, 1) == "{" && splitline[1].Substring(splitline[1].Length - 1, 1) == "}") //check if string simply assigned;
-                    {
-                        code += varname + " = new string[]" + splitline[1] + ";"; //set variable to tempoary variable
-                        code += Environment.NewLine;
-                        return code;
-                    }
-
-
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 8) == "ROWSPLIT") //rowsplit command
-                        {
-                            _regex = new Regex(@"ROWSPLIT([^>]*)BY"); //this finds what variable is to be split
-                            match = _regex.Match(splitline[1]);
-                            string invar = match.Groups[1].Value.Trim();
-
-                            _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
-                            match = _regex.Match(splitline[1]);
-                            string bywhat = match.Groups[1].Value.Trim();
-
-
-                            code += varname + " = ROWSPLIT_F(" + invar + "," + bywhat + ");"; //interperted code
-                        }
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 6) == "FILTER") //filter command
-                        {
-                            _regex = new Regex(@"FILTER([^>]*)IF"); //this finds what variable is to be split
-                            match = _regex.Match(splitline[1]);
-                            string invar = match.Groups[1].Value.Trim();
-
-
-                            _regex = new Regex(@"IF(.*?)\["); //this finds what variable is to be split
-                            match = _regex.Match(splitline[1]);
-                            string mode = match.Groups[1].Value.Trim();
-
-
-                            _regex = new Regex(@"\[(.*)\]"); //this finds by what string to split the variable
-                            match = _regex.Match(splitline[1]);
-                            string param = match.Groups[1].Value.Trim();
-
-                            if (mode != "CONTAINS" && mode != "CONTAINSNOT" && mode != "IS" && mode != "ISNOT")
-                            {
-                                Console.WriteLine("ListSharp exception: Filter mode does not exist, aborting operation\nadditional information: mode:\"" + mode + "\"");
-
-                                while (true)
-                                {
-                                    Thread.Sleep(1000); //sleep forever
-                                }
-                            }
-                            code += varname + " = FILTER_F(" + invar + ",\"" + mode + "\"," + param + ");"; //interperted code
-                        }
-
-
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 8) == "GETLINES") //rowsplit command
-                        {
-                            _regex = new Regex(@"GETLINES([^>]*)\["); //this finds what variable is to be split
-                            match = _regex.Match(splitline[1]);
-                            string invar = match.Groups[1].Value.Trim();
-
-                            _regex = new Regex(@"\[(.*)\]"); //this finds what lines of the array to get
-                            match = _regex.Match(splitline[1]);
-                            string bywhat = match.Groups[1].Value.Trim();
-
-                            code += varname + " = GETLINES_F(" + invar + ",\"" + bywhat + "\");"; //interperted code
-                        }
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 3) == "ADD") //rowsplit command
-                        {
-                            _regex = new Regex(@"TO([^>]*)"); //this finds what variable is to be split
-                            match = _regex.Match(splitline[1]);
-                            string invar = match.Groups[1].Value.Trim();
-
-                            _regex = new Regex(@"\[(.*)\]"); //this finds what lines of the array to get
-                            match = _regex.Match(splitline[1]);
-                            string bywhat = match.Groups[1].Value.Trim();
-
-                            code += varname + " = ADD_F(" + invar + ",new object[] {" + bywhat + "});"; //interperted code
-                        }
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 7) == "EXTRACT") //extract command
-                        {
-                            _regex = new Regex(@"EXTRACT([^>]*)FROM");
-                            match = _regex.Match(splitline[1]);
-                            string collumvar = match.Groups[1].Value.Trim();
-
-                            _regex = new Regex(@"\[(.*)\]"); //this finds what collum is to be extracted
-                            match = _regex.Match(collumvar);
-                            int collumnum = Convert.ToInt32(match.Groups[1].Value.Trim());
-
-                            _regex = new Regex(@"FROM([^>]*)SPLIT"); //this finds what variable is to be extracted from
-                            match = _regex.Match(splitline[1]);
-                            string whatvar = match.Groups[1].Value.Trim();
-
-                            _regex = new Regex(@"BY \[(.*)\]"); //this finds by what string to extract the variable
-                            match = _regex.Match(splitline[1]);
-                            string bywhat = match.Groups[1].Value;
-
-
-                            code += varname + " = EXTRACT_F(" + whatvar + "," + bywhat + "," + collumnum + ");"; //interperted code
-                        }
-
-
-                    if (specifications.isCommand(splitline[1]))
-                        if (splitline[1].Substring(0, 7) == "COMBINE") //extract command
-                        {
-
-                            _regex = new Regex(@"COMBINE\[([^>]*?)\]"); //everything between the square brackets "[array,array,array]"
-                            match = _regex.Match(splitline[1]);
-                            string combinearrays = @match.Groups[1].Value.Trim();
-
-                            _regex = new Regex(@"WITH \[(.*)\]"); //this finds by what string to extract the variable
-                            match = _regex.Match(splitline[1]);
-                            string withwhat = match.Groups[1].Value;
-
-                            code += varname + " = COMBINE_F(new string[][] {" + combinearrays + "}," + withwhat + ");"; //interperted code
-                        }
-
-
-
-                }
-
-
-                if (splitline[0].Substring(0, 4) == "STRG" || splitline[0].Substring(0, 4) == "ROWS")
-                {
-
-                    if (!specifications.isCommand(splitline[1]))
-                    {
-                        code += varname + " = " + splitline[1] + ";"; //set variable to tempoary variable
-                        code += Environment.NewLine;
-                        return code;
-                    }
-
-
-
-                    string restring = "";
-                    if (splitline[0].Substring(0, 4) == "STRG")
-                        restring = "string";
-                    if (splitline[0].Substring(0, 4) == "ROWS")
-                        restring = "string[]";
-
-
-
-                    if (splitline[1].Substring(0, 10) == "GETBETWEEN") //filter command
-                    {
-                        _regex = new Regex(@"GETBETWEEN(.*?)\["); //this finds what variable is to be split
-                        match = _regex.Match(splitline[1]);
-                        string invar = match.Groups[1].Value.Trim();
-
-
-                        _regex = new Regex(@"\[(.*)\] AND"); //this finds what variable is to be split
-                        match = _regex.Match(splitline[1]);
-                        string start = match.Groups[1].Value.Trim();
-
-
-                        _regex = new Regex(@"AND \[(.*)\]"); //this finds by what string to split the variable
-                        match = _regex.Match(splitline[1]);
-                        string end = match.Groups[1].Value.Trim();
-
-
-                        code += varname + " = (" + restring + ")GETBETWEEN_F(" + invar + "," + start + "," + end + ");"; //interperted code
-                    }
-
-                    if (splitline[1].Substring(0, 8) == "GETRANGE") //getrange command
-                    {
-                        _regex = new Regex(@"GETRANGE(.*?)FROM \["); //this finds what variable is to be split
-                        match = _regex.Match(splitline[1]);
-                        string invar = match.Groups[1].Value.Trim();
-
-
-                        _regex = new Regex(@"FROM \[(.*)\] TO"); //find starting index
-                        match = _regex.Match(splitline[1]);
-                        string start = match.Groups[1].Value.Trim();
-
-
-                        _regex = new Regex(@"TO \[(.*)\]"); //find end index
-                        match = _regex.Match(splitline[1]);
-                        string end = match.Groups[1].Value.Trim();
-
-
-                        code += varname + " = (" + restring + ")GETRANGE_F(" + invar + "," + start + "," + end + ");"; //interperted code
-                    }
-
-                    if (splitline[1].Substring(0, 7) == "REPLACE")
-                    {
-
-                        _regex = new Regex(@"\[(.*)\]");
-                        match = _regex.Match(splitline[1]);
-                        string withwhat = match.Groups[1].Value.Trim();
-                        _regex = new Regex(@"IN([^>]*)"); //this finds by what string to extract the variable
-                        match = _regex.Match(splitline[1]);
-                        string whatvar = match.Groups[1].Value.Trim();
-
-                        code += varname + " = (" + restring + ")REPLACE_F(" + whatvar + "," + withwhat + ");";
-                    }
-                }
 
                 if (splitline[0].Substring(0, 4) == "SHOW") //show a variable to debug your program
                 {
@@ -511,7 +352,7 @@ namespace ListSharp
                     code += Environment.NewLine;
                 }
 
-            }
+            
             return code;
         }
 
