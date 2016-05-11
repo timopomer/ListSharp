@@ -4,9 +4,8 @@
 				return "Show Error";
 			}
 
-			public string SHOW_F(object thein, string output) {
-				output += System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine, "<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
-				return output;
+			public string SHOW_F(object thein) {
+				return System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine, "<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
 			}
 
 

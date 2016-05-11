@@ -11,6 +11,8 @@ namespace ListSharp
 {
     public static class codeProcessing
     {
+
+        #region preprocessing
         public static List<string> preProcessCode(this string rawCode)
         {
             string[] codeLines = rawCode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
@@ -36,8 +38,11 @@ namespace ListSharp
                     alllines[i] = alllines[i].Replace(replacer.name,replacer.value);
 
             return alllines.ToList();
-
         }
+
+        #endregion
+
+        #region process codeline
 
         public static string processOperators(string line, int line_num)
         {
@@ -233,6 +238,71 @@ namespace ListSharp
             return ""; //this never happens
         }
 
+        #endregion
+
+        #region SHOW command
+
+        public static string processShow(string line, int line_num)
+        {
+            switch (line)
+            {
+                case "STRG":
+                case "ROWS":
+                case "ALL":
+                {
+                        return (genericShow(line));
+                }
+                default:
+                {
+                        return "output += SHOW_F(" + line + ") + System.Environment.NewLine;";
+                }
+            }
+        }
+
+        public static string genericShow(string type)
+        {
+            string returnedCode = "";
+            returnedCode += "output += System.Environment.NewLine + \"Listing " + type + " variables\" + System.Environment.NewLine;";
+            switch (type)
+            {
+                case "ALL":
+                    {
+                        returnedCode += typeShow("STRG") + "\n" + typeShow("ROWS");
+                            break;
+                    }
+                default:
+                    {
+                        returnedCode += typeShow(type);
+                            break;
+                    }
+            }
+            return returnedCode;
+        }
+
+        
+
+
+        public static string typeShow(string type)
+        {
+            string toReturn = "";
+            foreach (Variable ver in memory.variables[type])
+            {
+                toReturn += "output += \"Listing " + ver.name + ":\" ;";
+                toReturn += "output += SHOW_F(" + ver.name + ") + System.Environment.NewLine;"; //call SHOW_F() on any type of variable the users wants to display
+            }
+            return toReturn;
+        }
+
+        #endregion
+
+        #region OUTP command
+        public static string processOutput(string line, int line_num)
+        {
+            GroupCollection gc = new Regex(@"(.*) HERE\[(.*)\]").Match(line).Groups;
+            return "OUTP_F(" + gc[2].Value + ", " + gc[1].Value + ");"; //outputs to file
+        }
+
+        #endregion
 
         public static string processLine(string line, int line_num)
         {
@@ -242,123 +312,29 @@ namespace ListSharp
 
             string[] splitline = line.Split(new char[] { '=' }, 2); //splitting the line of "variable = evaluated string later to be parsed
             string varname = splitline[0].Substring(4).Trim(); //the first 4 characters will always be the variable type ex: strg,rows
-            string vartype = splitline[0].Substring(0, 4);
+            string start_argument = splitline[0].Substring(0, 4);
             splitline[1] = splitline[1].Substring(1);
 
-            if (vartype == "STRG")
+            if (start_argument == "STRG")
                 return processStrg(splitline[1], line_num, new STRG(varname));
 
 
-            if (vartype == "ROWS")
+            if (start_argument == "ROWS")
                 return processRows(splitline[1], line_num, new ROWS(varname));
 
 
-            Regex _regex;
-            Match match;
-            string code = "";
+            if (start_argument == "SHOW")
+                return processShow(splitline[1], line_num);
 
 
+            if (start_argument == "OUTP")
+                return processOutput(splitline[1], line_num);
 
 
+            debug.throwException("Line: " + line + " could not be interpeted", debug.importance.Fatal);
+            return "";
 
-
-
-
-
-
-                if (splitline[0].Substring(0, 4) == "SHOW") //show a variable to debug your program
-                {
-                    if (splitline[1] == "STRG")
-                    {
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += "output += \"Listing all STRG variables\";";
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += Environment.NewLine;
-                        foreach (Variable ver in memory.variables["STRG"])
-                        {
-                            code += "output += \"Listing " + ver.name + "\";";
-                            code += Environment.NewLine;
-
-                            code += "output = SHOW_F(" + ver.name + " , output);"; //call makeOutput() on any type of variable the users wants to display
-                            code += Environment.NewLine;
-                        }
-                    }
-                    else
-                    if (splitline[1] == "ROWS")
-                    {
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += "output += \"Listing all ROWS variables\";";
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += Environment.NewLine;
-                        foreach (Variable ver in memory.variables["ROWS"])
-                        {
-                            code += "output += \"Listing " + ver.name + "\";";
-                            code += Environment.NewLine;
-
-                            code += "output = SHOW_F(" + ver.name + " , output);"; //call makeOutput() on any type of variable the users wants to display
-                            code += Environment.NewLine;
-                        }
-                    }
-                    else
-                        if (splitline[1] == "ALL")
-                    {
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += "output += \"Listing all variables\";";
-                        code += Environment.NewLine;
-                        code += "output += System.Environment.NewLine;";
-                        code += Environment.NewLine;
-                        foreach (Variable ver in memory.variables["STRG"])
-                        {
-                            code += "output += \"Listing " + ver.name + "\";";
-                            code += Environment.NewLine;
-
-                            code += "output = SHOW_F(" + ver.name + " , output);"; //call makeOutput() on any type of variable the users wants to display
-                            code += Environment.NewLine;
-                        }
-
-                        foreach (Variable ver in memory.variables["ROWS"])
-                        {
-                            code += "output += \"Listing " + ver.name + "\";";
-                            code += Environment.NewLine;
-
-                            code += "output = SHOW_F(" + ver.name + " , output);"; //call makeOutput() on any type of variable the users wants to display
-                            code += Environment.NewLine;
-                        }
-                    }
-                    else
-                    {
-                        code += "output = SHOW_F(" + splitline[1] + " , output);"; //call makeOutput() on any type of variable the users wants to display
-                        code += Environment.NewLine;
-                    }
-                }
-
-                if (splitline[0].Substring(0, 4) == "OUTP") //output command
-                {
-                    _regex = new Regex(@"([^>]*)HERE"); //everything between the square brackets "[path]"
-                    match = _regex.Match(splitline[1]);
-                    string thevar = @match.Groups[1].Value.Trim();
-
-
-                    _regex = new Regex(@"HERE\[([^>]*)\]"); //everything between the square brackets "[path]"
-                    match = _regex.Match(splitline[1]);
-                    string path = @match.Groups[1].Value.Trim();
-
-                    code += "OUTP_F(" + path + ", " + thevar + ");"; //output the rows to file
-                    code += Environment.NewLine;
-                }
-
-            
-            return code;
         }
-
-
-
-
 
 
         #region processingFunctions
@@ -399,16 +375,6 @@ namespace ListSharp
             return part_1 + " = " + part_2;
 
         }
-        /*
-        public static bool startsWith(this string line,string value)
-        {
-            if (line.Length < value.Length)
-                return false;
-
-            return line.Substring(0, value.Length) == value;
-
-        }
-        */
 
         public static bool isLogic(this string line)
         {
