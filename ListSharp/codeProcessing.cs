@@ -15,6 +15,7 @@ namespace ListSharp
         #region preprocessing
         public static List<string> preProcessCode(this string rawCode)
         {
+            rawCode = Regex.Replace(rawCode, "/^*(.*?)^*/", "", RegexOptions.Singleline);
             string[] codeLines = rawCode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
             for (int i = 0; i < codeLines.Length; i++)
@@ -66,10 +67,13 @@ namespace ListSharp
                 return "//command executed: " + line;
             }
 
+
+            /* shouldnt be able to happen anymore */
             if (line.StartsWith("/*") || line.StartsWith("*/")) //to see if the code is commented out so it does net get into the final code
             {
                 return line;
             }
+            
 
             if (line.StartsWith("[") && line.EndsWith("]"))
             {
