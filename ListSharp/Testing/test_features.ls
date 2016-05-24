@@ -57,9 +57,9 @@ SHOW = "all html rows: "
 SHOW = allrows
 
 
-//filter
-ROWS filtered = FILTER allrows IF CONTAINS ["a href"]
-ROWS filtered = FILTER filtered IF CONTAINS ["<td>"]
+//select
+ROWS filtered = SELECT FROM allrows WHERE[EVERY STRG CONTAINS "a href"]
+ROWS filtered = SELECT FROM filtered WHERE[EVERY STRG CONTAINS "<td>"]
 SHOW = "all filtered html rows: "
 SHOW = filtered
 
