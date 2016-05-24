@@ -9,11 +9,32 @@ namespace ListSharp
     public static class baseDefinitions
     {
 
-        public static replacePair[] replacePairs;
+        public static Dictionary<String,String> constantPairs;
+        public static Dictionary<String, String> operatorConversion;
+
         public static void initialize()
         {
-            replacePairs = new replacePair[]{ new replacePair("<here>", "@\"" + IO.currentdir + "\""), new replacePair("<newline>", "\"\\n\"") };
+            constantPairs = new Dictionary<String, String>();
+            operatorConversion = new Dictionary<String, String>();
+
+            #region contstants
+            constantPairs.Add("<here>", "@\"" + IO.currentdir + "\"");
+            constantPairs.Add("<newline>", "\"\\n\"");
+            #endregion
+
+            #region operators
+            operatorConversion.Add("ISOVER", ">");
+            operatorConversion.Add("ISUNDER", ">");
+            operatorConversion.Add("ISEQUALOVER", "=>");
+            operatorConversion.Add("ISEQUALUNDER", "=<");
+            operatorConversion.Add("ISEQUAL", "==");
+            operatorConversion.Add("IS", "==");
+            operatorConversion.Add("ISNOT", "!=");
+            operatorConversion.Add("CONTAINS", "");
+            operatorConversion.Add("CONTAINSNOT", "!");
+            #endregion
+
         }
-        
+
     }
 }

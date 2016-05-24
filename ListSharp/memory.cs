@@ -50,5 +50,10 @@ namespace ListSharp
             return variableInitializers.Distinct().ToList<string>();
 
         }
+
+        public static bool ofVarType(this string varname,string type)
+        {
+            return variables[type].Where(p => p.name == varname).ToArray().Length > 0;
+        }
     }
 }

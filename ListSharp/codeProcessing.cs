@@ -15,7 +15,7 @@ namespace ListSharp
         #region preprocessing
         public static List<string> preProcessCode(this string rawCode)
         {
-            rawCode = Regex.Replace(rawCode, "/^*(.*?)^*/", "", RegexOptions.Singleline);
+            rawCode = Regex.Replace(rawCode, @"\/\*(.*?)\*/", "", RegexOptions.Singleline);
             string[] codeLines = rawCode.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
             for (int i = 0; i < codeLines.Length; i++)
@@ -35,8 +35,8 @@ namespace ListSharp
             string[] alllines = inputLines.ToArray();
 
             for (int i = 0; i < alllines.Length; i++)
-                foreach (replacePair replacer in baseDefinitions.replacePairs)
-                    alllines[i] = alllines[i].Replace(replacer.name,replacer.value);
+                foreach (KeyValuePair<String,String> replacer in baseDefinitions.constantPairs)
+                    alllines[i] = alllines[i].Replace(replacer.Key,replacer.Value);
 
             return alllines.ToList();
         }
@@ -91,7 +91,7 @@ namespace ListSharp
 
             if (line.StartsWith("FOREACH"))
             {
-                GroupCollection gc = new Regex(@"IN (.*)AS (.*)").Match(line).Groups;
+                GroupCollection gc = new Regex(@"FOREACH STRG IN (.*) AS (.*)").Match(line).Groups;
                 return "foreach (string " + gc[2].Value + " in " + gc[1].Value + ")";
             }
 
@@ -148,17 +148,11 @@ namespace ListSharp
                 return rowsVar.name + " = ROWSPLIT_F(" + gc[1].Value + "," + gc[2].Value + ");"; //interperted code
             }
 
-            if (line.StartsWith("FILTER")) //filter command
+            if (line.StartsWith("SELECT")) //rowsplit command
             {
-                GroupCollection gc = new Regex(@"FILTER ([^>]*) IF (.*?) \[(.*)\]").Match(line).Groups;
-
-                if (!new string[] {"CONTAINS","CONTAINSNOT","IS","ISNOT"}.Contains(gc[2].Value))
-                {
-                     debug.throwException("Filter mode \"" + gc[2].Value + "\" does not exist", debug.importance.Fatal);
-                }
-
-                return rowsVar.name + " = FILTER_F(" + gc[1].Value + ",\"" + gc[2].Value + "\"," + gc[3].Value + ");"; //interperted code
+                return rowsVar.name + " = " + selectBuilder(line); //interperted code
             }
+
 
 
             if (line.StartsWith("GETLINES")) //getlines command
@@ -223,7 +217,7 @@ namespace ListSharp
             
             if (inpVar is STRG)
             {
-                if (memory.variables["STRG"].Where(p => p.name == line).ToArray().Length > 0)
+                if (line.ofVarType("STRG"))
                     return inpVar.name + " = " + line + ";";
                 else
                     debug.throwException("Variable: " + line + " wasnt defined yet", debug.importance.Fatal);
@@ -231,7 +225,7 @@ namespace ListSharp
             }
             if (inpVar is ROWS)
             {
-                if (memory.variables["ROWS"].Where(p => p.name == line).ToArray().Length > 0)
+                if (line.ofVarType("ROWS"))
                     return inpVar.name + " = " + line + ";";
                 else
                     debug.throwException("Variable: " + line + " wasnt defined yet", debug.importance.Fatal);
@@ -340,7 +334,6 @@ namespace ListSharp
 
         }
 
-
         #region processingFunctions
 
         public static string removePreWhitespace(string line)
@@ -389,6 +382,91 @@ namespace ListSharp
             return !Char.IsLetter(line.Substring(0, 1).ToCharArray()[0]);
 
         }
+
+        #endregion
+
+
+
+        #region queryFunctions
+        public static string selectBuilder(string line)
+        {
+            string var1 = new Regex(@"FROM (.*) WHERE").Match(line).Groups[1].Value;
+            line = new Regex(@"WHERE\[(.*)\]").Match(line).Groups[1].Value;
+            GroupCollection gc = new Regex(@"(.*)(ISOVER|ISUNDER|ISEQUALOVER|ISEQUALUNDER|ISEQUAL|ISNOT|IS|CONTAINSNOT|CONTAINS)(.*)").Match(line).Groups;
+            Tuple<string, string> variables = getVarnames(line, var1);
+            Tuple<string, string> sides = new Tuple<string, string>(gc[1].Value, gc[3].Value);
+            switch (gc[2].Value)
+            {
+                case "ISOVER":
+                case "ISUNDER":
+                case "ISEQUAL":
+                case "ISEQUALOVER":
+                case "ISEQUALUNDER":
+                    return numericSelect(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
+
+                case "CONTAINSNOT":
+                case "CONTAINS":
+                    return containSelect(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
+
+                case "IS":
+                case "ISNOT":
+                    return equallitySelect(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
+
+            }
+            debug.throwException("select mode does not exist", debug.importance.Fatal);
+            return "";
+
+
+        }
+
+        public static string numericSelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
+        {
+            if (line.Item2.Contains("LENGTH"))
+            {
+                if (line.Item2.Contains("EVERY"))
+                    return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ".Max(temp_2 => temp_2.Length)).ToArray();";
+
+                if (line.Item2.Contains("ANY"))
+                    return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ".Min(temp_2 => temp_2.Length)).ToArray();";
+
+                return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " returnLength(" + variables.Item2 + ")).ToArray();";
+            }
+            return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ").ToArray();";
+        }
+
+        public static string containSelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
+        {
+            if (line.Item2.Contains("EVERY"))
+                return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => " + operation + "temp_2.Contains(temp)).ToArray().Length == " + variables.Item2 + ".Length).ToArray();";
+
+            if (line.Item2.Contains("ANY"))
+                return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => " + operation + "temp_2.Contains(temp)).ToArray().Length > 0).ToArray();";
+
+            return variables.Item1 + ".Where(temp => " + operation + "temp.Contains(" + variables.Item2 + ")).ToArray();";
+        }
+
+        public static string equallitySelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
+        {
+            bool positive = (operation == "==");
+            bool enclusive = line.Item2.Contains("EVERY");
+
+
+            if (positive == enclusive)
+                return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => temp_2 " + operation + " temp).ToArray().Length == " + variables.Item2 + ".Length).ToArray();";
+
+            if (!enclusive)
+                return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => temp_2 " + operation + " temp).ToArray().Length > 0).ToArray();";
+
+
+            return variables.Item1 + ".Where(temp => temp " + operation + " " + variables.Item2 + ").ToArray();";
+        }
+
+        public static Tuple<string, string> getVarnames(string inp, string var1)
+        {
+            string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "ISOVER", "IS", "ISNOT", "ISUNDER", "ISOVER", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
+            return new Tuple<string, string>(var1, t[0]);
+        }
+
 
         #endregion
     }

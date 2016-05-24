@@ -142,6 +142,7 @@ namespace ListSharp
             
             string code =
             @"using System.Net;
+            using System.Linq;
             public class MainClass
             { 
             public string Execute()
@@ -184,22 +185,14 @@ namespace ListSharp
             foreach (string singleline in maincode)
             {
 
-
-                
-
                 code += codeProcessing.processLine(singleline, line_num);
                 code += Environment.NewLine;
                 line_num++; //to know what line number we are currently processing
 
             }
 
-            code += Environment.NewLine + "return output;";
-
-
+            code += "return output;";
             code += Environment.NewLine + "}" + Environment.NewLine;
-
-
-
             code += Properties.Resources.externalFunctions + "}"; //here we add all function depndecies
 
 
@@ -236,6 +229,7 @@ namespace ListSharp
             parameters.GenerateInMemory = true;
 
             parameters.ReferencedAssemblies.Add("System.dll");
+            parameters.ReferencedAssemblies.Add("System.Core.dll");
 
             using (Microsoft.CSharp.CSharpCodeProvider CodeProv =
             new Microsoft.CSharp.CSharpCodeProvider())

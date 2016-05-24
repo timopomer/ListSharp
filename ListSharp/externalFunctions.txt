@@ -253,6 +253,16 @@
             return temp.ToArray();
         }
 
+		public static int returnLength(object inp)
+        {
+            if (inp is string)
+                return ((string)inp).Length;
+
+            if (inp is string[])
+                return ((string[])inp).Length;
+            return 0;
+        }
+
         public static object GETBETWEEN_F(object ob,string start,string end)
         {
         string[] rows = new string[0];
