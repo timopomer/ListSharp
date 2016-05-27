@@ -463,8 +463,13 @@ namespace ListSharp
 
         public static Tuple<string, string> getVarnames(string inp, string var1)
         {
-            string literal = new Regex("\"(.*)\"").Match(inp).Groups[0].Value;
-            inp = inp.Replace(" " + literal, "");
+            string literal = "";
+            if (inp.Contains("\""))
+            {
+                literal = new Regex("\"(.*)\"").Match(inp).Groups[0].Value;
+                inp = inp.Replace(" " + literal, "");
+            }
+
             string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "ISOVER", "IS", "ISNOT", "ISUNDER", "ISOVER", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
             if (t.Length == 0)
                 return new Tuple<string, string>(var1, literal);

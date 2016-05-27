@@ -1,19 +1,10 @@
-﻿using ListSharp.Properties;
-using System;
+﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Deployment;
-using Microsoft.Win32;
-using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Associations;
-using System.Windows;
 using System.Windows.Forms;
 namespace ListSharp
 {
