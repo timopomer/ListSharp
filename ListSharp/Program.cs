@@ -131,16 +131,16 @@ namespace ListSharp
 
 
             
-            string code =
-            @"using System.Net;
-            using System.Linq;
-            public class MainClass
-            { 
-            public string Execute()
-            {
-            string temp_contents = """";
-            string output = """";
-            ";
+string code =
+@"using System.Net;
+using System.Linq;
+public class MainClass
+{ 
+public string Execute()
+{
+string temp_contents = """";
+string output = """";
+";
             //variables initialization starts here:
             
 
