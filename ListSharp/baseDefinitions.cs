@@ -24,7 +24,7 @@ namespace ListSharp
 
             #region operators
             operatorConversion.Add("ISOVER", ">");
-            operatorConversion.Add("ISUNDER", ">");
+            operatorConversion.Add("ISUNDER", "<");
             operatorConversion.Add("ISEQUALOVER", "=>");
             operatorConversion.Add("ISEQUALUNDER", "=<");
             operatorConversion.Add("ISEQUAL", "==");
