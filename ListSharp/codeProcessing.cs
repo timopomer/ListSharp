@@ -470,7 +470,7 @@ namespace ListSharp
                 inp = inp.Replace(" " + literal, "");
             }
 
-            string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "ISOVER", "IS", "ISNOT", "ISUNDER", "ISOVER", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
+            string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "IS", "ISNOT", "ISUNDER", "ISOVER", "ISEQUAL" ,"CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
             if (t.Length == 0)
                 return new Tuple<string, string>(var1, literal);
             return new Tuple<string, string>(var1, t[0]);
