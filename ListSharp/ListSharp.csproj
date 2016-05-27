@@ -108,6 +108,7 @@
     <None Include="Examples\READ.ls" />
     <None Include="Examples\REPLACE.ls" />
     <None Include="Examples\ROWSPLIT.ls" />
+    <None Include="Examples\SELECT.ls" />
     <None Include="Examples\SHOW.ls" />
     <None Include="ListSharp_TemporaryKey.pfx" />
     <None Include="Testing\test_features.ls" />
