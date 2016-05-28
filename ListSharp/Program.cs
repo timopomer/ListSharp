@@ -114,6 +114,9 @@ namespace ListSharp
 
             #region getting and cleaning up code
 
+
+
+
             Console.WriteLine("Script file");
             Console.WriteLine(IO.scriptfile);
             Console.WriteLine("\n");

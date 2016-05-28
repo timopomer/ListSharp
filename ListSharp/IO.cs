@@ -13,13 +13,7 @@ namespace ListSharp
         public static string currentdir = "";
         public static void setScriptFile(string[] args)
         {
-            foreach (string s in args)
-            {
-                scriptfile = s;
-            }
-
-
-
+            scriptfile = string.Join(" ", args);
         }
 
         public static void setScriptLocation()
