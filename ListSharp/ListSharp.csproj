@@ -90,7 +90,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ROWS.cs" />
-    <Compile Include="specifications.cs" />
     <Compile Include="STRG.cs" />
     <Compile Include="Variable.cs" />
   </ItemGroup>

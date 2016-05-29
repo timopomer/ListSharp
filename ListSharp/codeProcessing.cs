@@ -94,6 +94,11 @@ namespace ListSharp
                 GroupCollection gc = new Regex(@"FOREACH STRG IN (.*) AS (.*)").Match(line).Groups;
                 return "foreach (string " + gc[2].Value + " in " + gc[1].Value + ")";
             }
+            
+            if (line.StartsWith("IF"))
+            {
+                return "if (" + ifBuilder(line) + ")";
+            }
 
             debug.throwException("Line: " + line_num + " invalid Expression", debug.importance.Fatal);
 
@@ -388,6 +393,65 @@ namespace ListSharp
 
 
         #region queryFunctions
+        #region if
+        public static string ifBuilder(string line)
+        {
+            line = new Regex(@"IF (.*)").Match(line).Groups[1].Value;
+            GroupCollection gc = new Regex(@"(.*)(ISOVER|ISUNDER|ISEQUALOVER|ISEQUALUNDER|ISEQUAL|ISNOT|IS|CONTAINSNOT|CONTAINS)(.*)").Match(line).Groups;
+            Tuple<string, string> variables = getVarnames2(line);
+            Tuple<string, string> sides = new Tuple<string, string>(gc[1].Value, gc[3].Value);
+            switch (gc[2].Value)
+            {
+                case "ISOVER":
+                case "ISUNDER":
+                case "ISEQUAL":
+                case "ISEQUALOVER":
+                case "ISEQUALUNDER":
+                    return numericIf(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
+
+                case "CONTAINSNOT":
+                case "CONTAINS":
+                    return containIf(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
+
+                case "IS":
+                case "ISNOT":
+                    return equallityIf(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
+            }
+            debug.throwException("if mode does not exist", debug.importance.Fatal);
+            return "";
+
+        }
+        
+
+        public static string numericIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
+        {
+            string side1 = line.Item1;
+            string side2 = line.Item2;
+
+            if (side1.EndsWith(" LENGTH"))
+                side1 = "returnLength(" + new Regex(@"(.*) LENGTH ").Match(side1).Groups[1].Value + ")";
+
+            if (side2.EndsWith(" LENGTH"))
+                side2 = "returnLength(" + new Regex(@"(.*) LENGTH ").Match(side2).Groups[1].Value + ")";
+
+            return side1 + operation + side2;
+        }
+
+        public static string containIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
+        {
+            return operation + variables.Item1 + ".Contains(" + variables.Item2 + ")";
+        }
+
+        public static string equallityIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
+        {
+            if (variables.Item1.ofVarType("ROWS") && variables.Item2.ofVarType("ROWS"))
+                return operation=="=="?variables.Item1 + ".SequenceEqual(" + variables.Item2 + ")" : "!" + variables.Item1 + ".SequenceEqual(" + variables.Item2 + ")";
+
+            return variables.Item1 + operation + variables.Item2;
+        }
+        #endregion
+
+        #region select
         public static string selectBuilder(string line)
         {
             string var1 = new Regex(@"FROM (.*) WHERE").Match(line).Groups[1].Value;
@@ -411,7 +475,6 @@ namespace ListSharp
                 case "IS":
                 case "ISNOT":
                     return equallitySelect(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
-
             }
             debug.throwException("select mode does not exist", debug.importance.Fatal);
             return "";
@@ -478,7 +541,21 @@ namespace ListSharp
             return new Tuple<string, string>(var1, t[0]);
         }
 
+        public static Tuple<string, string> getVarnames2(string inp)
+        {
+            string literal = "";
+            if (inp.Contains("\""))
+            {
+                literal = new Regex("\"(.*)\"").Match(inp).Groups[0].Value;
+                inp = inp.Replace(" " + literal, "");
+            }
 
+            string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "IS", "ISNOT", "ISUNDER", "ISOVER", "ISEQUAL", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
+            if (t.Length == 1)
+                return new Tuple<string, string>(t[0], literal);
+            return new Tuple<string, string>(t[0], t[1]);
+        }
+        #endregion
         #endregion
     }
 }
