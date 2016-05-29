@@ -448,15 +448,17 @@ namespace ListSharp
         public static string equallitySelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
             bool positive = (operation == "==");
-            bool enclusive = line.Item2.Contains("EVERY");
+            bool enclusive = line.Item2.StartsWith(" EVERY");
 
+            if (enclusive || line.Item2.StartsWith(" ANY"))
+            {
 
-            if (positive == enclusive)
-                return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => temp_2 " + operation + " temp).ToArray().Length == " + variables.Item2 + ".Length).ToArray();";
+                if (positive == enclusive)
+                    return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => temp_2 " + operation + " temp).ToArray().Length == " + variables.Item2 + ".Length).ToArray();";
 
-            if (!enclusive)
-                return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => temp_2 " + operation + " temp).ToArray().Length > 0).ToArray();";
-
+                if (!enclusive)
+                    return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => temp_2 " + operation + " temp).ToArray().Length > 0).ToArray();";
+            }
 
             return variables.Item1 + ".Where(temp => temp " + operation + " " + variables.Item2 + ").ToArray();";
         }
