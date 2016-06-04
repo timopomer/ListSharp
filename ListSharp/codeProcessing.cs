@@ -108,10 +108,7 @@ namespace ListSharp
         public static string processStrg(string line,int line_num,STRG strgVar)
         {
 
-            if (line.StartsWith("\"") && line.EndsWith("\"")) //check if string simply assigned;
-            {
-                return strgVar.name + " = @" + line + ";";
-            }
+
 
 
 
@@ -142,10 +139,7 @@ namespace ListSharp
         public static string processRows(string line, int line_num, ROWS rowsVar)
         {
         
-            if (line.StartsWith("{") && line.EndsWith("}")) //check if string simply assigned;
-            {
-                return rowsVar.name + " = new string[]" + line + ";";
-            }
+
 
             if (line.StartsWith("ROWSPLIT")) //rowsplit command
             {
@@ -222,20 +216,18 @@ namespace ListSharp
             
             if (inpVar is STRG)
             {
-                if (line.ofVarType("STRG"))
                     return inpVar.name + " = " + line + ";";
-                else
-                    debug.throwException("Variable: " + line + " wasnt defined yet", debug.importance.Fatal);
-
             }
+
             if (inpVar is ROWS)
             {
-                if (line.ofVarType("ROWS"))
-                    return inpVar.name + " = " + line + ";";
-                else
-                    debug.throwException("Variable: " + line + " wasnt defined yet", debug.importance.Fatal);
+                if (line.StartsWith("{"))
+                    return inpVar.name + " = new string[]" + line + ";";
+                return inpVar.name + " = " + line + ";";
+
             }
 
+            
             debug.throwException("Line: " + line_num + " invalid command", debug.importance.Fatal);
 
             return ""; //this never happens
@@ -422,17 +414,16 @@ namespace ListSharp
 
         }
         
-
         public static string numericIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
             string side1 = line.Item1;
             string side2 = line.Item2;
 
-            if (side1.EndsWith(" LENGTH"))
-                side1 = "returnLength(" + new Regex(@"(.*) LENGTH ").Match(side1).Groups[1].Value + ")";
+            if (side1.Contains("LENGTH"))
+                side1 = "returnLength(" + new Regex(@"(.*) LENGTH").Match(side1).Groups[1].Value + ")";
 
-            if (side2.EndsWith(" LENGTH"))
-                side2 = "returnLength(" + new Regex(@"(.*) LENGTH ").Match(side2).Groups[1].Value + ")";
+            if (side2.Contains("LENGTH"))
+                side2 = "returnLength(" + new Regex(@"(.*) LENGTH").Match(side2).Groups[1].Value + ")";
 
             return side1 + operation + side2;
         }

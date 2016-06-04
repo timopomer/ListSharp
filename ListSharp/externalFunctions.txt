@@ -144,12 +144,27 @@
         }
 
 
-        public string DOWNLOAD_F(string url)
+        public static string DOWNLOAD_F(string url)
         {
-        using (WebClient client = new WebClient())
-        {
-            return client.DownloadString(url);
-        }
+
+            string r = "";
+            while (r == "")
+            {
+
+                using (WebClient client = new WebClient())
+                {
+                    try
+                    {
+                        r = client.DownloadString(url);
+
+                    }
+                    catch
+                    {
+                    }
+
+                }
+            }
+            return r;
         }
 
 
