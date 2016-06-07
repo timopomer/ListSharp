@@ -96,6 +96,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Examples\FOREACH.ls" />
+    <None Include="Examples\GETLINE.ls" />
     <None Include="Examples\GETRANGE.ls" />
     <None Include="Examples\COMBINE.ls" />
     <None Include="Examples\DOWNLOAD.ls" />

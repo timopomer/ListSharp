@@ -1,4 +1,4 @@
-#ShowDebuggingInformation: true
+#ShowDebuggingInformation: false
 //demo showing how to read files
 
 //you can directly read a STRG
