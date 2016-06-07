@@ -4,7 +4,7 @@
 
 **Welcome to ListSharp!**
 
-ListSharp is a programming language made in its entirety in c#, with an easy to understand, word-heavy english syntax made to suit the average joe without previous and or limited knowledge in programming.
+ListSharp is a programming language made in its entirety in c#, with an easy to understand, word-heavy english syntax made to suit the average person which is without previous and or limited knowledge in programming.
 
 The Main Objective of ListSharp is to enable the manipulation of big lists and or blobs of text in an orderly fashion without learning a general use programming language, like for example learn Python and maybe get experienced with RegEx just to save a list of products on a webpage to a file.
 
@@ -15,7 +15,7 @@ ListSharp comes pre equipped with powerful algorithmic tools information extract
 ![Beta](http://puu.sh/pkwVK/89d09e42ed.png)
 
 
-## ListSharp Documentation
+## ListSharp Specifications
 
 ### With what things in mind ListSharp was made
 
@@ -39,17 +39,3 @@ ListSharp comes pre equipped with powerful algorithmic tools information extract
 
 ### Associates to .ls files
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
-
-### Follows c# standarts for the creation/addition of variables
-```
-STRG MYSTRG = "I love"
-ROWS MYLIST = {"My Listsharp",@"<here>"}
-STRG MYSTRGS = MYSTRG+" you"
-```
-yet innovates where as you dont need to declare a variable to use it, it exists the moment you try to access it
-
-for example
-```
-ROWS c = ADD["a","b"] TO c
-```
-c exists when you try to add 2 STRG's to it, even tho its declaraition should in theory only happen after you did that -> all variable names exist as empty placeholders before their use
