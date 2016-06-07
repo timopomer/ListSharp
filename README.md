@@ -34,8 +34,10 @@ ListSharp comes pre equipped with powerful algorithmic tools information extract
 * ListSharp functions are logically named, you will appreciate the the word rich syntax when you read it after some time.
 
 ### 2 variable types
-* STRG : 0 dimensional string of data, used to store raw text
-* ROWS : 1 dimensional array of strings
+| Name | Description                                          |
+|------|------------------------------------------------------|
+| STRG | 0 dimensional string of data, used to store raw text |
+| ROWS | 1 dimensional array of strings                       |
 
 ### Associates to .ls files
 ![File Association](http://puu.sh/lSDir/5497c7ae40.png)
