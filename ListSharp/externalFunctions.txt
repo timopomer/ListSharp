@@ -12,7 +12,7 @@
 			public string arr2str(string[] arr) {
 				string r = "";
 				for (int i = 0; i < arr.Length; i++)
-				r += "[" + i + "]" + arr[i] + "[" + i + "]\n";
+				r += "[" + i + "]" + arr[i] + "[/" + i + "]\n";
 				return r;
 			}
 
@@ -61,17 +61,19 @@
 
 
 
-			public string[] GETLINES_F(string[] ins, string lines) {
-
+			public string[] GETLINES_F(string[] ins, string lines)
+			{
 				var range = rangeToList(lines);
 				string[] tempret = new string[range.Count];
 				for (int i = 0; i < range.Count; i++)
-				{
-				
 				tempret[i] = ins.Length>=range[i]?ins[range[i]-1]:"";
-				}
 				
 				return tempret;
+			}
+
+			public string GETLINE_F(string[] ins, int linnum)
+			{
+			return ins.Length>=linnum?ins[linnum-1]:"";
 			}
 
 			public System.Collections.Generic.List<int> rangeToList(string input)

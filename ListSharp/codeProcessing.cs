@@ -108,10 +108,6 @@ namespace ListSharp
         public static string processStrg(string line,int line_num,STRG strgVar)
         {
 
-
-
-
-
             if (line.StartsWith("READ")) //read text file into code command is called "read"
             {
                 string path = new Regex(@"READ\[([^>]*)\]").Match(line).Groups[1].Value.Trim(); //everything between the square brackets "[path]"
@@ -126,7 +122,13 @@ namespace ListSharp
             }
 
 
-            if (line.StartsWith("DOWNLOAD")) //read text file into code command is called "read"
+            if (line.StartsWith("GETLINE")) //get single line from ROWS into STRG
+            {
+                GroupCollection gc = new Regex(@"GETLINE (.*) \[(.*)\]").Match(line).Groups;
+                return strgVar.name + " = GETLINE_F(" + gc[1].Value + "," + gc[2].Value + ");"; //interperted code
+            }
+
+            if (line.StartsWith("DOWNLOAD")) //download html code into STRG
             {
                 string path = new Regex(@"DOWNLOAD\[([^>]*)\]").Match(line).Groups[1].Value.Trim(); //everything between the square brackets "[path]"
                 return strgVar.name +  " = DOWNLOAD_F(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
