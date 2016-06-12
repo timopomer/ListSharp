@@ -71,6 +71,15 @@
 				return tempret;
 			}
 
+
+			public static int evaluate_string(string input)
+			{
+			
+			return 0;
+
+
+			}
+
 			public string GETLINE_F(string[] ins, int linnum)
 			{
 			return ins.Length>=linnum?ins[linnum-1]:"";
@@ -253,6 +262,8 @@
                 return ((string[])inp).Length;
             return 0;
         }
+
+
 
         public static object GETBETWEEN_F(object ob,string start,string end)
         {
