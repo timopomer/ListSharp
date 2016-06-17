@@ -137,6 +137,8 @@ namespace ListSharp
 string code =
 @"using System.Net;
 using System.Linq;
+using System;
+using System.Collections.Generic;
 public class MainClass
 { 
 public string Execute()

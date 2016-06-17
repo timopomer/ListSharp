@@ -125,7 +125,7 @@ namespace ListSharp
             if (line.StartsWith("GETLINE")) //get single line from ROWS into STRG
             {
                 GroupCollection gc = new Regex(@"GETLINE (.*) \[(.*)\]").Match(line).Groups;
-                return strgVar.name + " = GETLINE_F(" + gc[1].Value + "," + gc[2].Value + ");"; //interperted code
+                return strgVar.name + " = GETLINE_F(" + gc[1].Value + "," + serializeNumericString(gc[2].Value) + ");"; //interperted code
             }
 
             if (line.StartsWith("DOWNLOAD")) //download html code into STRG
@@ -159,7 +159,7 @@ namespace ListSharp
             if (line.StartsWith("GETLINES")) //getlines command
             {
                 GroupCollection gc = new Regex(@"GETLINES ([^>]*) \[(.*)\]").Match(line).Groups;
-                return rowsVar.name + " = GETLINES_F(" + gc[1].Value + ",\"" + gc[2].Value + "\");"; //interperted code
+                return rowsVar.name + " = GETLINES_F(" + gc[1].Value + "," + serializeNumericRange(gc[2].Value) + ");"; //interperted code
             }
 
             if (line.StartsWith("ADD")) //rowsplit command
@@ -171,16 +171,8 @@ namespace ListSharp
             if (line.StartsWith("EXTRACT")) //extract command
             {
                 GroupCollection gc = new Regex(@"EXTRACT COLLUM\[([^>]*)\] FROM (.*?) SPLIT BY \[(.*)\]").Match(line).Groups;
-                int collumnum = 0;
-                try
-                {
-                    collumnum = Convert.ToInt32(gc[1].Value);
-                }
-                catch
-                {
-                    debug.throwException("Could not turn \"" + gc[1].Value + "\" into number in extract command", debug.importance.Fatal);
-                }
-                return rowsVar.name + " = EXTRACT_F(" + gc[2].Value + "," + gc[3].Value + "," + collumnum + ");"; //interperted code
+
+                return rowsVar.name + " = EXTRACT_F(" + gc[2].Value + "," + gc[3].Value + "," + serializeNumericString(gc[1].Value) + ");"; //interperted code
             }
 
             if (line.StartsWith("COMBINE")) //extract command
@@ -206,7 +198,7 @@ namespace ListSharp
             if (line.StartsWith("GETRANGE")) //getrange command
             {
                 GroupCollection gc = new Regex(@"GETRANGE (.*?) FROM \[(.*)\] TO \[(.*)\]").Match(line).Groups;
-                return inpVar.name + " = (" + cast + ")GETRANGE_F(" + gc[1].Value + "," + gc[2].Value + "," + gc[3].Value + ");"; //interperted code
+                return inpVar.name + " = (" + cast + ")GETRANGE_F(" + gc[1].Value + "," + serializeNumericString(gc[2].Value) + "," + serializeNumericString(gc[3].Value) + ");"; //interperted code
             }
 
             if (line.StartsWith("REPLACE"))
@@ -418,16 +410,7 @@ namespace ListSharp
         
         public static string numericIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
-            string side1 = line.Item1;
-            string side2 = line.Item2;
-
-            if (side1.Contains("LENGTH"))
-                side1 = "returnLength(" + new Regex(@"(.*) LENGTH").Match(side1).Groups[1].Value + ")";
-
-            if (side2.Contains("LENGTH"))
-                side2 = "returnLength(" + new Regex(@"(.*) LENGTH").Match(side2).Groups[1].Value + ")";
-
-            return side1 + operation + side2;
+            return serializeNumericString(line.Item1) + operation + serializeNumericString(line.Item2);
         }
 
         public static string containIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
@@ -477,17 +460,13 @@ namespace ListSharp
 
         public static string numericSelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
-            if (line.Item2.Contains("LENGTH"))
-            {
-                if (line.Item2.Contains("EVERY"))
-                    return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ".Max(temp_2 => temp_2.Length)).ToArray();";
+            if (line.Item2.Contains("EVERY"))
+                return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ".Max(temp_2 => temp_2.Length)).ToArray();";
 
-                if (line.Item2.Contains("ANY"))
-                    return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ".Min(temp_2 => temp_2.Length)).ToArray();";
+            if (line.Item2.Contains("ANY"))
+                return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ".Min(temp_2 => temp_2.Length)).ToArray();";
 
-                return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " returnLength(" + variables.Item2 + ")).ToArray();";
-            }
-            return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ").ToArray();";
+            return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " +serializeNumericString(line.Item2) + ").ToArray();";
         }
 
         public static string containSelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
@@ -547,6 +526,34 @@ namespace ListSharp
             if (t.Length == 1)
                 return new Tuple<string, string>(t[0], literal);
             return new Tuple<string, string>(t[0], t[1]);
+        }
+
+        public static string serializeNumericString(string input)
+        {
+            foreach (Match m in Regex.Matches(input, @"(\w+) LENGTH"))
+                input = input.Replace(m.Groups[0].Value, "returnLength(" + m.Groups[1].Value + ")");
+
+            return input;
+        }
+
+        public static string serializeNumericRange(string input)
+        {
+            string[] rangeElements = input.Split(',');
+            string query = "new List<IEnumerable<int>>() {";
+
+            for (int i = 0; i<rangeElements.Length; i++)
+            {
+                string element = rangeElements[i];
+                string[] splitElement = Regex.Split(element, " TO ");
+                splitElement = splitElement.Select(n => serializeNumericString(n)).ToArray();
+
+                query += element.Contains(" TO ") ? "EdgeRange(" + splitElement[0] + "," + splitElement[1] + ")" : "EdgeRange(" + splitElement[0] + "," + splitElement[0] + ")";
+                if (i != rangeElements.Length - 1)
+                    query += ",";
+            }
+
+
+            return query + "}.SelectMany(n => n).ToList()";
         }
         #endregion
         #endregion

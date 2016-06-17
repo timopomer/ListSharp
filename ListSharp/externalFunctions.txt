@@ -61,9 +61,9 @@
 
 
 
-			public string[] GETLINES_F(string[] ins, string lines)
+			public string[] GETLINES_F(string[] ins,System.Collections.Generic.List<int> range)
 			{
-				var range = rangeToList(lines);
+
 				string[] tempret = new string[range.Count];
 				for (int i = 0; i < range.Count; i++)
 				tempret[i] = ins.Length>=range[i]?ins[range[i]-1]:"";
@@ -71,37 +71,21 @@
 				return tempret;
 			}
 
+			public static IEnumerable<int> EdgeRange(double start_d,double end_d)
+            {
+			int start = (int)start_d;
+			int end = (int)end_d;
 
-			public static int evaluate_string(string input)
-			{
-			
-			return 0;
+            return start < end ? Enumerable.Range(start, end - start + 1) : Enumerable.Range(end, start - end + 1).Reverse();
+            }
 
-
-			}
 
 			public string GETLINE_F(string[] ins, int linnum)
 			{
 			return ins.Length>=linnum?ins[linnum-1]:"";
 			}
 
-			public System.Collections.Generic.List<int> rangeToList(string input)
-			{
-				string[] findrange = input.Split(',');
-				System.Collections.Generic.List < int > range = new System.Collections.Generic.List < int > ();
-				for (int i = 0; i < findrange.Length; i++) {
-					if (findrange[i].Contains("-")) {
-						int start = System.Convert.ToInt32(findrange[i].Split('-')[0]);
-						int end = System.Convert.ToInt32(findrange[i].Split('-')[1]);
-						for (int j = start; j <= end; j++) {
-							range.Add(j);
-						}
-					} else {
-						range.Add(System.Convert.ToInt32(findrange[i]));
-					}
-				}
-				return range;
-			}
+
 
 			public string[] ROWSPLIT_F(object thevar, string delimiter) {
 
