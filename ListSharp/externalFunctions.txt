@@ -1,4 +1,7 @@
-﻿			public string getString(object thevar) {
+﻿			
+			
+			public string getString(object thevar) {
+				if (thevar.GetType() == typeof(Int32)) return "[0]" + (Int32) thevar + "[/0]";
 				if (thevar.GetType() == typeof(string)) return "[0]" + (string) thevar + "[/0]";
 				if (thevar.GetType() == typeof(string[])) return arr2str((string[]) thevar);
 				return "Show Error";
@@ -177,64 +180,16 @@
 
         public static object GETRANGE_F(object ob, int start, int end)
         {
-            start--;
+           start = Math.Max(start-1,0);
 
-            if (start < 0)
-                start = 0;
+            string[] temp_rows = ob.GetType() == typeof(string) ? new string[] { (string)ob } : (string[])ob;
 
-            if (end <= start)
-                return "";
-
-
-
-            string[] rows = new string[0];
-            if (ob.GetType() == typeof(string))
-            {
-                string s = (string)ob;
-                rows = new string[] { s };
-            }
-
-            if (ob.GetType() == typeof(string[]))
-            {
-                rows = (string[])ob;
-            }
-
-
-            var temp = new System.Collections.Generic.List<string>();
-
-            int actualstart;
-            int actualend;
-
-
-
-            foreach (string s in rows)
-            {
-
-            actualstart = start;
-            actualend = end;
-
-            if (start > s.Length - 1)
-            {
-                temp.Add("");
-                continue;
-            }
-
-            if (end > s.Length - 1)
-                actualend = s.Length-1;
-
-
-
-            temp.Add(s.Substring(actualstart, actualend-actualstart));
-
-
-            }
+            temp_rows = temp_rows.Select(n=>(start > n.Length-1 || end <= start)?"":n.Substring(start, Math.Min(end, n.Length) - start)).ToArray();
 
             if (ob.GetType() == typeof(string))
-            {
-                return temp.ToArray()[0];
-            }
-
-            return temp.ToArray();
+                return temp_rows[0];
+            else
+                return temp_rows;
         }
 
 		public static int returnLength(object inp)

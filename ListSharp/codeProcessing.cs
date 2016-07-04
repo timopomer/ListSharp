@@ -142,7 +142,6 @@ namespace ListSharp
         {
         
 
-
             if (line.StartsWith("ROWSPLIT")) //rowsplit command
             {
                 GroupCollection gc = new Regex(@"ROWSPLIT ([^>]*) BY \[(.*)\]").Match(line).Groups;
@@ -184,6 +183,12 @@ namespace ListSharp
             return processVariableIndependant(line, line_num, rowsVar);
         }
 
+        public static string processNumb(string line, int line_num, NUMB numbVar)
+        {
+            return processVariableIndependant(line, line_num, numbVar);
+        }
+
+
         public static string processVariableIndependant(string line, int line_num, Variable inpVar)
         {
 
@@ -218,10 +223,13 @@ namespace ListSharp
                 if (line.StartsWith("{"))
                     return inpVar.name + " = new string[]" + line + ";";
                 return inpVar.name + " = " + line + ";";
-
             }
 
-            
+            if (inpVar is NUMB)
+            {
+                    return inpVar.name + " = " + serializeNumericString(line) + ";";
+            }
+
             debug.throwException("Line: " + line_num + " invalid command", debug.importance.Fatal);
 
             return ""; //this never happens
@@ -310,6 +318,10 @@ namespace ListSharp
 
             if (start_argument == "ROWS")
                 return processRows(splitline[1], line_num, new ROWS(varname));
+
+
+            if (start_argument == "NUMB")
+                return processNumb(splitline[1], line_num, new NUMB(varname));
 
 
             if (start_argument == "SHOW")

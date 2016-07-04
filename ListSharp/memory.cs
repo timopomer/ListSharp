@@ -17,16 +17,16 @@ namespace ListSharp
             variables = new Dictionary<string, Variable[]>();
             Regex rowsRegex = new Regex(@"ROWS([^=]*)");
             Regex strgRegex = new Regex(@"STRG([^=]*)");
+            Regex numbRegex = new Regex(@"NUMB([^=]*)");
             List<string> variableInitializers = new List<string>();
 
             List<ROWS> tempRows = new List<ROWS>();
             List<STRG> tempStrg = new List<STRG>();
+            List<NUMB> tempNumb = new List<NUMB>();
 
             Match match;
             foreach (string singleline in maincode)
             {
-
-
 
                 //rows variable
                 if (singleline.StartsWith("ROWS"))
@@ -43,9 +43,20 @@ namespace ListSharp
                     variableInitializers.Add("string " + match.Groups[1].Value.Trim() + " = \"\";");
                     tempStrg.Add(new STRG(match.Groups[1].Value.Trim()));
                 }
+
+                //numb variable
+                if (singleline.StartsWith("NUMB"))
+                {
+                    match = numbRegex.Match(singleline);
+                    variableInitializers.Add("int " + match.Groups[1].Value.Trim() + " = 0;");
+                    tempNumb.Add(new NUMB(match.Groups[1].Value.Trim()));
+                }
+
             }
             variables.Add("STRG", tempStrg.ToArray().Distinct().ToArray());
             variables.Add("ROWS", tempRows.ToArray().Distinct().ToArray());
+            variables.Add("NUMB", tempNumb.ToArray().Distinct().ToArray());
+
 
             return variableInitializers.Distinct().ToList<string>();
 
