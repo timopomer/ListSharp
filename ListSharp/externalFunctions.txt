@@ -28,22 +28,9 @@
 			}
 
 
-			public string[] COMBINE_F(string[][] srar, string bywhat) {
-				int max = 0;
-				for (int i = 0; i < srar.Length; i++) {
-					if (srar[i].Length > max) max = srar[i].Length;
-				}
-				string[] tempo = new string[max];
-				string sinline = "";
-				for (int i = 0; i < max; i++) {
-					for (int j = 0; j < srar.Length; j++) {
-						if (i < srar[j].Length) sinline += srar[j][i];
-						if (j != (srar.Length - 1)) sinline += bywhat;
-					}
-					tempo[i] = sinline;
-					sinline = "";
-				}
-				return tempo;
+			public static string[] COMBINE_F(string[][] srar, string bywhat)
+			{
+				return Enumerable.Range(0,srar.Max(n=>n.Length)).Select(i=>string.Join(bywhat, srar.Select(m=>m.ElementAtOrDefault(i)))).ToArray();
 			}
 
 			public void OUTP_F(string path, object thevar) {
