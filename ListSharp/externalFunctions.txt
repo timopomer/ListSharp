@@ -21,17 +21,10 @@
 
 
 
-			public string[] EXTRACT_F(string[] arr, string bywhat, int collumnum) {
+			public static string[] EXTRACT_F(string[] arr, string bywhat, int collumnum)
+			{
 				collumnum--;
-				string[] temp;
-				string[] restr = new string[arr.Length];
-				for (int i = 0; i < arr.Length; i++) {
-					temp = arr[i].Split(new string[] {
-						bywhat
-					}, System.StringSplitOptions.None);
-					if (temp.Length > collumnum) restr[i] = temp[collumnum];
-				}
-				return restr;
+				return arr.Select(n=> n.Split(new string[] { bywhat }, System.StringSplitOptions.None).ElementAtOrDefault(collumnum)).ToArray();
 			}
 
 
@@ -90,179 +83,70 @@
 
 
 
-			public string[] ROWSPLIT_F(object thevar, string delimiter) {
-
+			public static string[] ROWSPLIT_F(object ob, string delimiter)
+			{
 				if (delimiter == "<newline>") delimiter = "\n";
-
-				if (thevar.GetType() == typeof(string)) {
-					string temp = (string) thevar;
-					return temp.Split(new string[] {
-						delimiter
-					}, System.StringSplitOptions.None);
-				}
-				if (thevar.GetType() == typeof(string[])) {
-					return stringarraysplitter((string[]) thevar, delimiter);
-				}
-				return null;
+				return ob.GetType() == typeof(string) ? ((string)ob).Split(new string[] { delimiter }, System.StringSplitOptions.None) : ((string[])ob).SelectMany(n => n.Split(new string[] { delimiter }, System.StringSplitOptions.None)).ToArray();
 			}
 
 
-			public string[] stringarraysplitter(string[] arr, string delimiter) {
-				var results = new System.Collections.Generic.List<string>(arr.Length);
-				
-				for(int i = 0; i < arr.Length; i++){
-				results.AddRange(arr[i].Split(new string[] {delimiter}, System.StringSplitOptions.None));
-				}
-				return results.ToArray();
+			public static object REPLACE_F(object ob, string toReplace, string replaceWith)
+			{
+				return ob.GetType() == typeof(string) ? ((string)ob).Replace(toReplace, replaceWith) : (object)((string[])ob).Select(n=>n.Replace(toReplace, replaceWith)).ToArray();
+			}
+
+			public static string[] ADD_F(string[] ogarr, object[] toadd)
+			{
+				return ogarr.Concat(toadd.SelectMany(n=> n.GetType() == typeof(string)?new string[] { (string)n } :(string[])n)).ToArray();
 			}
 
 
-			public object REPLACE_F(object ob, string remove1, string remove2) {
-				if (ob.GetType() == typeof(string)) {
-					string st = (string) ob;
-					return st.Replace(remove1, remove2);
-				}
+			public static string DOWNLOAD_F(string url)
+			{
 
-				if (ob.GetType() == typeof(string[])) {
-					string[] starr = (string[]) ob;
-					for (int i = 0; i < starr.Length; i++) {
-						starr[i] = starr[i].Replace(remove1, remove2);
+				string r = "";
+				while (r == "")
+				{
+					using (WebClient client = new WebClient())
+					{
+						try
+						{
+							r = client.DownloadString(url);
+						}
+						catch
+						{
+						}
+
 					}
-					return starr;
 				}
-
-				return null;
+				return r;
 			}
 
-        public string[] ADD_F(string[] ogarr,object[] toadd)
-        {
 
-            var results = new System.Collections.Generic.List<string>();
-            results.AddRange(ogarr);
+			public static object GETRANGE_F(object ob, int start, int end)
+			{
+				start = Math.Max(start-1,0);
+				string[] temp_rows = ob.GetType() == typeof(string) ? new string[] { (string)ob } : (string[])ob;
+				temp_rows = temp_rows.Select(n=>(start > n.Length-1 || end <= start)?"":n.Substring(start, Math.Min(end, n.Length) - start)).ToArray();
 
-            for (int i = 0; i < toadd.Length; i++)
-            {
-                if (toadd[i].GetType() == typeof(string[]))
-                    results.AddRange((string[])toadd[i]);
-                else
-                    results.Add((string)toadd[i]);
-            }
+				return ob.GetType() == typeof(string) ? (object)temp_rows[0] : temp_rows;
+			}
 
-                return results.ToArray();
-        }
-
-
-        public static string DOWNLOAD_F(string url)
-        {
-
-            string r = "";
-            while (r == "")
-            {
-
-                using (WebClient client = new WebClient())
-                {
-                    try
-                    {
-                        r = client.DownloadString(url);
-
-                    }
-                    catch
-                    {
-                    }
-
-                }
-            }
-            return r;
-        }
+			public static int returnLength(object inp)
+			{
+				if (inp.GetType() == typeof(int))
+					inp = ((int)inp).ToString();
+				return inp.GetType() == typeof(string) ? ((string)inp).Length : ((string[])inp).Length;
+			}
 
 
+			public static object GETBETWEEN_F(object ob, string start, string end)
+			{  
+				string[] temp_rows = ob.GetType() == typeof(string) ? new string[] { (string)ob } : (string[])ob;
+				temp_rows = temp_rows.Select(n => (string)GETRANGE_F(n,n.IndexOf(start)+2,n.LastIndexOf(end)!=-1? n.LastIndexOf(end):n.Length)).ToArray();
 
-
-        public static object GETRANGE_F(object ob, int start, int end)
-        {
-           start = Math.Max(start-1,0);
-
-            string[] temp_rows = ob.GetType() == typeof(string) ? new string[] { (string)ob } : (string[])ob;
-
-            temp_rows = temp_rows.Select(n=>(start > n.Length-1 || end <= start)?"":n.Substring(start, Math.Min(end, n.Length) - start)).ToArray();
-
-            if (ob.GetType() == typeof(string))
-                return temp_rows[0];
-            else
-                return temp_rows;
-        }
-
-		public static int returnLength(object inp)
-        {
-            if (inp is string)
-                return ((string)inp).Length;
-
-            if (inp is string[])
-                return ((string[])inp).Length;
-            return 0;
-        }
-
-
-
-        public static object GETBETWEEN_F(object ob,string start,string end)
-        {
-        string[] rows = new string[0];
-				if (ob.GetType() == typeof(string)) {
-                    string s = (string) ob;
-					rows = new string[]{s};
-				}
-
-				if (ob.GetType() == typeof(string[])) {
-					rows = (string[]) ob;
-				}
-
-
-            var temp = new System.Collections.Generic.List<string>();
-
-            foreach (string s in rows)
-            {
-            if (!s.Contains(start))
-                if (!s.Contains(end))
-                {
-                    temp.Add(s);
-                    continue;
-                }
-
-            if (s.Contains(start))
-                if (!s.Contains(end))
-                {
-                    temp.Add(s.Substring(s.IndexOf(start) + start.Length, s.Length - (s.IndexOf(start) + start.Length)));
-                    continue;
-                }
-
-            if (!s.Contains(start))
-                if (s.Contains(end))
-                {
-                    temp.Add(s.Substring(0, s.Length - (s.LastIndexOf(end))));
-                    continue;
-                }
-
-                int startindex;
-                int endindex;
-
-
-                    startindex = s.IndexOf(start) + start.Length;
-
-                    endindex = s.LastIndexOf(end);
-
-                if (startindex >= endindex)
-                    startindex = 0;
-
-
-                temp.Add(s.Substring(startindex, endindex - startindex));
-            }
-
-				if (ob.GetType() == typeof(string)) {
-					return temp.ToArray()[0];
-				}
-
-            return temp.ToArray();
-        }
+				return ob.GetType() == typeof(string) ? (object)temp_rows[0] : temp_rows;
+			}
 
 
 

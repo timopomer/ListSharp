@@ -71,7 +71,7 @@ SHOW = extracted
 
 
 //getlines
-ROWS gotten = GETLINES filtered [1-13]
+ROWS gotten = GETLINES filtered [1 TO 13]
 SHOW = "all gotten html rows: "
 SHOW = gotten
 

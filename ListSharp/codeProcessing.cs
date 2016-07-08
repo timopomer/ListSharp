@@ -91,8 +91,17 @@ namespace ListSharp
 
             if (line.StartsWith("FOREACH"))
             {
-                GroupCollection gc = new Regex(@"FOREACH STRG IN (.*) AS (.*)").Match(line).Groups;
-                return "foreach (string " + gc[2].Value + " in " + gc[1].Value + ")";
+                if (line.StartsWith("FOREACH NUMB"))
+                {
+                    GroupCollection gc = new Regex(@"FOREACH NUMB IN (.*) AS (.*)").Match(line).Groups;
+                    return "foreach (int " + gc[2].Value + " in " + serializeNumericRange(gc[1].Value) + ")";
+                }
+                if (line.StartsWith("FOREACH STRG"))
+                {
+                    GroupCollection gc = new Regex(@"FOREACH STRG IN (.*) AS (.*)").Match(line).Groups;
+                    return "foreach (string " + gc[2].Value + " in " + gc[1].Value + ")";
+                }
+
             }
             
             if (line.StartsWith("IF"))
