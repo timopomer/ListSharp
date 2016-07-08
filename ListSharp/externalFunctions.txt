@@ -143,7 +143,7 @@
 			public static object GETBETWEEN_F(object ob, string start, string end)
 			{  
 				string[] temp_rows = ob.GetType() == typeof(string) ? new string[] { (string)ob } : (string[])ob;
-				temp_rows = temp_rows.Select(n => (string)GETRANGE_F(n,n.IndexOf(start)+2,n.LastIndexOf(end)!=-1? n.LastIndexOf(end):n.Length)).ToArray();
+				temp_rows = temp_rows.Select(n => (string)GETRANGE_F(n,n.IndexOf(start)+1+start.Length,n.LastIndexOf(end)!=-1? n.LastIndexOf(end):n.Length)).ToArray();
 
 				return ob.GetType() == typeof(string) ? (object)temp_rows[0] : temp_rows;
 			}
