@@ -7,10 +7,31 @@
 				return "Show Error";
 			}
 
-			public string SHOW_F(object thein) {
+			public string SHOW_F(object thein) {	
 				return System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine, "<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
 			}
 
+			public static async void DEBG_F(object ob, int linenum)
+			{
+				Task mytask = Task.Run(async () =>
+				{
+					Form MyForm = new Form();
+					MyForm.Width = 400;
+					MyForm.Height = 500;
+					MyForm.Text = "Debuging line: " + linenum;
+					MyForm.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+					RichTextBox rtb = new RichTextBox();
+					rtb.Width = 400;
+					rtb.Height = 500;
+					rtb.Font = new Font(rtb.Font.FontFamily, 14);
+					string show = ob.GetType() == typeof(string) ? ((string)ob) : String.Join("\r\n", (string[])ob);
+					rtb.Text = show;
+					MyForm.Controls.Add(rtb);
+					MyForm.ShowDialog();
+
+
+				});
+			}
 
 			public string arr2str(string[] arr) {
 				string r = "";

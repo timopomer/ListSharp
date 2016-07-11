@@ -139,10 +139,18 @@ string code =
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using System.Threading.Tasks;
+using System.Drawing;
+
+
 public class MainClass
 { 
+
 public string Execute()
 {
+
 string temp_contents = """";
 string output = """";
 ";
@@ -226,7 +234,9 @@ string output = """";
 
             parameters.ReferencedAssemblies.Add("System.dll");
             parameters.ReferencedAssemblies.Add("System.Core.dll");
-
+            parameters.ReferencedAssemblies.Add("System.Windows.Forms.dll");
+            parameters.ReferencedAssemblies.Add("System.Drawing.dll");
+            
             using (Microsoft.CSharp.CSharpCodeProvider CodeProv =
             new Microsoft.CSharp.CSharpCodeProvider())
             {

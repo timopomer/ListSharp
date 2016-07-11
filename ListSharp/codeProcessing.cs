@@ -197,7 +197,6 @@ namespace ListSharp
             return processVariableIndependant(line, line_num, numbVar);
         }
 
-
         public static string processVariableIndependant(string line, int line_num, Variable inpVar)
         {
 
@@ -285,7 +284,7 @@ namespace ListSharp
             return returnedCode;
         }
 
-        
+
 
 
         public static string typeShow(string type)
@@ -301,6 +300,12 @@ namespace ListSharp
 
         #endregion
 
+        #region DEBG command
+        public static string processDebug(string line, int line_num)
+        {
+            return "DEBG_F(" + line + ",\"" + line + "\");";
+        }
+        #endregion
         #region OUTP command
         public static string processOutput(string line, int line_num)
         {
@@ -340,6 +345,9 @@ namespace ListSharp
             if (start_argument == "OUTP")
                 return processOutput(splitline[1], line_num);
 
+
+            if (start_argument == "DEBG")
+                return processDebug(splitline[1], line_num);
 
             debug.throwException("Line: " + line + " could not be interpeted", debug.importance.Fatal);
             return "";
