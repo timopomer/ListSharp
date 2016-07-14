@@ -299,11 +299,19 @@ namespace ListSharp
         }
 
         #endregion
+        
+
+        #region NOTF command
+        public static string processNotification(string line, int line_num)
+        {
+            return "NOTIFY_F(" + line + ");";
+        }
+        #endregion
 
         #region DEBG command
         public static string processDebug(string line, int line_num)
         {
-            return "DEBG_F(" + line + ",\"" + line + "\");";
+            return "DEBG_F(" + line + "," + line_num + ");";
         }
         #endregion
         #region OUTP command
@@ -348,6 +356,10 @@ namespace ListSharp
 
             if (start_argument == "DEBG")
                 return processDebug(splitline[1], line_num);
+
+
+            if (start_argument == "NOTF")
+                return processNotification(splitline[1], line_num);
 
             debug.throwException("Line: " + line + " could not be interpeted", debug.importance.Fatal);
             return "";

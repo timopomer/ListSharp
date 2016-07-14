@@ -33,6 +33,16 @@
 				});
 			}
 
+			public static void NOTIFY_F(string message)
+			{
+            var item = new NotifyIcon();
+            item.Visible = true;
+            item.Icon = System.Drawing.SystemIcons.WinLogo;
+            item.ShowBalloonTip(1000, "Listsharp Notification", message, ToolTipIcon.None);
+			}
+
+
+
 			public string arr2str(string[] arr) {
 				string r = "";
 				for (int i = 0; i < arr.Length; i++)
