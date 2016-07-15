@@ -104,6 +104,7 @@
     <None Include="Examples\GETLINES.ls" />
     <None Include="Examples\EXTRACT.ls" />
     <None Include="Examples\GETBETWEEN.ls" />
+    <None Include="Examples\IF.ls" />
     <None Include="Examples\OUTP.ls" />
     <None Include="Examples\ADD.ls" />
     <None Include="Examples\READ.ls" />

@@ -35,10 +35,11 @@
 
 			public static void NOTIFY_F(string message)
 			{
-            var item = new NotifyIcon();
-            item.Visible = true;
-            item.Icon = System.Drawing.SystemIcons.WinLogo;
-            item.ShowBalloonTip(1000, "Listsharp Notification", message, ToolTipIcon.None);
+            var notificationButton = new NotifyIcon();
+            notificationButton.Visible = true;
+            notificationButton.Icon = System.Drawing.SystemIcons.WinLogo;
+            notificationButton.ShowBalloonTip(200, "Listsharp Notification", message, ToolTipIcon.None);
+			notificationButton.Visible = false;
 			}
 
 
@@ -118,6 +119,7 @@
 			{
 
 				string r = "";
+				int count = 1;
 				while (r == "")
 				{
 					using (WebClient client = new WebClient())
@@ -128,6 +130,12 @@
 						}
 						catch
 						{
+						count++;
+						if (count > 5)
+						{
+						NOTIFY_F("failed downloading.. returning empty STRG");
+						return "";
+						}
 						}
 
 					}
