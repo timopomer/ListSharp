@@ -13,6 +13,8 @@
 
 			public static async void DEBG_F(object ob, int linenum)
 			{
+			if ((ob).GetType() == typeof(int))
+			ob = (int)ob + "";
 				Task mytask = Task.Run(async () =>
 				{
 					Form MyForm = new Form();
