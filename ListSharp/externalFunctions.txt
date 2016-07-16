@@ -111,9 +111,10 @@
 				return ob.GetType() == typeof(string) ? ((string)ob).Replace(toReplace, replaceWith) : (object)((string[])ob).Select(n=>n.Replace(toReplace, replaceWith)).ToArray();
 			}
 
-			public static string[] ADD_F(string[] ogarr, object[] toadd)
+			public static object ADD_F(object[] toadd,Type type)
 			{
-				return ogarr.Concat(toadd.SelectMany(n=> n.GetType() == typeof(string)?new string[] { (string)n } :(string[])n)).ToArray();
+				string[] temp = toadd.SelectMany(n => n.GetType() == typeof(string) ? new string[] { (string)n } : (string[])n).ToArray();
+				return type == typeof(string) ? (object)String.Join("", temp) : temp;
 			}
 
 

@@ -169,12 +169,13 @@ namespace ListSharp
                 GroupCollection gc = new Regex(@"GETLINES ([^>]*) \[(.*)\]").Match(line).Groups;
                 return rowsVar.name + " = GETLINES_F(" + gc[1].Value + "," + serializeNumericRange(gc[2].Value) + ");"; //interperted code
             }
-
+            /*
             if (line.StartsWith("ADD")) //rowsplit command
             {
                 GroupCollection gc = new Regex(@"\[(.*)\] TO ([^>]*)").Match(line).Groups;
                 return rowsVar.name + " = ADD_F(" + gc[2].Value + ",new object[] {" + gc[1].Value + "});"; //interperted code
             }
+            */
 
             if (line.StartsWith("EXTRACT")) //extract command
             {
@@ -223,14 +224,12 @@ namespace ListSharp
             
             if (inpVar is STRG)
             {
-                    return inpVar.name + " = " + line + ";";
+                return inpVar.name + " = (string)ADD_F(new object[]{" + sanitizeEvaluation(line) + "},typeof(string));";
             }
 
             if (inpVar is ROWS)
-            {
-                if (line.StartsWith("{"))
-                    return inpVar.name + " = new string[]" + line + ";";
-                return inpVar.name + " = " + line + ";";
+            {      
+                return inpVar.name + " = (string[])ADD_F(new object[]{" + sanitizeEvaluation(line) + "},typeof(string[]));";
             }
 
             if (inpVar is NUMB)
@@ -415,6 +414,35 @@ namespace ListSharp
 
         }
 
+        public static string sanitizeEvaluation(string input)
+        {
+            string pattern = @"""(?:[^""\\]*(?:\\.)?)*""";
+            Match[] mc = Regex.Matches(input, pattern).Cast<Match>().ToArray();
+            Array.Reverse(mc);
+            string[] replacementStrings = mc.Select(m => m.Value).ToArray();
+
+            mc.ToList().ForEach(n => input = input.replaceStringRange(n.Index, n.Length, "[" + mc.ToList().IndexOf(n) + "]"));
+            input = input.Replace("{", "").Replace("}", "").Replace(",", "+").Replace(" ", "");
+            string[] splitExpression = input.Split('+');
+
+            for (int i = 0; i < splitExpression.Length; i++)
+            {
+                for (int j = 0; j < mc.Length; j++)
+                {
+                    if (splitExpression[i] == "[" + j + "]")
+                    {
+                        splitExpression[i] = splitExpression[i].Replace("[" + j + "]", mc[j].Value);
+                        break;
+                    }
+                }
+            }
+            return String.Join(" , ", splitExpression);
+        }
+
+        public static string replaceStringRange(this string input, int startIndex, int length, string replacement)
+        {
+            return input.Substring(0, startIndex) + replacement + input.Substring(startIndex + length);
+        }
         #endregion
 
 
