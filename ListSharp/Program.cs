@@ -41,7 +41,6 @@ namespace ListSharp
 
             #region setting up workspace
             IO.setScriptFile(args);
-
             if (IO.scriptfile == "")
             {
                 Console.WriteLine("No Script file was provided");
@@ -107,6 +106,7 @@ namespace ListSharp
             }
 
             IO.setScriptLocation();
+            IO.setFileName();
             baseDefinitions.initialize();
             /* script file location intialized and validity checked */
 
@@ -271,10 +271,6 @@ string output = """";
         }
 
 
-
-
-
-
         public static byte[] IconToBytes(System.Drawing.Icon icon)
         {
             using (MemoryStream ms = new MemoryStream())
@@ -297,12 +293,7 @@ string output = """";
                 new ProgramIcon(IconPath),
                 new ExecApplication(OpenWith),
                 new OpenWithList(new string[] { KeyName }));
-
-
-
         }
-
-
 
         public static bool IsAdministrator()
         {

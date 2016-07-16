@@ -18,6 +18,7 @@ namespace ListSharp
             operatorConversion = new Dictionary<String, String>();
 
             #region contstants
+            constantPairs.Add("<scriptname>", "@\"" + IO.filename + "\"");
             constantPairs.Add("<here>", "@\"" + IO.currentdir + "\"");
             constantPairs.Add("<newline>", "\"\\n\"");
             #endregion

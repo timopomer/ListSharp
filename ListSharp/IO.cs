@@ -9,6 +9,7 @@ namespace ListSharp
 {
     class IO
     {
+        public static string filename = "";
         public static string scriptfile = "";
         public static string currentdir = "";
         public static void setScriptFile(string[] args)
@@ -24,6 +25,12 @@ namespace ListSharp
         public static string getFullCode()
         {
             return File.ReadAllText(scriptfile);
+        }
+
+        public static void setFileName()
+        {
+            Console.WriteLine("hey there");
+            filename = Path.GetFileName(scriptfile);
         }
 
 
