@@ -67,7 +67,8 @@
 				return Enumerable.Range(0,srar.Max(n=>n.Length)).Select(i=>string.Join(bywhat, srar.Select(m=>m.ElementAtOrDefault(i)))).ToArray();
 			}
 
-			public void OUTP_F(string path, object thevar) {
+			public void OUTP_F(string path, object thevar)
+			{
 				if (thevar.GetType() == typeof(string)) {
 					System.IO.File.WriteAllText(path, (string) thevar);
 				}
@@ -75,7 +76,10 @@
 					System.IO.File.WriteAllLines(path, (string[]) thevar);
 				}
 			}
-
+			public void OPEN_F(string path) {
+			System.Diagnostics.Process.Start(path);
+			}
+			
 
 
 			public static string[] GETLINES_F(string[] ins, System.Collections.Generic.List<int> range)

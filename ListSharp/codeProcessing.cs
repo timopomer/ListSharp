@@ -12,7 +12,7 @@ namespace ListSharp
     public static class codeProcessing
     {
 
-        #region preprocessing
+        #region preprocessing functions
         public static List<string> preProcessCode(this string rawCode)
         {
             rawCode = Regex.Replace(rawCode, @"\/\*(.*?)\*/", "", RegexOptions.Singleline);
@@ -40,11 +40,9 @@ namespace ListSharp
 
             return alllines.ToList();
         }
-
         #endregion
 
-        #region process codeline
-
+        #region process different commands
         public static string processOperators(string line, int line_num)
         {
             if (line.StartsWith("{"))
@@ -234,11 +232,9 @@ namespace ListSharp
 
             return ""; //this never happens
         }
-
         #endregion
 
         #region SHOW command
-
         public static string processShow(string line, int line_num)
         {
             switch (line)
@@ -276,9 +272,6 @@ namespace ListSharp
             return returnedCode;
         }
 
-
-
-
         public static string typeShow(string type)
         {
             string toReturn = "";
@@ -289,10 +282,8 @@ namespace ListSharp
             }
             return toReturn;
         }
-
         #endregion
         
-
         #region NOTF command
         public static string processNotification(string line, int line_num)
         {
@@ -306,14 +297,23 @@ namespace ListSharp
             return "DEBG_F(" + line + "," + line_num + ");";
         }
         #endregion
+
         #region OUTP command
         public static string processOutput(string line, int line_num)
         {
             GroupCollection gc = new Regex(@"(.*) HERE\[(.*)\]").Match(line).Groups;
             return "OUTP_F(" + gc[2].Value + ", " + gc[1].Value + ");"; //outputs to file
         }
-
         #endregion
+
+        #region OUTP command
+        public static string processOpen(string line, int line_num)
+        {
+            GroupCollection gc = new Regex(@"HERE\[(.*)\]").Match(line).Groups;
+            return "OPEN_F(" + gc[1].Value + ");"; //outputs to file
+        }
+        #endregion
+
 
         public static string processLine(string line, int line_num)
         {
@@ -352,6 +352,10 @@ namespace ListSharp
 
             if (start_argument == "NOTF")
                 return processNotification(splitline[1], line_num);
+
+
+            if (start_argument == "OPEN")
+                return processOpen(splitline[1], line_num);
 
             debug.throwException("Line: " + line + " could not be interpeted", debug.importance.Fatal);
             return "";
