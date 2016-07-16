@@ -118,7 +118,7 @@
 			}
 
 
-			public static string DOWNLOAD_F(string url)
+			public static string DOWNLOAD_F(string url,int maxtries)
 			{
 
 				string r = "";
@@ -134,7 +134,7 @@
 						catch
 						{
 						count++;
-						if (count > 5)
+						if (count >= maxtries)
 						{
 						NOTIFY_F("failed downloading.. returning empty STRG");
 						return "";

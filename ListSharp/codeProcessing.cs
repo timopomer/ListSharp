@@ -140,7 +140,7 @@ namespace ListSharp
             if (line.StartsWith("DOWNLOAD")) //download html code into STRG
             {
                 string path = new Regex(@"DOWNLOAD\[([^>]*)\]").Match(line).Groups[1].Value.Trim(); //everything between the square brackets "[path]"
-                return strgVar.name +  " = DOWNLOAD_F(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+                return strgVar.name +  " = DOWNLOAD_F(" + path + "," + launchArguments.downloadtries + "); "; //create the reading file code in interperted form that is read into a tempoary variable
             }
 
 
