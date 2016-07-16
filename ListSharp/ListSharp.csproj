@@ -108,7 +108,6 @@
     <None Include="Examples\IF.ls" />
     <None Include="Examples\NOTF.ls" />
     <None Include="Examples\OUTP.ls" />
-    <None Include="Examples\ADD.ls" />
     <None Include="Examples\READ.ls" />
     <None Include="Examples\REPLACE.ls" />
     <None Include="Examples\ROWSPLIT.ls" />

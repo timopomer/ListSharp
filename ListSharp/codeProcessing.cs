@@ -163,19 +163,12 @@ namespace ListSharp
             }
 
 
-
             if (line.StartsWith("GETLINES")) //getlines command
             {
                 GroupCollection gc = new Regex(@"GETLINES ([^>]*) \[(.*)\]").Match(line).Groups;
                 return rowsVar.name + " = GETLINES_F(" + gc[1].Value + "," + serializeNumericRange(gc[2].Value) + ");"; //interperted code
             }
-            /*
-            if (line.StartsWith("ADD")) //rowsplit command
-            {
-                GroupCollection gc = new Regex(@"\[(.*)\] TO ([^>]*)").Match(line).Groups;
-                return rowsVar.name + " = ADD_F(" + gc[2].Value + ",new object[] {" + gc[1].Value + "});"; //interperted code
-            }
-            */
+
 
             if (line.StartsWith("EXTRACT")) //extract command
             {
