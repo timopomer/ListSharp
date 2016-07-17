@@ -8,7 +8,7 @@ ListSharp is a programming language made in its entirety in c#, with an easy to 
 
 The Main Objective of ListSharp is to enable the manipulation of big lists and or blobs of text in an orderly fashion without learning a general use programming language, like for example learn Python and maybe get experienced with RegEx just to save a list of products on a webpage to a file.
 
-ListSharp comes pre equipped with powerful algorithmic tools information extraction and pre existing easy to understand concepts for  for web scraping and automation. 
+ListSharp comes pre equipped with powerful algorithmic tools for information extraction and easy to understand concepts for web scraping and automation workloads. 
 
 ### Example execution screenshot of console
 
