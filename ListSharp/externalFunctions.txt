@@ -80,7 +80,33 @@
 			System.Diagnostics.Process.Start(path);
 			}
 			
+			public static object INPT_F(string message,Type type)
+			{
+				Form MyForm = new Form();
+				MyForm.Width = 400;
+				MyForm.Height = 170;
+				MyForm.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+				MyForm.Text = message;
+				RichTextBox rtb = new RichTextBox();
+				rtb.Width = 400;
+				rtb.Height = 100;
+				rtb.Font = new Font(rtb.Font.FontFamily, 14);
+				if (type == typeof(int))
+					rtb.TextChanged += (s, e) => { int i = rtb.SelectionStart; int x = rtb.Text.Length; rtb.Text = String.Join("", rtb.Text.Where(Char.IsDigit)); rtb.SelectionStart = i+rtb.Text.Length-x; };
+				Button b = new Button();
+				b.Text = "Submit";
+				b.Width = 380;
+				b.Height = 30;
+				b.FlatStyle = FlatStyle.System;
+				b.Location = new Point(3, 100);
+				b.Click += (s, e) => MyForm.Close();
+				MyForm.Controls.Add(rtb);
+				MyForm.Controls.Add(b);
 
+				MyForm.ShowDialog();
+				MyForm.Close();
+				return type==typeof(int)?(object)long.Parse(rtb.Text):rtb.Text;
+			}
 
 			public static string[] GETLINES_F(string[] ins, System.Collections.Generic.List<int> range)
 			{

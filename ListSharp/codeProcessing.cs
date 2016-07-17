@@ -141,6 +141,11 @@ namespace ListSharp
                 return strgVar.name +  " = DOWNLOAD_F(" + path + "," + launchArguments.downloadtries + "); "; //create the reading file code in interperted form that is read into a tempoary variable
             }
 
+            if (line.StartsWith("INPUT"))
+            {
+                GroupCollection gc = new Regex(@"\[(.*)\]").Match(line).Groups;
+                return strgVar.name + " = (string)INPT_F(" + gc[1].Value + ",typeof(string));";
+            }
 
             return processVariableIndependant(line,line_num,strgVar);
         }
@@ -186,13 +191,19 @@ namespace ListSharp
 
         public static string processNumb(string line, int line_num, NUMB numbVar)
         {
+            if (line.StartsWith("INPUT"))
+            {
+                GroupCollection gc = new Regex(@"\[(.*)\]").Match(line).Groups;
+                return numbVar.name + " = (int)(long)INPT_F(" + gc[1].Value + ",typeof(int));";
+            }
+
             return processVariableIndependant(line, line_num, numbVar);
         }
 
         public static string processVariableIndependant(string line, int line_num, Variable inpVar)
         {
 
-            string cast = inpVar is STRG ? "string" : "string[]";
+            string cast = inpVar is STRG ? "string" : inpVar is ROWS ? "string[]" : "int";
 
             if (line.StartsWith("GETBETWEEN")) //filter command
             {
@@ -211,8 +222,10 @@ namespace ListSharp
                 GroupCollection gc = new Regex(@"\[(.*)\] IN ([^>]*)").Match(line).Groups;
                 return inpVar.name + " = (" + cast + ")REPLACE_F(" + gc[2].Value + "," + gc[1].Value + ");";
             }
-            
-            
+
+
+
+
             if (inpVar is STRG)
             {
                 return inpVar.name + " = (string)ADD_F(new object[]{" + sanitizeEvaluation(line) + "},typeof(string));";
@@ -225,7 +238,7 @@ namespace ListSharp
 
             if (inpVar is NUMB)
             {
-                    return inpVar.name + " = " + serializeNumericString(line) + ";";
+                return inpVar.name + " = " + serializeNumericString(line) + ";";
             }
 
             debug.throwException("Line: " + line_num + " invalid command", debug.importance.Fatal);
