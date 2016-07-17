@@ -80,6 +80,48 @@
 			System.Diagnostics.Process.Start(path);
 			}
 			
+			public static string CHOOSEFILE_F(string title)
+			{
+            
+				OpenFileDialog ofd = new OpenFileDialog();
+				ofd.Title = title;
+				Thread myth;
+				DialogResult result = DialogResult.None;
+				myth = new Thread(new System.Threading.ThreadStart(()=> {
+				result = ofd.ShowDialog();
+				while (result != DialogResult.OK)
+				result = ofd.ShowDialog();
+				}));
+				myth.SetApartmentState(ApartmentState.STA);
+				myth.Start();
+				while (result != DialogResult.OK)
+				Thread.Sleep(1);
+				
+
+				return ofd.FileName;
+			}
+
+			public static string CHOOSEFOLDER_F(string title)
+			{
+
+				FolderBrowserDialog fbd = new FolderBrowserDialog();
+				fbd.Description = title;
+				Thread myth;
+				DialogResult result = DialogResult.None;
+				myth = new Thread(new System.Threading.ThreadStart(() => {
+					result = fbd.ShowDialog();
+					while (result != DialogResult.OK)
+						result = fbd.ShowDialog();
+				}));
+				myth.SetApartmentState(ApartmentState.STA);
+				myth.Start();
+				while (result != DialogResult.OK)
+					Thread.Sleep(1);
+
+
+				return fbd.SelectedPath;
+			}
+
 			public static object INPT_F(string message,Type type)
 			{
 				Form MyForm = new Form();

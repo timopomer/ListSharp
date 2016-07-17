@@ -147,6 +147,18 @@ namespace ListSharp
                 return strgVar.name + " = (string)INPT_F(" + gc[1].Value + ",typeof(string));";
             }
 
+            if (line.StartsWith("CHOOSEFILE"))
+            {
+                GroupCollection gc = new Regex(@"\[(.*)\]").Match(line).Groups;
+                return strgVar.name + " = CHOOSEFILE_F(" + gc[1].Value + ");";
+            }
+
+            if (line.StartsWith("CHOOSEFOLDER"))
+            {
+                GroupCollection gc = new Regex(@"\[(.*)\]").Match(line).Groups;
+                return strgVar.name + " = CHOOSEFOLDER_F(" + gc[1].Value + ");";
+            }
+
             return processVariableIndependant(line,line_num,strgVar);
         }
 
