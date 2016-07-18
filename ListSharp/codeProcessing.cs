@@ -229,7 +229,7 @@ namespace ListSharp
                 return inpVar.name + " = (" + cast + ")GETRANGE_F(" + gc[1].Value + "," + serializeNumericString(gc[2].Value) + "," + serializeNumericString(gc[3].Value) + ");"; //interperted code
             }
 
-            if (line.StartsWith("REPLACE"))
+            if (line.StartsWith("REPLACE")) //replace command
             {
                 GroupCollection gc = new Regex(@"\[(.*)\] IN ([^>]*)").Match(line).Groups;
                 return inpVar.name + " = (" + cast + ")REPLACE_F(" + gc[2].Value + "," + gc[1].Value + ");";
