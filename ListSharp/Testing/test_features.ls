@@ -83,7 +83,7 @@ SHOW = between
 
 
 //add
-ROWS added = ADD[between,"A COMMAND I WANT"] TO added
+ROWS added = added + between + "A COMMAND I WANT"
 SHOW = added
 
 

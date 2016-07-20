@@ -195,13 +195,14 @@
 
 				string r = "";
 				int count = 1;
+				WebClient wb = new WebClient();
+			    wb.Headers.Add("User-Agent: Other");
 				while (r == "")
 				{
-					using (WebClient client = new WebClient())
-					{
+
 						try
 						{
-							r = client.DownloadString(url);
+							r = wb.DownloadString(url);
 						}
 						catch
 						{
@@ -213,7 +214,7 @@
 						}
 						}
 
-					}
+					
 				}
 				return r;
 			}
