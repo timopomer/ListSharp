@@ -29,7 +29,7 @@ ListSharp comes pre equipped with powerful algorithmic tools for information ext
 
 * ListSharp does not need the initializatiion of variables. you can start using all variables you want to as if they exist and assign them values to your liking
 * ListSharp is an expandable platform of useful functions for the manipulation of text. most manipulation algorithems are single liners without the need to study the code or understand how its done you can get everything up and running in minutes.
-* ListSharp does not need editing programs to code in, while notpad will do an editor is on the way
+* ListSharp does not need editing programs to code in, while notpad will do there is an [official editor](https://github.com/timopomer/ListSharpIDE)
 * ListSharp is extremely simplistic, writing ListSharp code is like explaining the computer what you want just like in your head.
 * ListSharp functions are logically named, you will appreciate the the word rich syntax when you read it after some time.
 
