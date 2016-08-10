@@ -1,5 +1,5 @@
-#ShowDebuggingInformation: true
-
+#ShowDebuggingInformation: True
+#DownloadMaxTries: 5
 
 //replace STRG
 STRG characters = "abcdefghijklmnopqrstuv1111"
@@ -19,7 +19,6 @@ STRG characters = "1111abcd1111"
 STRG characters = GETBETWEEN characters ["1111"] AND ["1111"]
 SHOW = "characters: " + characters
 
-
 //getbetween ROWS
 ROWS nums = {"a1a","a2a","a3a","a4a"}
 ROWS nums = GETBETWEEN nums ["a"] AND ["a"]
@@ -31,7 +30,6 @@ SHOW = nums
 STRG characters = "1111abcd1111"
 STRG characters = GETRANGE characters FROM [5] TO [8]
 SHOW = "characters: " + characters
-
 
 
 //getrange ROWS
@@ -76,7 +74,6 @@ SHOW = "all gotten html rows: "
 SHOW = gotten
 
 
-
 //getbetween to get commands
 ROWS between = GETBETWEEN gotten ["\">"] AND ["</a>"]
 SHOW = between
@@ -96,7 +93,6 @@ SHOW = combined
 
 //outp
 OUTP = combined HERE[<here>+"//commands.txt"]
-
 
 
 SHOW = "If this compiled,were in luck! \n Everything should be golden - this displays all functions"

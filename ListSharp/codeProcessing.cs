@@ -11,7 +11,8 @@ namespace ListSharp
 {
     public static class codeProcessing
     {
-
+        public static Tuple<string, string>[] replacementStrings;
+        public static Tuple<string, string>[] replacementCode;
         #region preprocessing functions
         public static List<string> preProcessCode(this string rawCode)
         {
@@ -117,15 +118,8 @@ namespace ListSharp
 
             if (line.StartsWith("READ")) //read text file into code command is called "read"
             {
-                string path = new Regex(@"READ\[([^>]*)\]").Match(line).Groups[1].Value.Trim(); //everything between the square brackets "[path]"
-
-                if (path.StartsWith("\"") && path.EndsWith("\"")) //if the path is a literal string we can check if it exists before compilation
-                if (!File.Exists(path.Substring(1, path.Length - 2))) //checking that the file is readable
-                {
-                debug.throwException("File: " + path + " does not exist before compilation", debug.importance.Regular);
-                }
-
-                return strgVar.name + " = System.IO.File.ReadAllText(" + path + ");"; //create the reading file code in interperted form that is read into a tempoary variable
+                GroupCollection gc = new Regex(@"READ\[([^>]*)\]").Match(line).Groups; //everything between the square brackets "[path]"
+                return strgVar.name + " = System.IO.File.ReadAllText(" + gc[1].Value + ");"; //create the reading file code in interperted form that is read into a tempoary variable
             }
 
 
@@ -235,17 +229,21 @@ namespace ListSharp
                 return inpVar.name + " = (" + cast + ")REPLACE_F(" + gc[2].Value + "," + gc[1].Value + ");";
             }
 
-
+            if (line.StartsWith("MULTIPLY")) //replace command
+            {
+                GroupCollection gc = new Regex(@"MULTIPLY (.*) BY ([^>]*)").Match(line).Groups;
+                return inpVar.name + " = (" + cast + ")MULTIPY_F(" + gc[1].Value + "," + serializeNumericString(gc[2].Value) + ");";
+            }
 
 
             if (inpVar is STRG)
             {
-                return inpVar.name + " = (string)ADD_F(new object[]{" + sanitizeEvaluation(line) + "},typeof(string));";
+                return inpVar.name + " = (string)ADD_F(typeof(string)," + santizeEvaluation(line) + ");";
             }
 
             if (inpVar is ROWS)
             {      
-                return inpVar.name + " = (string[])ADD_F(new object[]{" + sanitizeEvaluation(line) + "},typeof(string[]));";
+                return inpVar.name + " = (string[])ADD_F(typeof(string[])," + santizeEvaluation(line) + ");";
             }
 
             if (inpVar is NUMB)
@@ -342,6 +340,9 @@ namespace ListSharp
 
         public static string processLine(string line, int line_num)
         {
+
+            if (line.StartsWith("<") && line.EndsWith(">")) //c# code
+                return line;
             if (line.isLogic())
                 return processOperators(line, line_num);
 
@@ -436,37 +437,88 @@ namespace ListSharp
 
         }
 
-        public static string sanitizeEvaluation(string input)
+        public static string replaceStringRange(this string input, int startIndex, int lengthOfReplacedText, string replacementText)
         {
-            string pattern = @"""(?:[^""\\]*(?:\\.)?)*""";
-            Match[] mc = Regex.Matches(input, pattern).Cast<Match>().ToArray();
-            Array.Reverse(mc);
-            string[] replacementStrings = mc.Select(m => m.Value).ToArray();
-
-            mc.ToList().ForEach(n => input = input.replaceStringRange(n.Index, n.Length, "[" + mc.ToList().IndexOf(n) + "]"));
-            input = input.Replace("{", "").Replace("}", "").Replace(",", "+").Replace(" ", "");
-            string[] splitExpression = input.Split('+');
-
-            for (int i = 0; i < splitExpression.Length; i++)
-            {
-                for (int j = 0; j < mc.Length; j++)
-                {
-                    if (splitExpression[i] == "[" + j + "]")
-                    {
-                        splitExpression[i] = splitExpression[i].Replace("[" + j + "]", mc[j].Value);
-                        break;
-                    }
-                }
-            }
-            return String.Join(" , ", splitExpression);
-        }
-
-        public static string replaceStringRange(this string input, int startIndex, int length, string replacement)
-        {
-            return input.Substring(0, startIndex) + replacement + input.Substring(startIndex + length);
+            return input.Substring(0, startIndex) + replacementText + input.Substring(startIndex + lengthOfReplacedText);
         }
         #endregion
 
+        #region sanitizationFunctions
+        public static string sanitizeStrings(this string inputCode)
+        {
+            string pattern = @"""(?:[^""\\]*(?:\\.)?)*""";
+            Match[] mc = Regex.Matches(inputCode, pattern,RegexOptions.Singleline).Cast<Match>().ToArray();
+            Array.Reverse(mc);
+            replacementStrings = mc.Select((m, i) => new Tuple<string, string>(m.Value, createHash(i))).ToArray();
+            for (int i = 0; i < mc.Length; i++)
+            {
+                inputCode = inputCode.replaceStringRange(mc[i].Index, mc[i].Length, "[" + replacementStrings[i].Item2 + "]");
+            }
+            Array.Reverse(replacementStrings);
+            return inputCode;
+        }
+        public static string deSanitizeStrings(this string inputCode)
+        {
+            for (int i = 0; i < replacementStrings.Length; i++)
+            {
+                inputCode = inputCode.Replace("[" + replacementStrings[i].Item2 + "]", replacementStrings[i].Item1);
+            }
+            return inputCode;
+        }
+        public static string sanitizeCode(this string inputCode)
+        {
+            string pattern = @"<c#(.*?)c#>";
+            Match[] mc = Regex.Matches(inputCode, pattern, RegexOptions.Singleline).Cast<Match>().ToArray();
+            Array.Reverse(mc);
+            replacementCode = mc.Select((m, i) => new Tuple<string, string>(m.Groups[1].Value, createHash(i))).ToArray();
+            for (int i = 0; i < mc.Length; i++)
+            {
+                inputCode = inputCode.replaceStringRange(mc[i].Index, mc[i].Length, "<" + replacementCode[i].Item2 + ">");
+            }
+            Array.Reverse(replacementCode);
+            return inputCode;
+        }
+        public static string deSanitizeCode(this string inputCode)
+        {
+            for (int i = 0; i < replacementCode.Length; i++)
+            {
+                inputCode = inputCode.Replace("<" + replacementCode[i].Item2 + ">",replacementCode[i].Item1);
+            }
+            return inputCode;
+        }
+
+        public static string santizeEvaluation(this string inputCode)
+        {
+            inputCode = inputCode.Replace("{", "").Replace("}", "").Replace(",", "+").Replace(" ", "");
+            return String.Join(" , ", inputCode.Split('+'));
+        }
+        #endregion
+
+
+        #region hashing functions
+        public static string CreateMD5(string input)
+        {
+            // Use input string to calculate MD5 hash
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                // Convert the byte array to hexadecimal string
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+                return sb.ToString();
+            }
+        }
+        public static string createHash(int index)
+        {
+            var now = DateTime.Now;
+            return index + "-" + CreateMD5(index + now.Hour + now.Minute + now.Second + now.Millisecond + "").Substring(10);
+        }
+        #endregion
 
 
         #region queryFunctions
@@ -598,7 +650,7 @@ namespace ListSharp
                 inp = inp.Replace(" " + literal, "");
             }
 
-            string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "IS", "ISNOT", "ISUNDER", "ISOVER", "ISEQUAL" ,"CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
+            string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "IS", "ISNOT", "ISUNDER", "ISOVER", "ISEQUAL" ,"ISDIFF", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
             if (t.Length == 0)
                 return new Tuple<string, string>(var1, literal);
             return new Tuple<string, string>(var1, t[0]);
@@ -613,7 +665,7 @@ namespace ListSharp
                 inp = inp.Replace(" " + literal, "");
             }
 
-            string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "IS", "ISNOT", "ISUNDER", "ISOVER", "ISEQUAL", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
+            string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "IS", "ISNOT", "ISUNDER", "ISOVER", "ISEQUAL","ISDIFF", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
             if (t.Length == 1)
                 return new Tuple<string, string>(t[0], literal);
             return new Tuple<string, string>(t[0], t[1]);

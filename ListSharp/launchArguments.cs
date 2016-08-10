@@ -21,7 +21,7 @@ namespace ListSharp
                 if (singleline.StartsWith("#")) //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
                 {
                     if (singleline.Contains("ShowDebuggingInformation"))
-                        debugmode = singleline.EndsWith("true");
+                        debugmode = singleline.EndsWith("True");
 
 
                     if (singleline.Contains("DownloadMaxTries"))

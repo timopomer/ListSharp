@@ -29,7 +29,6 @@ namespace ListSharp
 
         public static void setFileName()
         {
-            Console.WriteLine("hey there");
             filename = Path.GetFileName(scriptfile);
         }
 

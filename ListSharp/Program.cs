@@ -6,6 +6,8 @@ using System.Threading;
 using System.Security.Principal;
 using Associations;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+
 namespace ListSharp
 {
     class Program
@@ -124,8 +126,16 @@ namespace ListSharp
 
 
             string allcode = IO.getFullCode();
-
+            if (launchArguments.debugmode)
+            {
+                Console.WriteLine("Original Code \n-----------------------");
+                Console.WriteLine(allcode);
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(Environment.NewLine);
+            }
             /* cleaning up code */
+            allcode = allcode.sanitizeStrings();
+            allcode = allcode.sanitizeCode();
             maincode = allcode.preProcessCode();
             maincode = maincode.replaceConstants();
             maincode.RemoveAll(string.IsNullOrWhiteSpace);
@@ -133,8 +143,8 @@ namespace ListSharp
             #endregion
 
 
-            
-string code =
+
+            string code =
 @"using System.Net;
 using System.Linq;
 using System;
@@ -144,7 +154,7 @@ using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Threading;
-
+using System.Text.RegularExpressions;
 
 public class MainClass
 { 
@@ -172,7 +182,7 @@ string output = """";
 
             if (launchArguments.debugmode)
             {
-                Console.WriteLine("Original Code \n-----------------------");
+                Console.WriteLine("Original Code Tokenized \n-----------------------");
                 foreach (string l in maincode)
                     Console.WriteLine(l);
                 Console.WriteLine("-----------------------");
@@ -200,15 +210,17 @@ string output = """";
             code += Environment.NewLine + "}" + Environment.NewLine;
             code += Properties.Resources.externalFunctions + "}"; //here we add all function depndecies
 
+            code = code.deSanitizeCode();
+            code = code.deSanitizeStrings();
 
             if (launchArguments.debugmode)
             {
                 Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine);
-                Console.WriteLine("Interperted Code \n-----------------------");
+                Console.WriteLine("Interperted Code De-tokenized \n-----------------------");
             }
             int index = 1;
-            char[] delimiterChars = { '\n' };
-            string[] allLines = code.Split(delimiterChars);
+
+            string[] allLines = Regex.Split(code,"\r\n");
 
 
             foreach (string currentLine in allLines)
@@ -228,6 +240,7 @@ string output = """";
 
 
             //compiling starts here
+
 
             string[] sources = { code };
             CompilerParameters parameters = new CompilerParameters();

@@ -29,6 +29,7 @@ namespace ListSharp
             operatorConversion.Add("ISEQUALOVER", "=>");
             operatorConversion.Add("ISEQUALUNDER", "=<");
             operatorConversion.Add("ISEQUAL", "==");
+            operatorConversion.Add("ISDIFF", "!=");
             operatorConversion.Add("IS", "==");
             operatorConversion.Add("ISNOT", "!=");
             operatorConversion.Add("CONTAINS", "");
