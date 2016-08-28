@@ -3,13 +3,13 @@
 
 //replace STRG
 STRG characters = "abcdefghijklmnopqrstuv1111"
-STRG characters = REPLACE["1111","wxyz"] IN characters
-SHOW = "characters: " + characters
-
+STRG characters = REPLACE ["1111"] WITH ["wxyz"] IN characters
+SHOW = "characters: "
+SHOW = characters
 
 //replace ROWS
 ROWS nums = {"a","2","3","4","5","6","7","8","9","a0","aa","a2","a3","a4","a5","a6","a7","a8","a9"}
-ROWS nums = REPLACE["a","1"] IN nums
+ROWS nums = REPLACE ["a"] WITH ["1"] IN nums
 SHOW = "nums: "
 SHOW = nums
 
@@ -17,7 +17,8 @@ SHOW = nums
 //getbetween STRG
 STRG characters = "1111abcd1111"
 STRG characters = GETBETWEEN characters ["1111"] AND ["1111"]
-SHOW = "characters: " + characters
+SHOW = "characters: "
+SHOW = characters
 
 //getbetween ROWS
 ROWS nums = {"a1a","a2a","a3a","a4a"}
@@ -29,8 +30,8 @@ SHOW = nums
 //getrange STRG
 STRG characters = "1111abcd1111"
 STRG characters = GETRANGE characters FROM [5] TO [8]
-SHOW = "characters: " + characters
-
+SHOW = "characters: "
+SHOW = characters
 
 //getrange ROWS
 ROWS nums = {"a1a","a2a","a3a","a4a"}
@@ -41,13 +42,13 @@ SHOW = nums
 
 //read
 STRG fullcode = READ[<here> + "\\test_features.ls"]
-SHOW = "full code: " + fullcode
-
+SHOW = "full code: "
+SHOW = fullcode
 
 //download
 STRG html = DOWNLOAD[@"https://github.com/timopomer/ListSharp/wiki/List-of-functions-by-type"]
-SHOW = "full html: " + html
-
+SHOW = "full html: "
+SHOW = html
 
 //rowsplit
 ROWS allrows = ROWSPLIT html BY [<newline>]

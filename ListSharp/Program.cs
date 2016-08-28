@@ -30,9 +30,7 @@ namespace ListSharp
             List<string> maincode;
 
             Console.ForegroundColor = ConsoleColor.DarkCyan;
-
             Console.BackgroundColor = ConsoleColor.White;
-
             Console.Title = "ListSharp Console";
             Console.Clear();
 
@@ -134,11 +132,17 @@ namespace ListSharp
                 Console.WriteLine(Environment.NewLine);
             }
             /* cleaning up code */
+
+            
+
+            allcode = allcode.replaceConstants();
+            allcode = allcode.initialCleanup();
+            List<string> initializers = memory.InitializeVariables(allcode);
             allcode = allcode.sanitizeStrings();
             allcode = allcode.sanitizeCode();
-            maincode = allcode.preProcessCode();
-            maincode = maincode.replaceConstants();
-            maincode.RemoveAll(string.IsNullOrWhiteSpace);
+            allcode = allcode.sanitizeVars();
+            allcode = allcode.preProcessCode();
+            maincode = new List<string>(Regex.Split(allcode, "\r\n"));
 
             #endregion
 
@@ -162,7 +166,6 @@ public class MainClass
 public string Execute()
 {
 
-string temp_contents = """";
 string output = """";
 ";
             //variables initialization starts here:
@@ -176,7 +179,7 @@ string output = """";
              */
 
             launchArguments.initializeArguments(maincode);
-            List<string> initializers = memory.InitializeVariables(maincode);
+            
 
 
 
@@ -200,7 +203,7 @@ string output = """";
             foreach (string singleline in maincode)
             {
 
-                code += codeProcessing.processLine(singleline, line_num);
+                code += codeParsing.processLine(singleline, line_num);
                 code += Environment.NewLine;
                 line_num++; //to know what line number we are currently processing
 
@@ -208,8 +211,11 @@ string output = """";
 
             code += "return output;";
             code += Environment.NewLine + "}" + Environment.NewLine;
+            int initialCodeLen = Regex.Split(code, "\r\n").Length;
             code += Properties.Resources.externalFunctions + "}"; //here we add all function depndecies
 
+            code = code.returnStringArr();
+            code = code.desanitizeVars();
             code = code.deSanitizeCode();
             code = code.deSanitizeStrings();
 
@@ -225,7 +231,7 @@ string output = """";
 
             foreach (string currentLine in allLines)
             {
-                if (launchArguments.debugmode)
+                if (launchArguments.debugmode && index <= initialCodeLen)
                     System.Console.WriteLine("Line: " + index + "    " + currentLine);
                 index++;
             }

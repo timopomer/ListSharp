@@ -55,10 +55,10 @@ return r;
 
 
 
-public static string[] EXTRACT_F(string[] arr, string bywhat, int collumnum)
+public static string[] EXTRACT_F(string[] arr, string delimiter, int collumnum)
 {
 collumnum--;
-return arr.Select(n=> n.Split(new string[] { bywhat }, System.StringSplitOptions.None).ElementAtOrDefault(collumnum)).ToArray();
+return arr.Select(n=> Regex.Split(n, delimiter).ElementAtOrDefault(collumnum)).ToArray();
 }
 
 
@@ -178,7 +178,7 @@ return ob.GetType() == typeof(string) ? Regex.Split(((string)ob), delimiter) : (
 }
 
 
-public static object REPLACE_F(object ob, string toReplace, string replaceWith)
+public static object REPLACE_F(string toReplace, string replaceWith,object ob)
 {
 return ob.GetType() == typeof(string) ? ((string)ob).Replace(toReplace, replaceWith) : (object)((string[])ob).Select(n=>n.Replace(toReplace, replaceWith)).ToArray();
 }

@@ -10,8 +10,12 @@ namespace ListSharp
     public static class memory
     {
         public static Dictionary<string, Variable[]> variables;
+        public static string[] getVariableNames()
+        {
+            return variables["STRG"].Select(n => n.name).Concat(variables["ROWS"].Select(n => n.name).Concat(variables["ROWS"].Select(n => n.name))).ToArray();
+        }
 
-        public static List<string> InitializeVariables(List<string> maincode)
+        public static List<string> InitializeVariables(string allcode)
         {
 
             variables = new Dictionary<string, Variable[]>();
@@ -25,7 +29,7 @@ namespace ListSharp
             List<NUMB> tempNumb = new List<NUMB>();
 
             Match match;
-            foreach (string singleline in maincode)
+            foreach (string singleline in Regex.Split(allcode, "\r\n"))
             {
 
                 //rows variable
