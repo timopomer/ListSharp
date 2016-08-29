@@ -15,6 +15,7 @@ namespace ListSharp
 
         public static bool startsWithSymbol(this string line)
         {
+            
             return !Char.IsLetter(line[0]);
         }
         #region process different commands

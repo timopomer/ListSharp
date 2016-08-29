@@ -152,7 +152,12 @@ return type==typeof(int)?(object)long.Parse(rtb.Text):rtb.Text;
 
 public static string[] GETLINES_F(string[] ins, System.Collections.Generic.List<int> range)
 {
-return range.Select(n => ins.ElementAtOrDefault(n-1)).ToArray();
+return range.Select(n => inRange(ins.Length,n-1)?ins[n-1]:"").ToArray();
+}
+
+public static bool inRange(int length,int element)
+{
+return length>element && element >= 0;
 }
 
 public static IEnumerable<int> EdgeRange(double start_d,double end_d)

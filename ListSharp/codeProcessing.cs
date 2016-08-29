@@ -19,7 +19,7 @@ namespace ListSharp
         public static string initialCleanup(this string rawCode)
         {
             rawCode = Regex.Replace(rawCode, @"\/\*(.*?)\*/", "", RegexOptions.Singleline);
-            string[] codeLines = Regex.Split(rawCode, "\r\n").Where(n=>!string.IsNullOrWhiteSpace(n)).ToArray();
+            string[] codeLines = Regex.Split(rawCode, "\r\n").Where(n=> n!="" && !string.IsNullOrWhiteSpace(n)).ToArray();
 
             for (int i = 0; i < codeLines.Length; i++)
             {
@@ -36,6 +36,7 @@ namespace ListSharp
 
             for (int i = 0; i < codeLines.Length; i++)
             {
+                if (codeLines[i] != "}" && codeLines[i] != "{")
                 codeLines[i] = removeArrayBrackets(codeLines[i]);
                 codeLines[i] = makeAdditionEvenlySpaced(codeLines[i]);
                 codeLines[i] = replaceAddition(codeLines[i]);
