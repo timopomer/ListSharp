@@ -12,14 +12,11 @@ namespace ListSharp
     public static class codeParsing
     {
 
-
         public static bool startsWithSymbol(this string line)
         {
             
             return !Char.IsLetter(line[0]);
         }
-        #region process different commands
-
         public static string processOperators(string line, int line_num)
         {
 
@@ -58,7 +55,6 @@ namespace ListSharp
 
             return "";
         }
-
         public static string processExpression(string line, int line_num)
         {
             line = new Regex(@"\[(.*)\]").Match(line).Groups[1].Value; //everything between the square brackets "[]"
@@ -89,54 +85,6 @@ namespace ListSharp
         }
 
 
-        public static string processRows1(string line, int line_num, ROWS rowsVar)
-        {
-
-
-            if (line.StartsWith("ROWSPLIT")) //rowsplit command
-            {
-                GroupCollection gc = new Regex(@"ROWSPLIT ([^>]*) BY \[(.*)\]").Match(line).Groups;
-                return " ROWSPLIT_F(" + gc[1].Value + "," + gc[2].Value + ");"; //interperted code
-            }
-            /*
-            if (line.StartsWith("SELECT")) //rowsplit command
-            {
-                return " " + selectBuilder(line); //interperted code
-            }
-
-            */
-
-
-
-
-            return processVariableIndependant(line, line_num, rowsVar);
-        }
-
-        public static string processNumb1(string line, int line_num, NUMB numbVar)
-        {
-            if (line.StartsWith("INPUT"))
-            {
-                GroupCollection gc = new Regex(@"\[(.*)\]").Match(line).Groups;
-                return " (int)(long)INPT_F(" + gc[1].Value + ",typeof(int));";
-            }
-
-            return processVariableIndependant(line, line_num, numbVar);
-        }
-
-        public static string processVariableIndependant(string line, int line_num, Variable inpVar)
-        {
-
-            string cast = inpVar is STRG ? "string" : inpVar is ROWS ? "string[]" : "int";
-
-
-
-
-            debug.throwException("Line: " + line_num + " invalid command", debug.importance.Fatal);
-
-            return ""; //this never happens
-        }
-        #endregion
-
         #region SHOW command
         public static string processShow(string line, int line_num)
         {
@@ -154,7 +102,6 @@ namespace ListSharp
                     }
             }
         }
-
         public static string genericShow(string type)
         {
             string returnedCode = "";
@@ -174,7 +121,6 @@ namespace ListSharp
             }
             return returnedCode;
         }
-
         public static string typeShow(string type)
         {
             string toReturn = "";
@@ -187,39 +133,46 @@ namespace ListSharp
         }
         #endregion
 
-        #region NOTF command
+
         public static string processNotification(string line, int line_num)
         {
             return "NOTIFY_F(" + line + ");";
         }
-        #endregion
-
-        #region DEBG command
         public static string processDebug(string line, int line_num)
         {
             return "DEBG_F(" + line + "," + line_num + ");";
         }
-        #endregion
-
-        #region OUTP command
         public static string processOutput(string line, int line_num)
         {
             GroupCollection gc = new Regex(@"(.*?) HERE\[(.*?)\]").Match(line).Groups;
-            return "OUTP_F(" + codeParsing.processStrg(gc[2].Value) + ", " + gc[1].Value + ");"; //outputs to file
+            return "OUTP_F(" + gc[2].Value + ", " + gc[1].Value + ");";
         }
-        #endregion
-
-        #region OUTP command
         public static string processOpen(string line, int line_num)
         {
-            GroupCollection gc = new Regex(@"HERE\[(.*)\]").Match(line).Groups;
-            return "OPEN_F(" + gc[1].Value + ");"; //outputs to file
+            GroupCollection gc = new Regex(@"HERE\[(.*?)\]").Match(line).Groups;
+            return "OPEN_F(" + gc[1].Value + ");";
         }
-        #endregion
+        public static string processInput(string message,string type)
+        {
+
+            switch (type)
+            {
+
+                case "STRG":
+                    return processStrg("INPT_F(" + message + ",typeof(string))");
+
+                case "ROWS":
+                    return processRows("INPT_F(" + message + ",typeof(string[]))");
+
+                case "NUMB":
+                    return "(int)(long)INPT_F(" + message + ", typeof(int))";
+            }
+            return "";
+        }
 
         public static string processStrg(string line) => "(string)ADD_F(typeof(string)," + line + ")";
         public static string processRows(string line) => "(stringarr)ADD_F(typeof(stringarr)," + line + ")";
-        public static string processNumb(string line) => serializeNumericRange(line);
+        public static string processNumb(string line) => serializeNumericString(line);
 
         public static string processCommand(string line, int line_num)
         {
@@ -238,37 +191,34 @@ namespace ListSharp
             string start_argument = splitline[0].Substring(0, 4);
             splitline[1] = splitline[1].Substring(1);
 
+            switch (start_argument)
+            {
 
-            if (start_argument == "STRG")
-                return varname + " = " + processStrg(processCommand(splitline[1], line_num)) + ";";
+                case "STRG":
+                    return varname + " = " + processStrg(processCommand(splitline[1], line_num)) + ";";
 
+                case "ROWS":
+                    return varname + " = " + processRows(processCommand(splitline[1], line_num)) + ";";
 
-            if (start_argument == "ROWS")
-                return varname + " = " + processRows(processCommand(splitline[1], line_num)) + ";";
+                case "NUMB":
+                    return varname + " = " + processNumb(processCommand(splitline[1], line_num)) + ";";
 
+                case "SHOW":
+                    return processShow(processCommand(splitline[1], line_num), line_num);
 
-            if (start_argument == "NUMB")
-                return varname + " = " + processNumb(processCommand(splitline[1], line_num)) + ";";
+                case "OUTP":
+                    return processOutput(processCommand(splitline[1], line_num), line_num);
 
+                case "DEBG":
+                    return processDebug(processCommand(splitline[1], line_num), line_num);
 
-            if (start_argument == "SHOW")
-                return processShow(splitline[1], line_num);
+                case "NOTF":
+                    return processNotification(processStrg(processCommand(splitline[1], line_num)), line_num);
 
+                case "OPEN":
+                    return processOpen(processStrg(processCommand(splitline[1], line_num)), line_num);
 
-            if (start_argument == "OUTP")
-                return processOutput(splitline[1], line_num);
-
-
-            if (start_argument == "DEBG")
-                return processDebug(splitline[1], line_num);
-
-
-            if (start_argument == "NOTF")
-                return processNotification(splitline[1], line_num);
-
-
-            if (start_argument == "OPEN")
-                return processOpen(splitline[1], line_num);
+            }
 
             debug.throwException("Line: " + line + " could not be interpeted", debug.importance.Fatal);
             return "";
@@ -277,7 +227,7 @@ namespace ListSharp
 
         
         #region queryFunctions
-        #region if
+
         public static string ifBuilder(string line)
         {
             line = new Regex(@"IF (.*)").Match(line).Groups[1].Value;
@@ -305,17 +255,14 @@ namespace ListSharp
             return "";
 
         }
-
         public static string numericIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
             return serializeNumericString(line.Item1) + operation + serializeNumericString(line.Item2);
         }
-
         public static string containIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
             return operation + variables.Item1 + ".Contains(" + variables.Item2 + ")";
         }
-
         public static string equallityIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
             if (variables.Item1.ofVarType("ROWS") && variables.Item2.ofVarType("ROWS"))
@@ -323,9 +270,8 @@ namespace ListSharp
 
             return variables.Item1 + operation + variables.Item2;
         }
-        #endregion
+ 
 
-        #region select
         public static string selectBuilder(string variableName,string query)
         {
             GroupCollection gc = new Regex(@"(.*)(ISOVER|ISUNDER|ISEQUALOVER|ISEQUALUNDER|ISEQUAL|ISNOT|IS|CONTAINSNOT|CONTAINS)(.*)").Match(query).Groups;
@@ -353,7 +299,6 @@ namespace ListSharp
 
 
         }
-
         public static string numericSelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
             if (line.Item2.Contains("EVERY"))
@@ -364,7 +309,6 @@ namespace ListSharp
 
             return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + serializeNumericString(line.Item2) + ").ToArray()";
         }
-
         public static string containSelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
             if (line.Item2.Contains("EVERY"))
@@ -375,7 +319,6 @@ namespace ListSharp
 
             return variables.Item1 + ".Where(temp => " + operation + "temp.Contains(" + variables.Item2 + ")).ToArray()";
         }
-
         public static string equallitySelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
         {
             bool positive = (operation == "==");
@@ -393,7 +336,6 @@ namespace ListSharp
 
             return variables.Item1 + ".Where(temp => temp " + operation + " " + variables.Item2 + ").ToArray()";
         }
-
         public static Tuple<string, string> getVarnames(string inp, string var1)
         {
             string literal = "";
@@ -408,7 +350,6 @@ namespace ListSharp
                 return new Tuple<string, string>(var1, literal);
             return new Tuple<string, string>(var1, t[0]);
         }
-
         public static Tuple<string, string> getVarnames2(string inp)
         {
             string literal = "";
@@ -424,6 +365,7 @@ namespace ListSharp
             return new Tuple<string, string>(t[0], t[1]);
         }
 
+        #endregion
         public static string serializeNumericString(string input)
         {
             foreach (Match m in Regex.Matches(input, @"(\w+) LENGTH"))
@@ -431,10 +373,9 @@ namespace ListSharp
 
             return input;
         }
-
         public static string serializeNumericRange(string input)
         {
-            string[] rangeElements = input.Split(',');
+            string[] rangeElements = Regex.Split(input," AND ");
             string query = "new List<IEnumerable<int>>() {";
 
             for (int i = 0; i < rangeElements.Length; i++)
@@ -451,8 +392,8 @@ namespace ListSharp
 
             return query + "}.SelectMany(n => n).ToList()";
         }
-        #endregion
-        #endregion
+
+        
 
     }
 }

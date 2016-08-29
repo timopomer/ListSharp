@@ -147,7 +147,7 @@ MyForm.Controls.Add(b);
 
 MyForm.ShowDialog();
 MyForm.Close();
-return type==typeof(int)?(object)long.Parse(rtb.Text):rtb.Text;
+return type==typeof(int)?(object)long.Parse(rtb.Text):type==typeof(string)?(object)rtb.Text:(object)Regex.Split(rtb.Text,"\n");
 }
 
 public static string[] GETLINES_F(string[] ins, System.Collections.Generic.List<int> range)

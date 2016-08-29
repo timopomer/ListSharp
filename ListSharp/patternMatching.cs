@@ -11,7 +11,8 @@ namespace ListSharp
     {
         public static bool notRecursing(string line)
         {
-            return baseDefinitions.commandPattern.Matches(line).Count == 0;
+            return baseDefinitions.regexPatterns.Select(n => n.Value.Item1).ToList().Where(n => n.IsMatch(line)).Count() == 0;
+            //return baseDefinitions.commandPattern.Matches(line).Count == 0;
         }
         public static string evaluateMatch(string line, string command)
         {
