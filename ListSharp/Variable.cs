@@ -14,4 +14,16 @@ namespace ListSharp
             this.name = name;
         }
     }
+    public class NUMB : Variable
+    {
+        public NUMB(string name) : base(name) { }
+    }
+    public class ROWS : Variable
+    {
+        public ROWS(string name) : base(name) { }
+    }
+    public class STRG : Variable
+    {
+        public STRG(string name) : base(name) { }
+    }
 }

@@ -91,9 +91,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ROWS.cs" />
-    <Compile Include="NUMB.cs" />
-    <Compile Include="STRG.cs" />
     <Compile Include="Variable.cs" />
   </ItemGroup>
   <ItemGroup>

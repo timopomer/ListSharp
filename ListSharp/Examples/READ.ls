@@ -9,3 +9,5 @@ SHOW = FileContents
 STRG FileLocation = <here>+@"\READ.ls"
 STRG FileContents = READ[FileLocation]
 SHOW = FileContents
+
+OUTP = ROWS[READ[STRG[<here>+"\\testrun.txt"]]+"READ works"] HERE[STRG[<here>+"\\testrun.txt"]]

@@ -40,6 +40,8 @@ namespace ListSharp
                 codeLines[i] = removeArrayBrackets(codeLines[i]);
                 codeLines[i] = makeAdditionEvenlySpaced(codeLines[i]);
                 codeLines[i] = replaceAddition(codeLines[i]);
+                codeLines[i] = replaceNumbOperators(codeLines[i]);
+
             }
             
 
@@ -63,7 +65,7 @@ namespace ListSharp
         }
         public static string removeAfterWhitespace(string line)
         {
-            return new Regex(@"(.*)\s*$").Match(line).Groups[1].Value;
+            return new Regex(@"(.*?)\s*$").Match(line).Groups[1].Value;
         }
         public static string makeEqualsEvenlySpaced(string line)
         {
@@ -87,18 +89,12 @@ namespace ListSharp
         public static string replaceAddition(string line)
         {
             return line.Replace("+",",");
-            /*
-            string oB = "(" + String.Join("|", new string[] { "«", "<", "(" }.Select(n => Regex.Escape(n))) + ")";
-            string cB = "(" + String.Join("|", new string[] { "»", ">", ")" }.Select(n => Regex.Escape(n))) + ")";
-            Regex r = new Regex(oB + @"\d-\w{10}" + cB + @"?\+?" + oB + @"\d-\w{10}" + cB + "?");
-            MatchCollection mc = r.Matches(line);
-            foreach (Match m in mc)
-            {
-                line = line.Replace(m.Value, String.Join(",", m.Value.Split('+')));
-            }
-            return r.Matches(line).Count == 0 ? line : modifyVariableAddition(line);
-            */
         }
+        public static string replaceNumbOperators(string line)
+        {
+            return line.Replace("PLUS", "+").Replace("MINUS", "-").Replace("MULTIPLY", "*").Replace("DIVIDE", "/");
+        }
+
         public static string replaceStringRange(this string input, int startIndex, int lengthOfReplacedText, string replacementText)
         {
             return input.Substring(0, startIndex) + replacementText + input.Substring(startIndex + lengthOfReplacedText);

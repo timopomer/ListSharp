@@ -114,9 +114,6 @@ namespace ListSharp
 
             #region getting and cleaning up code
 
-
-
-
             Console.WriteLine("Script file");
             Console.WriteLine(IO.scriptfile);
             Console.WriteLine("\n");
@@ -133,7 +130,6 @@ namespace ListSharp
             }
             /* cleaning up code */
 
-            
 
             allcode = allcode.replaceConstants();
             allcode = allcode.initialCleanup();
@@ -148,7 +144,7 @@ namespace ListSharp
 
 
 
-            string code =
+string code =
 @"using System.Net;
 using System.Linq;
 using System;
@@ -162,16 +158,24 @@ using System.Text.RegularExpressions;
 
 public class MainClass
 { 
+[DllImport(""kernel32.dll"")]
+static extern IntPtr GetConsoleWindow();
+
+[DllImport(""user32.dll"")]
+static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+const int SW_HIDE = 0;
+const int SW_SHOW = 5;
 
 public string Execute()
 {
-
+var handle = GetConsoleWindow();
 string output = """";
 ";
+
+
             //variables initialization starts here:
             
-
-
 
             /*
              * since it creates the appropiate code for each variable even if it occurs twice
@@ -180,8 +184,6 @@ string output = """";
 
             launchArguments.initializeArguments(maincode);
             
-
-
 
             if (launchArguments.debugmode)
             {
@@ -202,14 +204,12 @@ string output = """";
             int line_num = 1;
             foreach (string singleline in maincode)
             {
-
                 code += codeParsing.processLine(singleline, line_num);
                 code += Environment.NewLine;
                 line_num++; //to know what line number we are currently processing
-
             }
 
-            code += "return output;";
+            code += "ShowWindow(handle, SW_SHOW);\r\nreturn output;";
             code += Environment.NewLine + "}" + Environment.NewLine;
             int initialCodeLen = Regex.Split(code, "\r\n").Length;
             code += Properties.Resources.externalFunctions + "}"; //here we add all function depndecies

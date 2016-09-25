@@ -27,10 +27,6 @@ namespace ListSharp
                     if (singleline.Contains("DownloadMaxTries"))
                         downloadtries = int.Parse(Regex.Split(singleline, " ")[1]);
                 }
-
-
-                
-
             }
         }
     }
