@@ -1,4 +1,0 @@
-=
-//part1=
-//comments should work=
-STRG MYSTRG = <here>

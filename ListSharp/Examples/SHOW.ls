@@ -11,3 +11,6 @@ ROWS numbs = {"1","2","3"}
 SHOW = numbs
 
 
+STRG outplace = STRG[<here> + "\\testrun.txt"]
+OUTP = STRG[READ[outplace] + <newline> + "SHOW"] HERE[outplace]
+(exit)

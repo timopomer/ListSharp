@@ -249,146 +249,6 @@ namespace ListSharp
         }
 
         #region queryFunctions
-        /*
-                public static string ifBuilder(string line)
-                {
-                    line = new Regex(@"IF (.*)").Match(line).Groups[1].Value;
-                    GroupCollection gc = new Regex(@"(.*)(ISOVER|ISUNDER|ISEQUALOVER|ISEQUALUNDER|ISEQUAL|ISNOT|IS|CONTAINSNOT|CONTAINS)(.*)").Match(line).Groups;
-                    Tuple<string, string> variables = getVarnames2(line);
-                    Tuple<string, string> sides = new Tuple<string, string>(gc[1].Value, gc[3].Value);
-                    switch (gc[2].Value)
-                    {
-                        case "ISOVER":
-                        case "ISUNDER":
-                        case "ISEQUAL":
-                        case "ISEQUALOVER":
-                        case "ISEQUALUNDER":
-                            return numericIf(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
-
-                        case "CONTAINSNOT":
-                        case "CONTAINS":
-                            return containIf(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
-
-                        case "IS":
-                        case "ISNOT":
-                            return equallityIf(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
-                    }
-                    debug.throwException("if mode does not exist", debug.importance.Fatal);
-                    return "";
-
-                }
-                public static string numericIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
-                {
-                    return serializeNumericString(line.Item1) + operation + serializeNumericString(line.Item2);
-                }
-                public static string containIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
-                {
-                    return operation + variables.Item1 + ".Contains(" + variables.Item2 + ")";
-                }
-                public static string equallityIf(Tuple<string, string> variables, Tuple<string, string> line, string operation)
-                {
-                    if (variables.Item1.ofVarType("ROWS") && variables.Item2.ofVarType("ROWS"))
-                        return operation == "==" ? variables.Item1 + ".SequenceEqual(" + variables.Item2 + ")" : "!" + variables.Item1 + ".SequenceEqual(" + variables.Item2 + ")";
-
-                    return variables.Item1 + operation + variables.Item2;
-                }
-
-                     public static string selectBuilder(string variableName,string query)
-                {
-                    GroupCollection gc = new Regex(@"(.*)(ISOVER|ISUNDER|ISEQUALOVER|ISEQUALUNDER|ISEQUAL|ISNOT|IS|CONTAINSNOT|CONTAINS)(.*)").Match(query).Groups;
-                    Tuple<string, string> variables = getVarnames(query, variableName);
-                    Tuple<string, string> sides = new Tuple<string, string>(gc[1].Value, gc[3].Value);
-                    switch (gc[2].Value)
-                    {
-                        case "ISOVER":
-                        case "ISUNDER":
-                        case "ISEQUAL":
-                        case "ISEQUALOVER":
-                        case "ISEQUALUNDER":
-                            return numericSelect(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
-
-                        case "CONTAINSNOT":
-                        case "CONTAINS":
-                            return containSelect(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
-
-                        case "IS":
-                        case "ISNOT":
-                            return equallitySelect(variables, sides, baseDefinitions.operatorConversion[gc[2].Value]);
-                    }
-                    debug.throwException("select mode does not exist", debug.importance.Fatal);
-                    return "";
-
-
-                }
-                public static string numericSelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
-                {
-                    if (line.Item2.Contains("EVERY"))
-                        return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ".Max(temp_2 => temp_2.Length)).ToArray()";
-
-                    if (line.Item2.Contains("ANY"))
-                        return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + variables.Item2 + ".Min(temp_2 => temp_2.Length)).ToArray()";
-
-                    return variables.Item1 + ".Where(temp => returnLength(temp) " + operation + " " + serializeNumericString(line.Item2) + ").ToArray()";
-                }
-                public static string containSelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
-                {
-                    if (line.Item2.Contains("EVERY"))
-                        return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => " + operation + "temp_2.Contains(temp)).ToArray().Length == " + variables.Item2 + ".Length).ToArray()";
-
-                    if (line.Item2.Contains("ANY"))
-                        return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => " + operation + "temp_2.Contains(temp)).ToArray().Length > 0).ToArray()";
-
-                    return variables.Item1 + ".Where(temp => " + operation + "temp.Contains(" + variables.Item2 + ")).ToArray()";
-                }
-                public static string equallitySelect(Tuple<string, string> variables, Tuple<string, string> line, string operation)
-                {
-                    bool positive = (operation == "==");
-                    bool enclusive = line.Item2.StartsWith(" EVERY");
-
-                    if (enclusive || line.Item2.StartsWith(" ANY"))
-                    {
-
-                        if (positive == enclusive)
-                            return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => temp_2 " + operation + " temp).ToArray().Length == " + variables.Item2 + ".Length).ToArray()";
-
-                        if (!enclusive)
-                            return variables.Item1 + ".Where(temp => " + variables.Item2 + ".Where(temp_2 => temp_2 " + operation + " temp).ToArray().Length > 0).ToArray()";
-                    }
-
-                    return variables.Item1 + ".Where(temp => temp " + operation + " " + variables.Item2 + ").ToArray()";
-                }
-                public static Tuple<string, string> getVarnames(string inp, string var1)
-                {
-                    string literal = "";
-                    if (inp.Contains("\""))
-                    {
-                        literal = new Regex("\"(.*)\"").Match(inp).Groups[0].Value;
-                        inp = inp.Replace(" " + literal, "");
-                    }
-
-                    string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "IS", "ISNOT", "ISUNDER", "ISOVER", "ISEQUAL", "ISDIFF", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
-                    if (t.Length == 0)
-                        return new Tuple<string, string>(var1, literal);
-                    return new Tuple<string, string>(var1, t[0]);
-                }
-                public static Tuple<string, string> getVarnames2(string inp)
-                {
-                    string literal = "";
-                    if (inp.Contains("\""))
-                    {
-                        literal = new Regex("\"(.*)\"").Match(inp).Groups[0].Value;
-                        inp = inp.Replace(" " + literal, "");
-                    }
-
-                    string[] t = inp.Split(' ').Where(temp => !new string[] { "ANY", "EVERY", "LENGTH", "IN", "STRG", "IS", "ISNOT", "ISUNDER", "ISOVER", "ISEQUAL", "ISDIFF", "CONTAINS", "CONTAINSNOT" }.Contains(temp)).ToArray();
-                    if (t.Length == 1)
-                        return new Tuple<string, string>(t[0], literal);
-                    return new Tuple<string, string>(t[0], t[1]);
-                }
-                */
-
-        //http://regexstorm.net/tester?p=(LENGTH+%7c)(ISOVER%7cISUNDER%7cISEQUALOVER%7cISEQUALUNDER%7cISEQUAL%7cISNOT%7cIS%7cCONTAINSNOT%7cCONTAINS)+(ANY%7cEVERY%7c)(%3f%3a+STRG%7c)(%3f%3a+LENGTH%7c)(%3f%3a+IN%7c)(.*)&i=ISNOT+%22123%22%0d%0aIS+ANY+STRG+IN+chars%0d%0aISNOT+ANY+STRG+IN+chars%0d%0aCONTAINS+%224%22%0d%0aCONTAINSNOT+%224%22%0d%0aCONTAINSNOT+EVERY+STRG+IN+nums%0d%0aLENGTH+ISOVER+EVERY+STRG+LENGTH+IN+nums%0d%0aLENGTH+ISUNDER+4%0d%0aLENGTH+ISOVER+2%0d%0aLENGTH+ISEQUAL+%22123%22+LENGTH&o=m
-        
         public static string buildIfQuery(string query)
         {
             ifQuery rawQuery = new ifQuery(query);
@@ -400,8 +260,8 @@ namespace ListSharp
             selectQuery rawQuery = new selectQuery(variableName,gc); 
             return rawQuery.returnQuery();
         }
-
         #endregion
+
         public static string serializeNumericString(string input)
         {
             foreach (Match m in Regex.Matches(input, @"(\S*?) LENGTH"))
@@ -432,18 +292,17 @@ namespace ListSharp
     public class ifQuery
     {
 
-
-  
         IEnumerable<string> queryParts;
         public ifQuery(string query)
         {
             this.queryParts = Regex.Split(query, @"(AND|OR)");
-            var a = "";
         }
         public string returnQuery()
         {
             this.queryParts = this.queryParts.Select(n => n.Replace("AND", "&&").Replace("OR", "||"));
             this.queryParts = this.queryParts.Select(n => codeParsing.serializeNumericString(n));
+
+
             foreach (var patternpair in baseDefinitions.operatorConversion)
             {
                 this.queryParts = this.queryParts.Select(n => n.Contains(patternpair.Key) ? patternpair.Value(Regex.Split(n, $" {patternpair.Key} ")[0], Regex.Split(n, $" {patternpair.Key} ")[1]) : n);

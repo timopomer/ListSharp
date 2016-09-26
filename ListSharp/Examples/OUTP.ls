@@ -1,4 +1,4 @@
-#ShowDebuggingInformation: false
-ROWS a = {"1","2","3"}
+STRG outplace = STRG[<here> + "\\testrun.txt"]
+OUTP = STRG[READ[outplace] + <newline> + "OUTP"] HERE[outplace]
+(exit)
 
-OUTP = a HERE[<here>+@"\numbers.txt"]

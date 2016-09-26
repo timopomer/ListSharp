@@ -30,7 +30,7 @@ namespace ListSharp
                 {"EXTRACT",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"EXTRACT COLLUM\[(.*?)\] FROM (.*?) SPLIT BY \[(.*?)\]"), (gc) => "EXTRACT_F(" + codeParsing.processRows(gc[2].Value) + "," + codeParsing.processStrg(gc[3].Value) + "," + codeParsing.serializeNumericString(gc[1].Value) + ")")},
                 {"COMBINE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"COMBINE\[(.*?)\] WITH \[(.*?)\]"), (gc) => "COMBINE_F(new string[][] {" + gc[1].Value + "}," + codeParsing.processStrg(gc[2].Value) + ")")},
                 {"GETBETWEEN",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"GETBETWEEN (.*?) \[(.*?)\] AND \[(.*?)\]"), (gc) => "GETBETWEEN_F(" + gc[1].Value + "," + codeParsing.processStrg(gc[2].Value) + "," +codeParsing.processStrg(gc[3].Value) + ")")},
-                {"GETRANGE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"GETRANGE (.*?) FROM \[(.*?)\] TO \[(.*?)\]"), (gc) => "GETRANGE_F(" + gc[1].Value + "," + codeParsing.serializeNumericRange(gc[2].Value) + "," + codeParsing.serializeNumericString(gc[3].Value) + ")")},
+                {"GETRANGE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"GETRANGE (.*?) FROM \[(.*?)\] TO \[(.*?)\]"), (gc) => "GETRANGE_F(" + gc[1].Value + "," + codeParsing.serializeNumericString(gc[2].Value) + "," + codeParsing.serializeNumericString(gc[3].Value) + ")")},
                 {"REPLACE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"REPLACE \[(.*?)\] WITH \[(.*?)\] IN (.*)"), (gc) => "REPLACE_F(" + codeParsing.processStrg(gc[1].Value) + "," + codeParsing.processStrg(gc[2].Value) + "," + gc[3].Value + ")")},
                 {"MULTIPLY",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"MULTIPLY (.*?) BY (.*?)"), (gc) => "MULTIPY_F(" + gc[1].Value + "," + codeParsing.serializeNumericString(gc[2].Value) + ");")},
                 {"STRG",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"STRG\[(.*?)\]"), (gc) => codeParsing.processStrg(gc[1].Value))},
@@ -58,14 +58,14 @@ namespace ListSharp
             {
                 {"ISOVER", (s1,s2)=>$"{s1} > {s2}"},
                 {"ISUNDER", (s1,s2)=>$"{s1} < {s2}"},
-                {"ISEQUALOVER",(s1,s2)=>$"{s1} => {s2}"},
-                {"ISEQUALUNDER", (s1,s2)=>$"{s1} =< {s2}"},
+                {"ISEQUALOVER",(s1,s2)=>$"{s1} >= {s2}"},
+                {"ISEQUALUNDER", (s1,s2)=>$"{s1} <= {s2}"},
                 {"ISEQUAL",(s1,s2)=>$"{s1} == {s2}"},
                 {"ISDIFF", (s1,s2)=>$"{s1} != {s2}"},
-                {"IS", (s1,s2)=>$"{s1} == {s2}"},
-                {"ISNOT", (s1,s2)=>$"{s1} != {s2}"},
-                {"CONTAINS", (s1,s2)=>$"{s1}.Contains({s2})"},
-                {"CONTAINSNOT", (s1,s2)=>$"!{s1}.Contains({s2})"}
+                {"ISNOT", (s1,s2)=>$"!Enumerable.SequenceEqual({s1},{s2})"},
+                {"IS", (s1,s2)=>$"Enumerable.SequenceEqual({s1},{s2})"},
+                {"CONTAINSNOT", (s1,s2)=>$"!{s1}.Contains({s2})"},
+                {"CONTAINS", (s1,s2)=>$"{s1}.Contains({s2})"}
             };
             #endregion
 
