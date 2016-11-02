@@ -291,7 +291,6 @@ namespace ListSharp
     }
     public class ifQuery
     {
-
         IEnumerable<string> queryParts;
         public ifQuery(string query)
         {
@@ -309,8 +308,6 @@ namespace ListSharp
             }
             return string.Join("",this.queryParts);
         }
-
-
         }
     public class selectQuery
         {

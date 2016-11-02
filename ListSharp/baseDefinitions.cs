@@ -20,7 +20,6 @@ namespace ListSharp
             regexPatterns = new Dictionary<string, Tuple<Regex, Func<GroupCollection, string>>>()
             {
                 {"GETLINES",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"GETLINES (.*?) \[(.*?)\]"), (gc) => "GETLINES_F(" + codeParsing.processRows(gc[1].Value) + "," + codeParsing.serializeNumericRange(gc[2].Value) + ")")},
-                {"GETLINE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"GETLINE (.*?) \[(.*?)\]"), (gc) => "GETLINE_F(" + codeParsing.processRows(gc[1].Value) + "," + codeParsing.processNumb(gc[2].Value) + ")")},
                 {"DOWNLOAD",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"DOWNLOAD\[(.*?)\]"), (gc) => "DOWNLOAD_F(" + codeParsing.processStrg(gc[1].Value) + "," + launchArguments.downloadtries + ")")},
                 {"CHOOSEFILE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"CHOOSEFILE\[(.*?)\]"), (gc) => "CHOOSEFILE_F(" + codeParsing.processStrg(gc[1].Value) + ")")},
                 {"CHOOSEFOLDER",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"CHOOSEFOLDER\[(.*?)\]"), (gc) => "CHOOSEFOLDER_F(" + codeParsing.processStrg(gc[1].Value) + ")")},
@@ -32,7 +31,6 @@ namespace ListSharp
                 {"GETBETWEEN",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"GETBETWEEN (.*?) \[(.*?)\] AND \[(.*?)\]"), (gc) => "GETBETWEEN_F(" + gc[1].Value + "," + codeParsing.processStrg(gc[2].Value) + "," +codeParsing.processStrg(gc[3].Value) + ")")},
                 {"GETRANGE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"GETRANGE (.*?) FROM \[(.*?)\] TO \[(.*?)\]"), (gc) => "GETRANGE_F(" + gc[1].Value + "," + codeParsing.serializeNumericString(gc[2].Value) + "," + codeParsing.serializeNumericString(gc[3].Value) + ")")},
                 {"REPLACE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"REPLACE \[(.*?)\] WITH \[(.*?)\] IN (.*)"), (gc) => "REPLACE_F(" + codeParsing.processStrg(gc[1].Value) + "," + codeParsing.processStrg(gc[2].Value) + "," + gc[3].Value + ")")},
-                {"MULTIPLY",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"MULTIPLY (.*?) BY (.*?)"), (gc) => "MULTIPY_F(" + gc[1].Value + "," + codeParsing.serializeNumericString(gc[2].Value) + ");")},
                 {"STRG",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"STRG\[(.*?)\]"), (gc) => codeParsing.processStrg(gc[1].Value))},
                 {"ROWS",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"ROWS\[(.*?)\]"), (gc) => codeParsing.processRows(gc[1].Value))},
                 {"NUMB",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"NUMB\[(.*?)\]"), (gc) => codeParsing.processNumb(gc[1].Value))},

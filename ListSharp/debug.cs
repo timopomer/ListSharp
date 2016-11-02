@@ -24,8 +24,6 @@ namespace ListSharp
                 while (true)
                     Thread.Sleep(1000);
             }
-
-                
             
         }
     }

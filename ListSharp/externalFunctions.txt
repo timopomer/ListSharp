@@ -169,10 +169,7 @@ return start < end ? Enumerable.Range(start, end - start + 1) : Enumerable.Range
 }
 
 
-public string GETLINE_F(string[] ins, int linnum)
-{
-return ins.Length>=linnum?ins[linnum-1]:"";
-}
+
 
 
 
@@ -194,10 +191,6 @@ string[] temp = toadd.SelectMany(n => n.GetType() == typeof(string) ? new string
 return type == typeof(string) ? (object)String.Join("", temp) : temp;
 }
 
-public static object MULTIPY_F(object ob,int times)
-{
-return ob.GetType() == typeof(string) ? String.Join("",(string[])MULTIPY_F(new string[] { (string)ob } ,times)) : (object)(Enumerable.Range(0,times).SelectMany(n=>(string[])ob).ToArray());
-}
 
 
 public static string DOWNLOAD_F(string url,int maxtries)
