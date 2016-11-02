@@ -1,13 +1,13 @@
 ﻿
 
-public string getString(object thevar) {
+public static string getString(object thevar) {
 if (thevar.GetType() == typeof(Int32)) return "[0]" + (Int32) thevar + "[/0]";
 if (thevar.GetType() == typeof(string)) return "[0]" + (string) thevar + "[/0]";
 if (thevar.GetType() == typeof(string[])) return arr2str((string[]) thevar);
 return "Show Error";
 }
 
-public string SHOW_F(object thein) {
+public static string SHOW_F(object thein) {
 return System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine, "<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
 }
 
@@ -46,7 +46,7 @@ notificationButton.Visible = false;
 
 
 
-public string arr2str(string[] arr) {
+public static string arr2str(string[] arr) {
 string r = "";
 for (int i = 0; i < arr.Length; i++)
 r += "[" + i + "]" + arr[i] + "[/" + i + "]\n";
@@ -67,7 +67,7 @@ public static string[] COMBINE_F(string[][] srar, string bywhat)
 return Enumerable.Range(0,srar.Max(n=>n.Length)).Select(i=>string.Join(bywhat, srar.Select(m=>m.ElementAtOrDefault(i)))).ToArray();
 }
 
-public void OUTP_F(string path, object thevar)
+public static void OUTP_F(string path, object thevar)
 {
 if (thevar.GetType() == typeof(string)) {
 System.IO.File.WriteAllText(path, (string) thevar);
@@ -76,7 +76,7 @@ if (thevar.GetType() == typeof(string[])) {
 System.IO.File.WriteAllLines(path, (string[]) thevar);
 }
 }
-public void OPEN_F(string path) {
+public static void OPEN_F(string path) {
 System.Diagnostics.Process.Start(path);
 }
 
@@ -167,10 +167,6 @@ int end = (int)end_d;
 
 return start < end ? Enumerable.Range(start, end - start + 1) : Enumerable.Range(end, start - end + 1).Reverse();
 }
-
-
-
-
 
 
 public static string[] ROWSPLIT_F(object ob, string delimiter)

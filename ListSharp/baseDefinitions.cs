@@ -20,7 +20,7 @@ namespace ListSharp
             regexPatterns = new Dictionary<string, Tuple<Regex, Func<GroupCollection, string>>>()
             {
                 {"GETLINES",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"GETLINES (.*?) \[(.*?)\]"), (gc) => "GETLINES_F(" + codeParsing.processRows(gc[1].Value) + "," + codeParsing.serializeNumericRange(gc[2].Value) + ")")},
-                {"DOWNLOAD",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"DOWNLOAD\[(.*?)\]"), (gc) => "DOWNLOAD_F(" + codeParsing.processStrg(gc[1].Value) + "," + launchArguments.downloadtries + ")")},
+                {"DOWNLOAD",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"DOWNLOAD\[(.*?)\]"), (gc) => "DOWNLOAD_F(" + codeParsing.processStrg(gc[1].Value) + "," + 1 + ")")},
                 {"CHOOSEFILE",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"CHOOSEFILE\[(.*?)\]"), (gc) => "CHOOSEFILE_F(" + codeParsing.processStrg(gc[1].Value) + ")")},
                 {"CHOOSEFOLDER",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"CHOOSEFOLDER\[(.*?)\]"), (gc) => "CHOOSEFOLDER_F(" + codeParsing.processStrg(gc[1].Value) + ")")},
                 {"READ",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"READ\[(.*?)\]"), (gc) => "System.IO.File.ReadAllText(" + codeParsing.processStrg(gc[1].Value) + ")")},

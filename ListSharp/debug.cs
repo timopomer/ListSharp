@@ -15,10 +15,11 @@ namespace ListSharp
             Fatal
         }
 
-        public static void throwException(string message,importance e)
+        public static void throwException(string title,string message,importance e)
         {
 
-            Console.WriteLine(e.ToString() + " ListSharp exception: " + message);
+            Console.WriteLine(e.ToString() + " ListSharp exception: " + title);
+            Console.WriteLine(message);
             if (e == importance.Fatal)
             {
                 while (true)

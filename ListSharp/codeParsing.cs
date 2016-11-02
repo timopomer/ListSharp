@@ -52,7 +52,7 @@ namespace ListSharp
             if (line.StartsWith("(") && line.EndsWith(")"))
                 return processFlag(line, line_num);
 
-            debug.throwException("Line: " + line_num + " invalid Operator", debug.importance.Fatal);
+            debug.throwException("Parsing error, invalid Operator", $"Line: {line_num}", debug.importance.Fatal);
 
             return "";
         }
@@ -81,7 +81,7 @@ namespace ListSharp
                 return "if(" + buildIfQuery(new Regex(@"IF (.*)").Match(line).Groups[1].Value) + ")";
             }
 
-            debug.throwException("Line: " + line_num + " invalid Expression", debug.importance.Fatal);
+            debug.throwException("Parsing error, invalid Expression", $"Line: {line_num}", debug.importance.Fatal);
 
             return "";
         }
@@ -90,18 +90,13 @@ namespace ListSharp
             line = new Regex(@"\((.*)\)").Match(line).Groups[1].Value; //everything between the square brackets "[]"
             switch (line)
             {
-                case "hide":
-                    return "ShowWindow(handle, SW_HIDE);";
-
-                case "unhide":
-                    return "ShowWindow(handle, SW_SHOW);";
 
                 case "exit":
                     return "Environment.Exit(0);";
 
             }
 
-            debug.throwException("Line: " + line_num + " invalid Flag", debug.importance.Fatal);
+            debug.throwException("Parsing error, invalid Flag", $"Line: {line_num}", debug.importance.Fatal);
 
             return "";
         }
@@ -243,7 +238,8 @@ namespace ListSharp
             }
 
 
-            debug.throwException("Line: " + line + " could not be interpeted", debug.importance.Fatal);
+            debug.throwException("Parsing error, invalid line", $"Line: {line_num}", debug.importance.Fatal);
+
             return "";
 
         }

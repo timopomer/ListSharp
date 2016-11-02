@@ -7,6 +7,7 @@ using System.Security.Principal;
 using Associations;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace ListSharp
 {
@@ -21,13 +22,13 @@ namespace ListSharp
 
             System.Drawing.Icon theicon = Properties.Resources.Untitled; //the application icon
 
-            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ListSharp"))
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ListSharp");
-            string dpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ListSharp\\theIcon.ico";
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (!Directory.Exists(Path.Combine(appdata, "ListSharp")))
+                Directory.CreateDirectory(Path.Combine(appdata, "ListSharp"));
+            string dpath = Path.Combine(appdata, "ListSharp", "theIcon.ico");
             File.WriteAllBytes(dpath, IconToBytes(theicon)); //writing the icon from resources to a pleace in appdata to refference it later
 
 
-            List<string> maincode;
 
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.BackgroundColor = ConsoleColor.White;
@@ -40,111 +41,45 @@ namespace ListSharp
 
 
             #region setting up workspace
-            IO.setScriptFile(args);
-            if (IO.scriptfile == "")
+            
+
+            if (args.Length == 0)
             {
-                Console.WriteLine("No Script file was provided");
-                Console.WriteLine("type 1 to open one or 2 to associate .ls files to this console");
-                int choice = Convert.ToInt32(Console.ReadLine());
-
-                if (choice == 1)
-                {
-                    Console.WriteLine("Opening file selection");
-                    OpenFileDialog dialog1 = new OpenFileDialog();
-                    dialog1.Filter = "ListSharp Scripts|*.ls";
-                    DialogResult result = dialog1.ShowDialog();
-                    if (result == DialogResult.OK) // Test result.
-                    {
-                        IO.scriptfile = dialog1.FileName;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Closed Dialog");
-                        while (true)
-                        {
-                            Thread.Sleep(1000); //sleep forever
-                        }
-                    }
-
-
-                }
-
-
-
-
-
-                if (choice == 2)
-                {
-                    if (!IsAdministrator())
-                    {
-                        Console.WriteLine("Run as admin to associate .ls files");
-                        while (true)
-                        {
-                            Thread.Sleep(1000); //sleep forever
-                        }
-                    }
-                    SetAssociation(".ls", "ListSharp", Environment.CurrentDirectory + "\\listsharp.exe", "ListSharp Script", dpath); //.ls association
-                    Console.WriteLine("Associated .ls files to this console");
-                    while (true)
-                    {
-                        Thread.Sleep(1000); //sleep forever
-                    }
-
-
-                }
+                debug.throwException("Initializing error, invalid parameters","reason: 0 paramters", debug.importance.Fatal);
             }
+            Console.WriteLine(String.Join(" ", args));
 
-
-
-            if (Path.GetExtension(IO.scriptfile) != ".ls")
-            {
-                Console.WriteLine("Script file not from .ls type");
-                while (true)
-                {
-                    Thread.Sleep(1000); //sleep forever
-                }
-            }
-
+            IO.setScriptFile(args[0]);
             IO.setScriptLocation();
             IO.setFileName();
-            baseDefinitions.initialize();
             /* script file location intialized and validity checked */
+            launchArguments.processFlags(args.Skip(1));
+            baseDefinitions.initialize();
 
             #endregion
 
             #region getting and cleaning up code
-
-            Console.WriteLine("Script file");
-            Console.WriteLine(IO.scriptfile);
-            Console.WriteLine("\n");
-
-
-
-            string allcode = IO.getFullCode();
-            if (launchArguments.debugmode)
-            {
-                Console.WriteLine("Original Code \n-----------------------");
-                Console.WriteLine(allcode);
-                Console.WriteLine("-----------------------");
-                Console.WriteLine(Environment.NewLine);
-            }
             /* cleaning up code */
+            string rawCodeFromFile = IO.getFullCode();
+            string workedOnCode = rawCodeFromFile;
+
+            workedOnCode = workedOnCode.replaceConstants();
+            workedOnCode = workedOnCode.initialCleanup();
+            List<string> initializers = memory.InitializeVariables(workedOnCode);
+            workedOnCode = workedOnCode.sanitizeStrings();
+            workedOnCode = workedOnCode.sanitizeCode();
+            workedOnCode = workedOnCode.sanitizeVars();
+            workedOnCode = workedOnCode.preProcessCode();
+
+            List<string> codeAsLines = new List<string>(Regex.Split(workedOnCode, "\r\n"));
 
 
-            allcode = allcode.replaceConstants();
-            allcode = allcode.initialCleanup();
-            List<string> initializers = memory.InitializeVariables(allcode);
-            allcode = allcode.sanitizeStrings();
-            allcode = allcode.sanitizeCode();
-            allcode = allcode.sanitizeVars();
-            allcode = allcode.preProcessCode();
-            maincode = new List<string>(Regex.Split(allcode, "\r\n"));
 
             #endregion
 
 
-
-string code =
+            #region codepart
+            string code =
 @"using System.Net;
 using System.Linq;
 using System;
@@ -156,93 +91,84 @@ using System.Drawing;
 using System.Threading;
 using System.Text.RegularExpressions;
 
+
 public class MainClass
 { 
-[DllImport(""kernel32.dll"")]
-static extern IntPtr GetConsoleWindow();
-
-[DllImport(""user32.dll"")]
-static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-const int SW_HIDE = 0;
-const int SW_SHOW = 5;
-
-public string Execute()
+static void Main(string[] args){
+Console.ForegroundColor = ConsoleColor.DarkCyan;
+Console.BackgroundColor = ConsoleColor.White;
+Console.Title = ""ListSharp Console"";
+Console.Clear();
+Console.WriteLine(""Initializing ListSharp"");
+Console.WriteLine(Execute());
+while(true);
+}
+public static string Execute()
 {
-var handle = GetConsoleWindow();
 string output = """";
 ";
-
+            #endregion
 
             //variables initialization starts here:
-            
 
             /*
              * since it creates the appropiate code for each variable even if it occurs twice
              * i am making sure there are no duplicate variable initalizations which would break the code
              */
 
-            launchArguments.initializeArguments(maincode);
-            
 
-            if (launchArguments.debugmode)
-            {
-                Console.WriteLine("Original Code Tokenized \n-----------------------");
-                foreach (string l in maincode)
-                    Console.WriteLine(l);
-                Console.WriteLine("-----------------------");
-                Console.WriteLine(Environment.NewLine);
-            }
-
-
-
-            foreach (string temp_string in initializers)
-            {
-                code += temp_string + Environment.NewLine;
-            }
+            code += String.Join(Environment.NewLine, initializers);
             /* initializing all variables the script needs */
-            int line_num = 1;
-            foreach (string singleline in maincode)
-            {
-                code += codeParsing.processLine(singleline, line_num);
-                code += Environment.NewLine;
-                line_num++; //to know what line number we are currently processing
-            }
+            code += String.Join(Environment.NewLine, codeAsLines.Select((line,line_num)=>codeParsing.processLine(line, line_num+1)));
 
-            code += "ShowWindow(handle, SW_SHOW);\r\nreturn output;";
-            code += Environment.NewLine + "}" + Environment.NewLine;
+            code += Environment.NewLine;
+            code += "return output;";
+            code += Environment.NewLine;
+            code += "}";
+            code += Environment.NewLine;
+
             int initialCodeLen = Regex.Split(code, "\r\n").Length;
-            code += Properties.Resources.externalFunctions + "}"; //here we add all function depndecies
+            code += Properties.Resources.externalFunctions; //here we add all function depndecies
+            code += "}";
 
             code = code.returnStringArr();
             code = code.desanitizeVars();
             code = code.deSanitizeCode();
             code = code.deSanitizeStrings();
 
-            if (launchArguments.debugmode)
+
+
+
+            if (!launchArguments.flags["silent"])
             {
-                Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine);
-                Console.WriteLine("Interperted Code De-tokenized \n-----------------------");
-            }
-            int index = 1;
+                
 
-            string[] allLines = Regex.Split(code,"\r\n");
-
-
-            foreach (string currentLine in allLines)
-            {
-                if (launchArguments.debugmode && index <= initialCodeLen)
-                    System.Console.WriteLine("Line: " + index + "    " + currentLine);
-                index++;
-            }
-
-
-            if (launchArguments.debugmode)
-            {
+                Console.WriteLine("Flags");
                 Console.WriteLine("-----------------------");
-                Console.WriteLine(Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.NewLine);
+                Console.WriteLine(launchArguments.flagsAsString());
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(Environment.NewLine);
+
+                Console.WriteLine("Original Code");
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(rawCodeFromFile);
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(Environment.NewLine);
+
+                Console.WriteLine("Original Code Tokenized");
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(String.Join(Environment.NewLine, codeAsLines));
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(Environment.NewLine);
+
+                Console.WriteLine("Interperted Code De-tokenized");
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(String.Join(Environment.NewLine, Regex.Split(code, "\r\n").Take(initialCodeLen).Select((line, line_num) => $"Line:   {line_num}        {line}")));
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(Environment.NewLine);
+
+
             }
-            Console.WriteLine("Initializing ListSharp");
 
 
             //compiling starts here
@@ -251,6 +177,9 @@ string output = """";
             string[] sources = { code };
             CompilerParameters parameters = new CompilerParameters();
             parameters.GenerateInMemory = true;
+            parameters.GenerateExecutable = launchArguments.flags["createbinary"];
+            if (launchArguments.flags["createbinary"])
+            parameters.OutputAssembly = IO.getExePath();
 
             parameters.ReferencedAssemblies.Add("System.dll");
             parameters.ReferencedAssemblies.Add("System.Core.dll");
@@ -261,27 +190,22 @@ string output = """";
             new Microsoft.CSharp.CSharpCodeProvider())
             {
                 CompilerResults results = CodeProv.CompileAssemblyFromSource(parameters, sources);
-                foreach (CompilerError er in results.Errors)
-                {
-                    Console.WriteLine(er.ToString());
-                }
+
                 if (results.Errors.HasErrors)
                 {
-                    Console.WriteLine(Environment.NewLine + "Got compiling errors,aborting ListSharp");
-                    while (true)
-                    {
-                        Thread.Sleep(1000);
-                    }
+                    debug.throwException("Compilation error", String.Join(Environment.NewLine, results.Errors), debug.importance.Fatal);
                 }
 
+                if (!launchArguments.flags["createbinary"])
+                {
+                    Console.WriteLine("Initializing ListSharp");
 
+                    var type = results.CompiledAssembly.GetType("MainClass");
+                    var obj = Activator.CreateInstance(type);
+                    var output = type.GetMethod("Execute").Invoke(obj, new object[] { });
+                    Console.WriteLine(output);
+                }
 
-                var type = results.CompiledAssembly.GetType("MainClass");
-
-                var obj = Activator.CreateInstance(type);
-
-                var output = type.GetMethod("Execute").Invoke(obj, new object[] { });
-                Console.WriteLine(output);
             }
 
             while (true)
@@ -299,7 +223,7 @@ string output = """";
                 return ms.ToArray();
             }
         }
-
+        /*
         public static void SetAssociation(string Extension, string KeyName, string OpenWith, string FileDescription, string IconPath)
         {
             AF_FileAssociator assoc = new AF_FileAssociator(Extension);
@@ -322,6 +246,7 @@ string output = """";
 
             return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
         }
+        */
 
     }
 }

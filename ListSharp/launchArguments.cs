@@ -9,25 +9,29 @@ namespace ListSharp
 {
     public static class launchArguments
     {
-        public static bool debugmode = true;
-        public static int downloadtries = 1;
-        public static void initializeArguments(List<string> maincode)
+        public static Dictionary<string, bool> flags = new Dictionary<string, bool>()
         {
-            foreach (string singleline in maincode)
+            {"silent",false},
+            {"downloadretry",false},
+            {"createbinary",false}
+        };
+        public static void processFlags(IEnumerable<string> flaginp)
+        {
+            foreach (string flag in flaginp)
             {
-                if (singleline.Length < 1)
-                    continue;
+                if(flag.StartsWith("-s"))
+                    flags["silent"] = true;
 
-                if (singleline.StartsWith("#")) //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
-                {
-                    if (singleline.Contains("ShowDebuggingInformation"))
-                        debugmode = singleline.EndsWith("True");
+                if (flag.StartsWith("-r"))
+                    flags["downloadretry"] = true;
 
-
-                    if (singleline.Contains("DownloadMaxTries"))
-                        downloadtries = int.Parse(Regex.Split(singleline, " ")[1]);
-                }
+                if (flag.StartsWith("-b"))
+                    flags["createbinary"] = true;
             }
+        }
+        public static string flagsAsString()
+        {
+            return String.Join(Environment.NewLine,flags.Select(n => $"{n.Key}:{n.Value}"));
         }
     }
 }
