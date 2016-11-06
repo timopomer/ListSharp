@@ -21,12 +21,14 @@ namespace ListSharp
 
             System.Drawing.Icon theicon = Properties.Resources.Untitled; //the application icon
 
+            //will be moved to IDE
+            /*
             string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             if (!Directory.Exists(Path.Combine(appdata, "ListSharp")))
                 Directory.CreateDirectory(Path.Combine(appdata, "ListSharp"));
             string dpath = Path.Combine(appdata, "ListSharp", "theIcon.ico");
             File.WriteAllBytes(dpath, IconToBytes(theicon)); //writing the icon from resources to a pleace in appdata to refference it later
-
+            */
 
 
             Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -213,7 +215,8 @@ string output = """";
             }
         }
 
-
+        //will be moved to IDE
+        /*
         public static byte[] IconToBytes(System.Drawing.Icon icon)
         {
             using (MemoryStream ms = new MemoryStream())
@@ -222,7 +225,8 @@ string output = """";
                 return ms.ToArray();
             }
         }
-        /*
+        
+        
         public static void SetAssociation(string Extension, string KeyName, string OpenWith, string FileDescription, string IconPath)
         {
             AF_FileAssociator assoc = new AF_FileAssociator(Extension);
