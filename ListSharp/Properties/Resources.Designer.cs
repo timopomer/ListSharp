@@ -78,15 +78,5 @@ namespace ListSharp.Properties {
                 return ResourceManager.GetString("externalFunctions", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        public static System.Drawing.Icon Untitled {
-            get {
-                object obj = ResourceManager.GetObject("Untitled", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
     }
 }
