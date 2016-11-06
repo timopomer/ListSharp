@@ -19,7 +19,7 @@ namespace ListSharp
         {
             #region defining variables
 
-            System.Drawing.Icon theicon = Properties.Resources.Untitled; //the application icon
+            //System.Drawing.Icon theicon = Properties.Resources.Untitled; //the application icon
 
             //will be moved to IDE
             /*
