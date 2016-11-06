@@ -61,18 +61,17 @@ namespace ListSharp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 			public string getString(object thevar)
-        ///            {
-        ///            if (thevar.GetType() == typeof(string))
-        ///            return &quot;[0]&quot; + (string)thevar + &quot;[/0]&quot;;
-        ///            if (thevar.GetType() == typeof(string[]))
-        ///            return arr2str((string[])thevar);
-        ///            return &quot;Show Error&quot;;
-        ///            }
-        ///			
-        ///			public string makeOutput(object thein,string output)
-        ///            {
-        ///            output += System.Environment.NewLine + &quot;---------------output--------------&quot; + System.Environment.NewLine +  [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to 
+        ///
+        ///public static string getString(object thevar) {
+        ///if (thevar.GetType() == typeof(Int32)) return &quot;[0]&quot; + (Int32) thevar + &quot;[/0]&quot;;
+        ///if (thevar.GetType() == typeof(string)) return &quot;[0]&quot; + (string) thevar + &quot;[/0]&quot;;
+        ///if (thevar.GetType() == typeof(string[])) return arr2str((string[]) thevar);
+        ///return &quot;Show Error&quot;;
+        ///}
+        ///
+        ///public static string SHOW_F(object thein) {
+        ///return System.Environment.NewLine + &quot;---------------output--------------&quot; + System.Environment.NewLine + getString(thein).Replace(System.Environmen [rest of string was truncated]&quot;;.
         /// </summary>
         public static string externalFunctions {
             get {

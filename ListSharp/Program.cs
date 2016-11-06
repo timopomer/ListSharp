@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Security.Principal;
-using Associations;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Linq;
