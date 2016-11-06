@@ -33,6 +33,20 @@ ListSharp comes pre equipped with powerful algorithmic tools for information ext
 * ListSharp is extremely simplistic, writing ListSharp code is like explaining the computer what you want just like in your head.
 * ListSharp functions are logically named, you will appreciate the the word rich syntax when you read it after some time.
 
+### Getting Started
 
-### Associates to .ls files
-![File Association](http://puu.sh/lSDir/5497c7ae40.png)
+* Download repository
+* Open in visual studio (tested on 2015 community, should work in any inplementation supporting c# 6 including mono)
+* Build, compile
+
+### Compiling a .ls script
+
+* Locate transpiler executeable, defult in /bin/Debug
+
+#### On windows
+
+* Win+R
+* Type `cmd`, OK
+* In the command link Type `cd <Path to transpiler executeable folder>`
+* Type `ListSharp.exe "<Path to .ls file>"` , [feel free to add any launching args](https://github.com/timopomer/ListSharp/wiki/Launching-arguments)
+
