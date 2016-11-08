@@ -47,6 +47,15 @@ ListSharp comes pre equipped with powerful algorithmic tools for information ext
 
 * Win+R
 * Type `cmd`, OK
-* In the command link Type `cd <Path to transpiler executeable folder>`
-* Type `ListSharp.exe "<Path to .ls file>"` , [feel free to add any launching args](https://github.com/timopomer/ListSharp/wiki/Launching-arguments)
+* In the command line Type `<Path to ListSharp.exe> "<Path to .ls file>"`
+* You can save this as a `.bat` file to quickly execute these commands
 
+#### On mac
+
+* [Install mono](http://www.mono-project.com/docs/getting-started/install/mac/)
+* Open terminal
+* Type `mono <Path to ListSharp.exe> <Path to .ls file>`
+* You can save this as a `.command` file (use `chmod u+x <Path .command file>`)
+
+#### On both platforms
+[feel free to add any launching args](https://github.com/timopomer/ListSharp/wiki/Launching-arguments)
