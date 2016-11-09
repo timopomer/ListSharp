@@ -19,7 +19,7 @@ namespace ListSharp
             }
             if (Path.GetExtension(arg) != ".ls")
             {
-                debug.throwException("Initializing error, invalid script", "reason: Script file not from .ls type", debug.importance.Fatal);
+                debug.throwException("Initializing error, invalid script type", "reason: Script file not from .ls type", debug.importance.Fatal);
             }
             scriptfile = arg;
         }

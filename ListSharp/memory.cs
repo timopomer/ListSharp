@@ -29,7 +29,7 @@ namespace ListSharp
             List<NUMB> tempNumb = new List<NUMB>();
 
             Match match;
-            foreach (string singleline in Regex.Split(allcode, "\r\n"))
+            foreach (string singleline in Regex.Split(allcode, Environment.NewLine))
             {
 
                 //rows variable

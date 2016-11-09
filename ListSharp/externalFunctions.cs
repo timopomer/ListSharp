@@ -11,45 +11,23 @@ public static string SHOW_F(object thein) {
 return System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine, "<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
 }
 
-public static async void DEBG_F(object ob, int linenum)
+public static void DISP_F(object ob)
 {
 if ((ob).GetType() == typeof(int))
 ob = (int)ob + "";
-Task mytask = Task.Run(async () =>
-{
-Form MyForm = new Form();
-MyForm.Width = 400;
-MyForm.Height = 500;
-MyForm.Text = "Debuging line: " + linenum;
-MyForm.FormBorderStyle = FormBorderStyle.FixedToolWindow;
-RichTextBox rtb = new RichTextBox();
-rtb.Width = 400;
-rtb.Height = 500;
-rtb.Font = new Font(rtb.Font.FontFamily, 14);
-string show = ob.GetType() == typeof(string) ? ((string)ob) : String.Join("\r\n", (string[])ob);
-rtb.Text = show;
-MyForm.Controls.Add(rtb);
-MyForm.ShowDialog();
 
+Console.WriteLine(ob.GetType() == typeof(string) ? ((string)ob) : String.Join(Environment.NewLine, (string[])ob));
 
-});
 }
 
-public static void NOTIFY_F(string message)
-{
-var notificationButton = new NotifyIcon();
-notificationButton.Visible = true;
-notificationButton.Icon = System.Drawing.SystemIcons.WinLogo;
-notificationButton.ShowBalloonTip(200, "Listsharp Notification", message, ToolTipIcon.None);
-notificationButton.Visible = false;
-}
+
 
 
 
 public static string arr2str(string[] arr) {
 string r = "";
 for (int i = 0; i < arr.Length; i++)
-r += "[" + i + "]" + arr[i] + "[/" + i + "]\n";
+r += "[" + i + "]" + arr[i] + "[/" + i + "]" + Environment.NewLine;
 return r;
 }
 
@@ -122,32 +100,16 @@ Thread.Sleep(1);
 return fbd.SelectedPath;
 }
 
-public static object INPT_F(string message,Type type)
+public static object INPT_F(Type type)
 {
-Form MyForm = new Form();
-MyForm.Width = 400;
-MyForm.Height = 170;
-MyForm.FormBorderStyle = FormBorderStyle.FixedToolWindow;
-MyForm.Text = message;
-RichTextBox rtb = new RichTextBox();
-rtb.Width = 400;
-rtb.Height = 100;
-rtb.Font = new Font(rtb.Font.FontFamily, 14);
-if (type == typeof(int))
-rtb.TextChanged += (s, e) => { int i = rtb.SelectionStart; int x = rtb.Text.Length; rtb.Text = String.Join("", rtb.Text.Where(Char.IsDigit)); rtb.SelectionStart = i+rtb.Text.Length-x; };
-Button b = new Button();
-b.Text = "Submit";
-b.Width = 380;
-b.Height = 30;
-b.FlatStyle = FlatStyle.System;
-b.Location = new Point(3, 100);
-b.Click += (s, e) => MyForm.Close();
-MyForm.Controls.Add(rtb);
-MyForm.Controls.Add(b);
+	string inp = Console.ReadLine();
+	if(type==typeof(int))
+		return long.Parse(inp);
 
-MyForm.ShowDialog();
-MyForm.Close();
-return type==typeof(int)?(object)long.Parse(rtb.Text):type==typeof(string)?(object)rtb.Text:(object)Regex.Split(rtb.Text,"\n");
+	if(type==typeof(string[]))
+		return Regex.Split(Environment.NewLine, inp);
+
+	return inp; //implicit string
 }
 
 public static string[] GETLINES_F(string[] ins, System.Collections.Generic.List<int> range)
@@ -171,7 +133,7 @@ return start < end ? Enumerable.Range(start, end - start + 1) : Enumerable.Range
 
 public static string[] ROWSPLIT_F(object ob, string delimiter)
 {
-if (delimiter == "<newline>") delimiter = "\n";
+if (delimiter == "<newline>") delimiter = Environment.NewLine;
 return ob.GetType() == typeof(string) ? Regex.Split(((string)ob), delimiter) : ((string[])ob).SelectMany(n => Regex.Split((n), delimiter)).ToArray();
 }
 
@@ -208,7 +170,7 @@ catch
 count++;
 if (count >= maxtries)
 {
-NOTIFY_F("failed downloading.. returning empty STRG");
+DISP_F("failed downloading.. returning empty STRG");
 return "";
 }
 }

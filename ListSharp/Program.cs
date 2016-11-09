@@ -18,7 +18,6 @@ namespace ListSharp
         static void Main(string[] args)
         {
             #region defining variables
-
             //System.Drawing.Icon theicon = Properties.Resources.Untitled; //the application icon
 
             //will be moved to IDE
@@ -30,20 +29,13 @@ namespace ListSharp
             File.WriteAllBytes(dpath, IconToBytes(theicon)); //writing the icon from resources to a pleace in appdata to refference it later
             */
 
-
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.BackgroundColor = ConsoleColor.White;
             Console.Title = "ListSharp Console";
             Console.Clear();
-
-
-
             #endregion
 
-
             #region setting up workspace
-            
-
             if (args.Length == 0)
             {
                 debug.throwException("Initializing error, invalid parameters","reason: 0 paramters", debug.importance.Fatal);
@@ -56,7 +48,6 @@ namespace ListSharp
             /* script file location intialized and validity checked */
             launchArguments.processFlags(args.Skip(1));
             baseDefinitions.initialize();
-
             #endregion
 
             #region getting and cleaning up code
@@ -72,12 +63,8 @@ namespace ListSharp
             workedOnCode = workedOnCode.sanitizeVars();
             workedOnCode = workedOnCode.preProcessCode();
 
-            List<string> codeAsLines = new List<string>(Regex.Split(workedOnCode, "\r\n"));
-
-
-
+			List<string> codeAsLines = new List<string>(Regex.Split(workedOnCode, Environment.NewLine));
             #endregion
-
 
             #region codepart
             string code =
@@ -119,8 +106,10 @@ string output = """";
 
 
             code += String.Join(Environment.NewLine, initializers);
-            /* initializing all variables the script needs */
-            code += String.Join(Environment.NewLine, codeAsLines.Select((line,line_num)=>codeParsing.processLine(line, line_num+1)));
+			code += Environment.NewLine;
+
+			/* initializing all variables the script needs */
+			code += String.Join(Environment.NewLine, codeAsLines.Select((line,line_num)=>codeParsing.processLine(line, line_num+1)));
 
             code += Environment.NewLine;
             code += "return output;";
@@ -128,7 +117,7 @@ string output = """";
             code += "}";
             code += Environment.NewLine;
 
-            int initialCodeLen = Regex.Split(code, "\r\n").Length;
+			int initialCodeLen = Regex.Split(code, Environment.NewLine).Length;
             code += Properties.Resources.externalFunctions; //here we add all function depndecies
             code += "}";
 
@@ -137,13 +126,8 @@ string output = """";
             code = code.deSanitizeCode();
             code = code.deSanitizeStrings();
 
-
-
-
             if (!launchArguments.flags["silent"])
             {
-                
-
                 Console.WriteLine("Flags");
                 Console.WriteLine("-----------------------");
                 Console.WriteLine(launchArguments.flagsAsString());
@@ -164,11 +148,10 @@ string output = """";
 
                 Console.WriteLine("Interperted Code De-tokenized");
                 Console.WriteLine("-----------------------");
-                Console.WriteLine(String.Join(Environment.NewLine, Regex.Split(code, "\r\n").Take(initialCodeLen).Select((line, line_num) => $"Line:   {line_num}        {line}")));
+
+				Console.WriteLine(String.Join(Environment.NewLine, Regex.Split(code, Environment.NewLine).Take(initialCodeLen).Select((line, line_num) => $"Line:   {line_num}        {line}")));
                 Console.WriteLine("-----------------------");
                 Console.WriteLine(Environment.NewLine);
-
-
             }
 
 
@@ -194,7 +177,7 @@ string output = """";
 
                 if (results.Errors.HasErrors)
                 {
-                    debug.throwException("Compilation error", String.Join(Environment.NewLine, results.Errors), debug.importance.Fatal);
+					debug.throwException("Compilation error", String.Join(Environment.NewLine, results.Errors.Cast<CompilerError>().Select(n=>n.ToString())), debug.importance.Fatal);
                 }
 
                 if (!launchArguments.flags["createbinary"])

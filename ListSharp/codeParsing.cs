@@ -20,25 +20,17 @@ namespace ListSharp
         {
 
             if (line.StartsWith("{"))
-            {
-                return "{";
-            }
+                return "{";  
 
             if (line.StartsWith("}"))
-            {
-                return "}";
-            }
+                return "}";    
 
             if (line.StartsWith("//")) //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
-            {
                 return "//skipped";
-            }
 
             if (line.StartsWith("#")) //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
-            {
                 return "//command executed: " + line;
-            }
-
+            
             if (line.StartsWith("<") && line.EndsWith(">")) //c# code
                 return line;
 
@@ -65,21 +57,18 @@ namespace ListSharp
                 if (line.StartsWith("FOREACH NUMB"))
                 {
                     GroupCollection gc = new Regex(@"FOREACH NUMB IN (.*) AS (.*)").Match(line).Groups;
-                    return "foreach (int " + gc[2].Value + " in " + serializeNumericRange(gc[1].Value) + ")";
+                    return $"foreach (int {gc[2].Value} in {serializeNumericRange(gc[1].Value)})";
                 }
                 if (line.StartsWith("FOREACH STRG"))
                 {
                     GroupCollection gc = new Regex(@"FOREACH STRG IN (.*) AS (.*)").Match(line).Groups;
-                    return "foreach (string " + gc[2].Value + " in " + gc[1].Value + ")";
+                    return $"foreach (string {gc[2].Value} in {gc[1].Value})";
                 }
-
             }
 
             if (line.StartsWith("IF"))
-            {
-
-                return "if(" + buildIfQuery(new Regex(@"IF (.*)").Match(line).Groups[1].Value) + ")";
-            }
+                return $"if({buildIfQuery(new Regex(@"IF (.*)").Match(line).Groups[1].Value)})";
+            
 
             debug.throwException("Parsing error, invalid Expression", $"Line: {line_num}", debug.importance.Fatal);
 
@@ -90,10 +79,8 @@ namespace ListSharp
             line = new Regex(@"\((.*)\)").Match(line).Groups[1].Value; //everything between the square brackets "[]"
             switch (line)
             {
-
                 case "exit":
                     return "Environment.Exit(0);";
-
             }
 
             debug.throwException("Parsing error, invalid Flag", $"Line: {line_num}", debug.importance.Fatal);
@@ -115,7 +102,7 @@ namespace ListSharp
                     }
                 default:
                     {
-                        return "output += SHOW_F(" + line + ") + System.Environment.NewLine;";
+                        return $"output += SHOW_F({line}){Environment.NewLine};";
                     }
             }
         }
@@ -127,7 +114,7 @@ namespace ListSharp
             {
                 case "ALL":
                     {
-                        returnedCode += typeShow("STRG") + "\n" + typeShow("ROWS");
+                        returnedCode += typeShow("STRG") + Environment.NewLine + typeShow("ROWS");
                         break;
                     }
                 default:
@@ -143,53 +130,46 @@ namespace ListSharp
             string toReturn = "";
             foreach (Variable ver in memory.variables[type])
             {
-                toReturn += "output += \"Listing " + ver.name + ":\" ;";
-                toReturn += "output += SHOW_F(" + ver.name + ") + System.Environment.NewLine;"; //call SHOW_F() on any type of variable the users wants to display
+                toReturn += $"output += \"Listing {ver.name} :\" ;";
+                toReturn += $"output += SHOW_F({ver.name}) + System.Environment.NewLine;"; //call SHOW_F() on any type of variable the users wants to display
             }
             return toReturn;
         }
         #endregion
 
 
-        public static string processNotification(string line, int line_num)
+        public static string processDisp(string line)
         {
-            return "NOTIFY_F(" + line + ");";
-        }
-        public static string processDebug(string line, int line_num)
-        {
-            return "DEBG_F(" + line + "," + line_num + ");";
+            return $"DISP_F({line});";
         }
         public static string processOutput(string line, int line_num)
         {
             GroupCollection gc = new Regex(@"(.*?) HERE\[(.*?)\]").Match(line).Groups;
-            return "OUTP_F(" + gc[2].Value + ", " + gc[1].Value + ");";
+            return $"OUTP_F({gc[2].Value},{gc[1].Value});";
         }
         public static string processOpen(string line, int line_num)
         {
             GroupCollection gc = new Regex(@"HERE\[(.*?)\]").Match(line).Groups;
-            return "OPEN_F(" + gc[1].Value + ");";
+            return $"OPEN_F({gc[1].Value});";
         }
-        public static string processInput(string message,string type)
+        public static string processInput(string type)
         {
-
             switch (type)
             {
-
                 case "STRG":
-                    return processStrg("INPT_F(" + message + ",typeof(string))");
+                    return processStrg("INPT_F(typeof(string))");
 
                 case "ROWS":
-                    return processRows("INPT_F(" + message + ",typeof(string[]))");
+                    return processRows("INPT_F(typeof(string[]))");
 
                 case "NUMB":
-                    return "(int)(long)INPT_F(" + message + ", typeof(int))";
+                    return "(int)(long)INPT_F(typeof(int))";
             }
             return "";
         }
 
-        public static string processStrg(string line) => "((string)ADD_F(typeof(string)," + line + "))";
-        public static string processRows(string line) => "((stringarr)ADD_F(typeof(stringarr)," + line + "))";
-
+        public static string processStrg(string line) => $"((string)ADD_F(typeof(string),{line}))";
+        public static string processRows(string line) => $"((stringarr)ADD_F(typeof(stringarr),{line}))";
         public static string processNumb(string line) => serializeNumericString(line);
 
         public static string processCommand(string line, int line_num)
@@ -199,6 +179,8 @@ namespace ListSharp
         }
         public static string processLine(string line, int line_num)
         {
+            if (line == "")
+                return "";
             if (line.startsWithSymbol())
                 return processOperators(line, line_num);
 
@@ -210,7 +192,6 @@ namespace ListSharp
 
             switch (start_argument)
             {
-
                 case "STRG":
                     return varname + " = " + processStrg(processCommand(splitline[1], line_num)) + ";";
 
@@ -226,20 +207,15 @@ namespace ListSharp
                 case "OUTP":
                     return processOutput(processCommand(splitline[1], line_num), line_num);
 
-                case "DEBG":
-                    return processDebug(processCommand(splitline[1], line_num), line_num);
-
-                case "NOTF":
-                    return processNotification(processStrg(processCommand(splitline[1], line_num)), line_num);
+                case "DISP":
+                    return processDisp(processCommand(splitline[1], line_num));
 
                 case "OPEN":
                     return processOpen(processStrg(processCommand(splitline[1], line_num)), line_num);
-
             }
 
 
             debug.throwException("Parsing error, invalid line", $"Line: {line_num}", debug.importance.Fatal);
-
             return "";
 
         }
@@ -261,7 +237,7 @@ namespace ListSharp
         public static string serializeNumericString(string input)
         {
             foreach (Match m in Regex.Matches(input, @"(\S*?) LENGTH"))
-                input = input.Replace(m.Groups[0].Value, "returnLength(" + m.Groups[1].Value + ")");
+                input = input.Replace(m.Groups[0].Value, $"returnLength({m.Groups[1].Value})");
 
             return input;
         }
@@ -276,7 +252,7 @@ namespace ListSharp
                 string[] splitElement = Regex.Split(element, " TO ");
                 splitElement = splitElement.Select(n => serializeNumericString(n)).ToArray();
 
-                query += element.Contains(" TO ") ? "EdgeRange(" + splitElement[0] + "," + splitElement[1] + ")" : "EdgeRange(" + splitElement[0] + "," + splitElement[0] + ")";
+                query += element.Contains(" TO ") ? $"EdgeRange({splitElement[0]},{splitElement[1]})" : $"EdgeRange({splitElement[0]},{splitElement[0]})";
                 if (i != rangeElements.Length - 1)
                     query += ",";
             }

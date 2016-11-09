@@ -19,7 +19,8 @@ namespace ListSharp
         public static string initialCleanup(this string rawCode)
         {
             rawCode = Regex.Replace(rawCode, @"\/\*(.*?)\*/", "", RegexOptions.Singleline);
-            string[] codeLines = Regex.Split(rawCode, "\r\n").Where(n=> n!="" && !string.IsNullOrWhiteSpace(n)).ToArray();
+			string[] codeLines = Regex.Split(rawCode, Environment.NewLine);
+			codeLines.Where(n=> n!="" && !string.IsNullOrWhiteSpace(n)).ToArray();
 
             for (int i = 0; i < codeLines.Length; i++)
             {
@@ -27,12 +28,12 @@ namespace ListSharp
                 codeLines[i] = makeEqualsEvenlySpaced(codeLines[i]);
             }
             codeLines = codeLines.Where(n => !n.StartsWith(@"//")).ToArray();
-            return String.Join("\r\n",codeLines);
+			return String.Join(Environment.NewLine,codeLines);
         }
         public static string preProcessCode(this string rawCode)
         {
 
-            string[] codeLines = Regex.Split(rawCode, "\r\n");
+            string[] codeLines = Regex.Split(rawCode, Environment.NewLine);
 
             for (int i = 0; i < codeLines.Length; i++)
             {
@@ -41,15 +42,13 @@ namespace ListSharp
                 codeLines[i] = makeAdditionEvenlySpaced(codeLines[i]);
                 codeLines[i] = replaceAddition(codeLines[i]);
                 codeLines[i] = replaceNumbOperators(codeLines[i]);
-
             }
             
 
-            return String.Join("\r\n", codeLines);
+			return String.Join(Environment.NewLine, codeLines);
         }
         public static string replaceConstants(this string inputCode)
         {
-
             foreach (KeyValuePair<String,String> replacer in baseDefinitions.constantPairs)
                 inputCode = inputCode.Replace(replacer.Key,replacer.Value);
 
@@ -57,22 +56,13 @@ namespace ListSharp
         }
         #endregion
 
-
         #region processingFunctions
-        public static string removePreWhitespace(string line)
-        {
-            return new Regex(@"^\s*(.*)").Match(line).Groups[1].Value;
-        }
-        public static string removeAfterWhitespace(string line)
-        {
-            return new Regex(@"(.*?)\s*$").Match(line).Groups[1].Value;
-        }
-        public static string makeEqualsEvenlySpaced(string line)
-        {
-            
-            return line.Contains("=")?line.Replace(new Regex(@"\s*=\s*").Match(line).Groups[0].Value," = "):line;
+        public static string removePreWhitespace(string line) => new Regex(@"^\s*(.*)").Match(line).Groups[1].Value;
 
-        }
+        public static string removeAfterWhitespace(string line) => new Regex(@"(.*?)\s*$").Match(line).Groups[1].Value;
+
+        public static string makeEqualsEvenlySpaced(string line) => line.Contains("=") ? line.Replace(new Regex(@"\s*=\s*").Match(line).Groups[0].Value, " = ") : line;
+
         public static string makeAdditionEvenlySpaced(string line)
         {
             MatchCollection mc = new Regex(@"\s*\+\s*").Matches(line);
@@ -82,27 +72,15 @@ namespace ListSharp
             }
             return line;
         }
-        public static string removeArrayBrackets(string line)
-        {
-            return line.Replace("{", "").Replace("}", "");
-        }
-        public static string replaceAddition(string line)
-        {
-            return line.Replace("+",",");
-        }
-        public static string replaceNumbOperators(string line)
-        {
-            return line.Replace("PLUS", "+").Replace("MINUS", "-").Replace("MULTIPLY", "*").Replace("DIVIDE", "/");
-        }
+        public static string removeArrayBrackets(string line) => line.Replace("{", "").Replace("}", "");
 
-        public static string replaceStringRange(this string input, int startIndex, int lengthOfReplacedText, string replacementText)
-        {
-            return input.Substring(0, startIndex) + replacementText + input.Substring(startIndex + lengthOfReplacedText);
-        }
-        public static string returnStringArr(this string inputCode)
-        {
-            return inputCode.Replace("stringarr", "string[]");
-        }
+        public static string replaceAddition(string line) => line.Replace("+", ",");
+
+        public static string replaceNumbOperators(string line) => line.Replace("PLUS", "+").Replace("MINUS", "-").Replace("MULTIPLY", "*").Replace("DIVIDE", "/");
+
+        public static string replaceStringRange(this string input, int startIndex, int lengthOfReplacedText, string replacementText) => input.Substring(0, startIndex) + replacementText + input.Substring(startIndex + lengthOfReplacedText);
+
+        public static string returnStringArr(this string inputCode) => inputCode.Replace("stringarr", "string[]");
         #endregion
 
         #region sanitizationFunctions
@@ -150,7 +128,6 @@ namespace ListSharp
         }
         public static string sanitizeVars(this string inputCode)
         {
-
             replacementVars = memory.getVariableNames().Select((m, i) => new Tuple<string, string>(m, createHash(i))).ToArray();
             replacementVars = replacementVars.OrderByDescending(n => n.Item1.Length).ToArray();
             for (int i = 0; i < replacementVars.Length; i++)
@@ -169,7 +146,6 @@ namespace ListSharp
             return inputCode;
         }
         #endregion
-
 
         #region hashingFunctions
         public static string CreateMD5(string input)
