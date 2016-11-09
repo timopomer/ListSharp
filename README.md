@@ -12,7 +12,7 @@ ListSharp comes pre equipped with powerful algorithmic tools for information ext
 
 ### Example execution screenshot of console
 
-![Beta](http://puu.sh/pkwVK/89d09e42ed.png)
+![Release](http://image.prntscr.com/image/455508167b164d5aa0ab0b6830f0a168.png)
 
 
 ## ListSharp Specifications
