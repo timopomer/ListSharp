@@ -10,14 +10,12 @@ namespace ListSharp
     public static class memory
     {
         public static Dictionary<string, Variable[]> variables;
-        public static string[] getVariableNames()
-        {
-            return variables["STRG"].Select(n => n.name).Concat(variables["ROWS"].Select(n => n.name).Concat(variables["ROWS"].Select(n => n.name))).ToArray();
-        }
-
+        public static string[] getVariableNames() => variables["STRG"].Select(n => n.name)
+            .Concat(variables["ROWS"].Select(n => n.name)
+            .Concat(variables["ROWS"].Select(n => n.name))).ToArray();
+        
         public static List<string> InitializeVariables(string allcode)
         {
-
             variables = new Dictionary<string, Variable[]>();
             Regex rowsRegex = new Regex(@"ROWS([^=]*)");
             Regex strgRegex = new Regex(@"STRG([^=]*)");
@@ -36,7 +34,7 @@ namespace ListSharp
                 if (singleline.StartsWith("ROWS"))
                 {
                     match = rowsRegex.Match(singleline);
-                    variableInitializers.Add("string[] " + match.Groups[1].Value.Trim() + " = { };");
+                    variableInitializers.Add($"string[] {match.Groups[1].Value.Trim()} = {{ }};");
                     tempRows.Add(new ROWS(match.Groups[1].Value.Trim()));
                 }
 
@@ -44,7 +42,7 @@ namespace ListSharp
                 if (singleline.StartsWith("STRG"))
                 {      
                     match = strgRegex.Match(singleline);
-                    variableInitializers.Add("string " + match.Groups[1].Value.Trim() + " = \"\";");
+                    variableInitializers.Add($"string {match.Groups[1].Value.Trim()} = \"\";");
                     tempStrg.Add(new STRG(match.Groups[1].Value.Trim()));
                 }
 
@@ -52,7 +50,7 @@ namespace ListSharp
                 if (singleline.StartsWith("NUMB"))
                 {
                     match = numbRegex.Match(singleline);
-                    variableInitializers.Add("int " + match.Groups[1].Value.Trim() + " = 0;");
+                    variableInitializers.Add($"int {match.Groups[1].Value.Trim()} = 0;");
                     tempNumb.Add(new NUMB(match.Groups[1].Value.Trim()));
                 }
 
@@ -63,12 +61,7 @@ namespace ListSharp
 
 
             return variableInitializers.Distinct().ToList<string>();
-
         }
-
-        public static bool ofVarType(this string varname,string type)
-        {
-            return variables[type].Where(p => p.name == varname).ToArray().Length > 0;
-        }
+        public static bool ofVarType(this string varname, string type) => variables[type].Where(p => p.name == varname).ToArray().Length > 0;
     }
 }

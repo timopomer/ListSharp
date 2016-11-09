@@ -95,19 +95,11 @@ string output = """";
 ";
             #endregion
 
-            //variables initialization starts here:
-
-            /*
-             * since it creates the appropiate code for each variable even if it occurs twice
-             * i am making sure there are no duplicate variable initalizations which would break the code
-             */
-
-
             code += String.Join(Environment.NewLine, initializers);
 			code += Environment.NewLine;
 
-			/* initializing all variables the script needs */
-			code += String.Join(Environment.NewLine, codeAsLines.Select((line,line_num)=>codeParsing.processLine(line, line_num+1)));
+            /* initializing all variables the script needs */
+            code += String.Join(Environment.NewLine, codeAsLines.Select((line, line_num) => codeParsing.processLine(line, line_num + 1)));
 
             code += Environment.NewLine;
             code += "return output;";
@@ -116,7 +108,7 @@ string output = """";
             code += Environment.NewLine;
 
 			int initialCodeLen = Regex.Split(code, Environment.NewLine).Length-1;
-            code += Properties.Resources.externalFunctions; //here we add all function depndecies
+            code += Properties.Resources.externalFunctions;
             code += "}";
 
             code = code.returnStringArr();
@@ -124,7 +116,7 @@ string output = """";
             code = code.deSanitizeCode();
             code = code.deSanitizeStrings();
 
-            if (!launchArguments.flags["silent"])
+            if (!(bool)launchArguments.flags["silent"])
             {
                 Console.WriteLine("Flags");
                 Console.WriteLine("-----------------------");
@@ -146,21 +138,18 @@ string output = """";
 
                 Console.WriteLine("Interperted Code De-tokenized");
                 Console.WriteLine("-----------------------");
-
 				Console.WriteLine(String.Join(Environment.NewLine, Regex.Split(code, Environment.NewLine).Take(initialCodeLen).Select((line, line_num) => $"Line:   {line_num}        {line}")));
                 Console.WriteLine("-----------------------");
                 Console.WriteLine(Environment.NewLine);
             }
 
-
             //compiling starts here
-
 
             string[] sources = { code };
             CompilerParameters parameters = new CompilerParameters();
             parameters.GenerateInMemory = true;
-            parameters.GenerateExecutable = launchArguments.flags["createbinary"];
-            if (launchArguments.flags["createbinary"])
+            parameters.GenerateExecutable = (bool)launchArguments.flags["createbinary"];
+            if ((bool)launchArguments.flags["createbinary"])
             parameters.OutputAssembly = IO.getExePath();
 
             parameters.ReferencedAssemblies.Add("System.dll");
@@ -174,11 +163,9 @@ string output = """";
                 CompilerResults results = CodeProv.CompileAssemblyFromSource(parameters, sources);
 
                 if (results.Errors.HasErrors)
-                {
-					debug.throwException("Compilation error", String.Join(Environment.NewLine, results.Errors.Cast<CompilerError>().Select(n=>n.ToString())), debug.importance.Fatal);
-                }
-
-                if (!launchArguments.flags["createbinary"])
+                    debug.throwException("Compilation error", String.Join(Environment.NewLine, results.Errors.Cast<CompilerError>().Select(n => n.ToString())), debug.importance.Fatal);
+                
+                if (!(bool)launchArguments.flags["createbinary"])
                 {
                     Console.WriteLine("Initializing ListSharp");
 
@@ -187,51 +174,9 @@ string output = """";
                     var output = type.GetMethod("Execute").Invoke(obj, new object[] { });
                     Console.WriteLine(output);
                 }
-
             }
-
-            while (true)
-            {
-                Thread.Sleep(1000); //sleep forever
-            }
+            while (true){Thread.Sleep(1000);}
         }
-
-        //will be moved to IDE
-        /*
-        public static byte[] IconToBytes(System.Drawing.Icon icon)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                icon.Save(ms);
-                return ms.ToArray();
-            }
-        }
-        
-        
-        public static void SetAssociation(string Extension, string KeyName, string OpenWith, string FileDescription, string IconPath)
-        {
-            AF_FileAssociator assoc = new AF_FileAssociator(Extension);
-
-            if (assoc.Exists)
-                assoc.Delete();
-            // Creates a new file association for the .ABC file extension. 
-            // Data is overwritten if it already exists.
-            assoc.Create(KeyName,
-                FileDescription,
-                new ProgramIcon(IconPath),
-                new ExecApplication(OpenWith),
-                new OpenWithList(new string[] { KeyName }));
-        }
-
-        public static bool IsAdministrator()
-        {
-            WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
-            WindowsPrincipal windowsPrincipal = new WindowsPrincipal(windowsIdentity);
-
-            return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
-        }
-        */
-
     }
 }
 

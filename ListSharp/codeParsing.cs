@@ -12,81 +12,8 @@ namespace ListSharp
     public static class codeParsing
     {
 
-        public static bool startsWithSymbol(this string line)
-        {
-            return !Char.IsLetter(line[0]);
-        }
-        public static string processOperators(string line, int line_num)
-        {
-            if (line.StartsWith("{"))
-                return "{";  
-
-            if (line.StartsWith("}"))
-                return "}";    
-
-            if (line.StartsWith("//")) //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
-                return "//skipped";
-
-            if (line.StartsWith("#")) //to see if the code is commented out so it does net get into the final code (replaced with //skipped for debugging porpuses
-                return "//command executed: " + line;
-            
-            if (line.StartsWith("<") && line.EndsWith(">")) //c# code
-                return line;
-
-            if (line.StartsWith("/*") || line.StartsWith("*/")) //to see if the code is commented out so it does net get into the final code
-                return line;
-            
-            if (line.StartsWith("[") && line.EndsWith("]"))
-                return processExpression(line, line_num);
-
-            if (line.StartsWith("(") && line.EndsWith(")"))
-                return processFlag(line, line_num);
-
-            debug.throwException("Parsing error, invalid Operator", $"Line: {line_num}", debug.importance.Fatal);
-
-            return "";
-        }
-        public static string processExpression(string line, int line_num)
-        {
-            line = new Regex(@"\[(.*)\]").Match(line).Groups[1].Value; //everything between the square brackets "[]"
-            line = processCommand(line, line_num);
-            if (line.StartsWith("FOREACH"))
-            {
-                if (line.StartsWith("FOREACH NUMB"))
-                {
-                    GroupCollection gc = new Regex(@"FOREACH NUMB IN (.*) AS (.*)").Match(line).Groups;
-                    return $"foreach (int {gc[2].Value} in {serializeNumericRange(gc[1].Value)})";
-                }
-                if (line.StartsWith("FOREACH STRG"))
-                {
-                    GroupCollection gc = new Regex(@"FOREACH STRG IN (.*) AS (.*)").Match(line).Groups;
-                    return $"foreach (string {gc[2].Value} in {gc[1].Value})";
-                }
-            }
-
-            if (line.StartsWith("IF"))
-                return $"if({buildIfQuery(new Regex(@"IF (.*)").Match(line).Groups[1].Value)})";
-            
-
-            debug.throwException("Parsing error, invalid Expression", $"Line: {line_num}", debug.importance.Fatal);
-
-            return "";
-        }
-        public static string processFlag(string line, int line_num)
-        {
-            line = new Regex(@"\((.*)\)").Match(line).Groups[1].Value; //everything between the square brackets "[]"
-            switch (line)
-            {
-                case "exit":
-                    return "Environment.Exit(0);";
-            }
-
-            debug.throwException("Parsing error, invalid Flag", $"Line: {line_num}", debug.importance.Fatal);
-
-            return "";
-        }
-
-
+        public static bool startsWithSymbol(this string line) => !Char.IsLetter(line[0]);
+        
         #region SHOW command
         public static string processShow(string line, int line_num)
         {
@@ -136,10 +63,83 @@ namespace ListSharp
         #endregion
 
 
-        public static string processDisp(string line)
+        #region processFunctions
+        public static string processOperators(string line, int line_num)
         {
-            return $"DISP_F({line});";
+            if (line.StartsWith("{"))
+                return "{";
+
+            if (line.StartsWith("}"))
+                return "}";
+
+            if (line.StartsWith("//"))
+                return "//skipped";
+
+            if (line.StartsWith("#"))
+                return processArg(line);
+            
+            if (line.StartsWith("<") && line.EndsWith(">")) //c# code
+                return line;
+
+            if (line.StartsWith("/*") || line.StartsWith("*/")) //to see if the code is commented out so it does net get into the final code
+                return line;
+
+            if (line.StartsWith("[") && line.EndsWith("]"))
+                return processExpression(line, line_num);
+
+            if (line.StartsWith("(") && line.EndsWith(")"))
+                return processFlag(line, line_num);
+
+            debug.throwException("Parsing error, invalid Operator", $"Line: {line_num}", debug.importance.Fatal);
+
+            return "";
         }
+        public static string processExpression(string line, int line_num)
+        {
+            line = new Regex(@"\[(.*)\]").Match(line).Groups[1].Value; //everything between the square brackets "[]"
+            line = processCommand(line, line_num);
+            if (line.StartsWith("FOREACH"))
+            {
+                if (line.StartsWith("FOREACH NUMB"))
+                {
+                    GroupCollection gc = new Regex(@"FOREACH NUMB IN (.*) AS (.*)").Match(line).Groups;
+                    return $"foreach (int {gc[2].Value} in {serializeNumericRange(gc[1].Value)})";
+                }
+                if (line.StartsWith("FOREACH STRG"))
+                {
+                    GroupCollection gc = new Regex(@"FOREACH STRG IN (.*) AS (.*)").Match(line).Groups;
+                    return $"foreach (string {gc[2].Value} in {gc[1].Value})";
+                }
+            }
+
+            if (line.StartsWith("IF"))
+                return $"if({buildIfQuery(new Regex(@"IF (.*)").Match(line).Groups[1].Value)})";
+
+
+            debug.throwException("Parsing error, invalid Expression", $"Line: {line_num}", debug.importance.Fatal);
+
+            return "";
+        }
+        public static string processFlag(string line, int line_num)
+        {
+            line = new Regex(@"\((.*)\)").Match(line).Groups[1].Value; //everything between the square brackets "[]"
+            switch (line)
+            {
+                case "exit":
+                    return "Environment.Exit(0);";
+            }
+
+            debug.throwException("Parsing error, invalid Flag", $"Line: {line_num}", debug.importance.Fatal);
+
+            return "";
+        }
+        public static string processArg(string line)
+        {
+            if (line.StartsWith("#DownloadMaxTries"))
+                launchArguments.flags["downloadtries"] = int.Parse(Regex.Split(line, " ")[1]);
+            return "//command executed: " + line;
+        }
+        public static string processDisp(string line) => $"DISP_F({line});";
         public static string processOutput(string line, int line_num)
         {
             GroupCollection gc = new Regex(@"(.*?) HERE\[(.*?)\]").Match(line).Groups;
@@ -162,11 +162,9 @@ namespace ListSharp
             }
             return "";
         }
-
         public static string processStrg(string line) => $"((string)ADD_F(typeof(string),{line}))";
         public static string processRows(string line) => $"((stringarr)ADD_F(typeof(stringarr),{line}))";
         public static string processNumb(string line) => serializeNumericString(line);
-
         public static string processCommand(string line, int line_num)
         {
             string processedLine = patternMatching.evaluateAllMatches(line);
@@ -188,13 +186,13 @@ namespace ListSharp
             switch (start_argument)
             {
                 case "STRG":
-                    return varname + " = " + processStrg(processCommand(splitline[1], line_num)) + ";";
+                    return $"{varname} = {processStrg(processCommand(splitline[1], line_num))};";
 
                 case "ROWS":
-                    return varname + " = " + processRows(processCommand(splitline[1], line_num)) + ";";
+                    return $"{varname} = {processRows(processCommand(splitline[1], line_num))};";
 
                 case "NUMB":
-                    return varname + " = " + processNumb(processCommand(splitline[1], line_num)) + ";";
+                    return $"{varname} = {processNumb(processCommand(splitline[1], line_num))};";
 
                 case "SHOW":
                     return processShow(processCommand(splitline[1], line_num), line_num);
@@ -209,11 +207,11 @@ namespace ListSharp
                     return processOpen(processStrg(processCommand(splitline[1], line_num)), line_num);
             }
 
-
             debug.throwException("Parsing error, invalid line", $"Line: {line_num}", debug.importance.Fatal);
             return "";
-
         }
+        #endregion
+
 
         #region queryFunctions
         public static string buildIfQuery(string query)
@@ -228,6 +226,7 @@ namespace ListSharp
             return rawQuery.returnQuery();
         }
         #endregion
+
 
         public static string serializeNumericString(string input)
         {
@@ -253,8 +252,6 @@ namespace ListSharp
             }
             return query + "}.SelectMany(n => n).ToList()";
         }
-
-
     }
     public class ifQuery
     {
@@ -316,5 +313,4 @@ namespace ListSharp
 
             }
         }
-    
 }

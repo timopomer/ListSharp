@@ -9,11 +9,7 @@ namespace ListSharp
 {
     public static class patternMatching
     {
-        public static bool notRecursing(string line)
-        {
-            return baseDefinitions.regexPatterns.Select(n => n.Value.Item1).ToList().Where(n => n.IsMatch(line)).Count() == 0;
-            //return baseDefinitions.commandPattern.Matches(line).Count == 0;
-        }
+        public static bool notRecursing(string line) => baseDefinitions.regexPatterns.Select(n => n.Value.Item1).ToList().Where(n => n.IsMatch(line)).Count() == 0;
         public static string evaluateMatch(string line, string command)
         {
             for (int i = 0; i < line.Length; i++)
@@ -31,7 +27,6 @@ namespace ListSharp
                 }
             }
             return line;
-
         }
         public static string evaluateAllMatches(string line)
         {

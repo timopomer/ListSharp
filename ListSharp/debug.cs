@@ -17,7 +17,6 @@ namespace ListSharp
 
         public static void throwException(string title,string message,importance e)
         {
-
             Console.WriteLine(e.ToString() + " ListSharp exception: " + title);
             Console.WriteLine(message);
             if (e == importance.Fatal)
@@ -25,7 +24,6 @@ namespace ListSharp
                 while (true)
                     Thread.Sleep(1000);
             }
-            
         }
     }
 }

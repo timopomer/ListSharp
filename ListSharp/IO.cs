@@ -14,13 +14,11 @@ namespace ListSharp
         public static void setScriptFile(string arg)
         {
             if (!File.Exists(arg))
-            {
                 debug.throwException("Initializing error, invalid script", "reason: Script file doesnt exist", debug.importance.Fatal);
-            }
+            
             if (Path.GetExtension(arg) != ".ls")
-            {
                 debug.throwException("Initializing error, invalid script type", "reason: Script file not from .ls type", debug.importance.Fatal);
-            }
+            
             scriptfile = arg;
         }
 
@@ -29,20 +27,14 @@ namespace ListSharp
             currentdir = Path.GetDirectoryName(scriptfile);
         }
 
-        public static string getFullCode()
-        {
-            return File.ReadAllText(scriptfile);
-        }
-
         public static void setFileName()
         {
             filename = Path.GetFileName(scriptfile);
         }
 
-        public static string getExePath()
-        {
-            return scriptfile.Substring(0,scriptfile.Length-2)+"exe";
-        }
+        public static string getFullCode() => File.ReadAllText(scriptfile);
+        public static string getExePath() => scriptfile.Substring(0, scriptfile.Length - 2) + "exe";
+        
 
     }
 }

@@ -32,7 +32,6 @@ namespace ListSharp
         }
         public static string preProcessCode(this string rawCode)
         {
-
             string[] codeLines = Regex.Split(rawCode, Environment.NewLine);
 
             for (int i = 0; i < codeLines.Length; i++)
@@ -43,8 +42,6 @@ namespace ListSharp
                 codeLines[i] = replaceAddition(codeLines[i]);
                 codeLines[i] = replaceNumbOperators(codeLines[i]);
             }
-            
-
 			return String.Join(Environment.NewLine, codeLines);
         }
         public static string replaceConstants(this string inputCode)
@@ -58,11 +55,8 @@ namespace ListSharp
 
         #region processingFunctions
         public static string removePreWhitespace(string line) => new Regex(@"^\s*(.*)").Match(line).Groups[1].Value;
-
         public static string removeAfterWhitespace(string line) => new Regex(@"(.*?)\s*$").Match(line).Groups[1].Value;
-
         public static string makeEqualsEvenlySpaced(string line) => line.Contains("=") ? line.Replace(new Regex(@"\s*=\s*").Match(line).Groups[0].Value, " = ") : line;
-
         public static string makeAdditionEvenlySpaced(string line)
         {
             MatchCollection mc = new Regex(@"\s*\+\s*").Matches(line);
@@ -73,13 +67,9 @@ namespace ListSharp
             return line;
         }
         public static string removeArrayBrackets(string line) => line.Replace("{", "").Replace("}", "");
-
         public static string replaceAddition(string line) => line.Replace("+", ",");
-
         public static string replaceNumbOperators(string line) => line.Replace("PLUS", "+").Replace("MINUS", "-").Replace("MULTIPLY", "*").Replace("DIVIDE", "/");
-
         public static string replaceStringRange(this string input, int startIndex, int lengthOfReplacedText, string replacementText) => input.Substring(0, startIndex) + replacementText + input.Substring(startIndex + lengthOfReplacedText);
-
         public static string returnStringArr(this string inputCode) => inputCode.Replace("stringarr", "string[]");
         #endregion
 
@@ -101,7 +91,7 @@ namespace ListSharp
         {
             for (int i = 0; i < replacementStrings.Length; i++)
             {
-                inputCode = inputCode.Replace("«" + replacementStrings[i].Item2 + "»", replacementStrings[i].Item1);
+                inputCode = inputCode.Replace($"«{replacementStrings[i].Item2}»", replacementStrings[i].Item1);
             }
             return inputCode;
         }
@@ -113,7 +103,7 @@ namespace ListSharp
             replacementCode = mc.Select((m, i) => new Tuple<string, string>(m.Groups[1].Value, createHash(i))).ToArray();
             for (int i = 0; i < mc.Length; i++)
             {
-                inputCode = inputCode.replaceStringRange(mc[i].Index, mc[i].Length, "<" + replacementCode[i].Item2 + ">");
+                inputCode = inputCode.replaceStringRange(mc[i].Index, mc[i].Length, $"<{replacementCode[i].Item2}>");
             }
             Array.Reverse(replacementCode);
             return inputCode;
@@ -122,7 +112,7 @@ namespace ListSharp
         {
             for (int i = 0; i < replacementCode.Length; i++)
             {
-                inputCode = inputCode.Replace("<" + replacementCode[i].Item2 + ">",replacementCode[i].Item1);
+                inputCode = inputCode.Replace($"<{replacementCode[i].Item2}>",replacementCode[i].Item1);
             }
             return inputCode;
         }
@@ -141,7 +131,7 @@ namespace ListSharp
         {
             for (int i = 0; i < replacementVars.Length; i++)
             {
-                inputCode = inputCode.Replace("(" + replacementVars[i].Item2 + ")", replacementVars[i].Item1);
+                inputCode = inputCode.Replace($"({replacementVars[i].Item2})", replacementVars[i].Item1);
             }
             return inputCode;
         }
@@ -168,7 +158,7 @@ namespace ListSharp
         public static string createHash(int index)
         {
             var now = DateTime.Now;
-            return index + "-" + CreateMD5(index + now.Hour + now.Minute + now.Second + now.Millisecond + "").Substring(0,10);
+            return index + "-" + CreateMD5($"{index}{now.Hour}{now.Minute}{now.Second}{now.Millisecond}").Substring(0,10);
         }
         #endregion
 

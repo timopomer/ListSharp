@@ -9,17 +9,18 @@ namespace ListSharp
 {
     public static class launchArguments
     {
-        public static Dictionary<string, bool> flags = new Dictionary<string, bool>()
+        public static Dictionary<string, object> flags = new Dictionary<string, object>()
         {
             {"silent",false},
             {"downloadretry",false},
-            {"createbinary",false}
+            {"createbinary",false},
+            {"downloadtries",1}
         };
         public static void processFlags(IEnumerable<string> flaginp)
         {
             foreach (string flag in flaginp)
             {
-                if(flag.StartsWith("-s"))
+                if (flag.StartsWith("-s"))
                     flags["silent"] = true;
 
                 if (flag.StartsWith("-r"))
@@ -31,7 +32,7 @@ namespace ListSharp
         }
         public static string flagsAsString()
         {
-            return String.Join(Environment.NewLine,flags.Select(n => $"{n.Key}:{n.Value}"));
+            return String.Join(Environment.NewLine, flags.Select(n => $"{n.Key}:{n.Value}"));
         }
     }
 }
