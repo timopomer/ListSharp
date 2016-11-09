@@ -144,7 +144,7 @@ public static object REPLACE_F(string toReplace, string replaceWith,object ob)
 
 public static object ADD_F(Type type,params object[] toadd)
 {
-    string[] temp = toadd.SelectMany(n => n.GetType() == typeof(string) ? new string[] { (string)n } : (string[])n).ToArray();
+    string[] temp = toadd.SelectMany(n => n.GetType() == typeof(string)|| n.GetType() == typeof(Int32) ? new string[] { (string)n.ToString() } : (string[])n).ToArray();
     return type == typeof(string) ? (object)String.Join("", temp) : temp;
 }
 
