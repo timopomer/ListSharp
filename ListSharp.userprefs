@@ -1,17 +1,16 @@
 ﻿<Properties StartupConfiguration="{4A72958C-8AB0-42AE-A7EB-7EA136847064}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="ListSharp/Program.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ListSharp Status">
     <Files>
-      <File FileName="ListSharp/Program.cs" Line="209" Column="1" />
-      <File FileName="ListSharp/externalFunctions.cs" Line="14" Column="26" />
+      <File FileName="ListSharp/Program.cs" Line="152" Column="94" />
+      <File FileName="ListSharp/codeParsing.cs" Line="158" Column="66" />
+      <File FileName="ListSharp/externalFunctions.cs" Line="33" Column="40" />
       <File FileName="ListSharp/codeProcessing.cs" Line="31" Column="47" />
-      <File FileName="ListSharp/codeParsing.cs" Line="17" Column="1" />
-      <File FileName="ListSharp/patternMatching.cs" Line="39" Column="25" />
-      <File FileName="ListSharp/memory.cs" Line="18" Column="55" />
+      <File FileName="ListSharp/baseDefinitions.cs" Line="37" Column="100" />
       <File FileName="ListSharp/launchArguments.cs" Line="25" Column="22" />
-      <File FileName="ListSharp/IO.cs" Line="22" Column="78" />
+      <File FileName="ListSharp/patternMatching.cs" Line="39" Column="25" />
       <File FileName="ListSharp/debug.cs" Line="1" Column="1" />
-      <File FileName="ListSharp/baseDefinitions.cs" Line="37" Column="159" />
-      <File FileName="ListSharp/Variable.cs" Line="17" Column="20" />
+      <File FileName="ListSharp Status" />
+      <File FileName="ListSharp.userprefs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

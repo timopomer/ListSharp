@@ -34,7 +34,7 @@ namespace ListSharp
                 {"STRG",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"STRG\[(.*?)\]"), (gc) => codeParsing.processStrg(gc[1].Value))},
                 {"ROWS",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"ROWS\[(.*?)\]"), (gc) => codeParsing.processRows(gc[1].Value))},
                 {"NUMB",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"NUMB\[(.*?)\]"), (gc) => codeParsing.processNumb(gc[1].Value))},
-                {"INPUT",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"INPUT AS (STRG|ROWS|NUMB)"), (gc) => codeParsing.processInput(gc[1].Value))},
+                {"INPUT",new Tuple<Regex, Func<GroupCollection, string>>(new Regex(@"INPUT AS (STRG|NUMB)"), (gc) => codeParsing.processInput(gc[1].Value))},
             };
 
             commandPattern = new Regex("(" + String.Join("|", regexPatterns.Select(n => n.Key)) + ")(?!_F)");

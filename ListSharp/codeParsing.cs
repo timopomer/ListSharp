@@ -18,7 +18,6 @@ namespace ListSharp
         }
         public static string processOperators(string line, int line_num)
         {
-
             if (line.StartsWith("{"))
                 return "{";  
 
@@ -34,7 +33,6 @@ namespace ListSharp
             if (line.StartsWith("<") && line.EndsWith(">")) //c# code
                 return line;
 
-            /* shouldnt be able to happen anymore */
             if (line.StartsWith("/*") || line.StartsWith("*/")) //to see if the code is commented out so it does net get into the final code
                 return line;
             
@@ -158,9 +156,6 @@ namespace ListSharp
             {
                 case "STRG":
                     return processStrg("INPT_F(typeof(string))");
-
-                case "ROWS":
-                    return processRows("INPT_F(typeof(string[]))");
 
                 case "NUMB":
                     return "(int)(long)INPT_F(typeof(int))";

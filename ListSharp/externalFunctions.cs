@@ -8,7 +8,12 @@ return "Show Error";
 }
 
 public static string SHOW_F(object thein) {
-return System.Environment.NewLine + "---------------output--------------" + System.Environment.NewLine + getString(thein).Replace(System.Environment.NewLine, "<newline>" + System.Environment.NewLine) + System.Environment.NewLine + "-----------------------------------" + System.Environment.NewLine;
+return System.Environment.NewLine +
+		     "---------------output--------------" +
+		     System.Environment.NewLine +
+		     getString(thein) +
+		     System.Environment.NewLine + "-----------------------------------" +
+		     System.Environment.NewLine;
 }
 
 public static void DISP_F(object ob)
@@ -17,18 +22,15 @@ if ((ob).GetType() == typeof(int))
 ob = (int)ob + "";
 
 Console.WriteLine(ob.GetType() == typeof(string) ? ((string)ob) : String.Join(Environment.NewLine, (string[])ob));
-
 }
 
 
 
 
 
-public static string arr2str(string[] arr) {
-string r = "";
-for (int i = 0; i < arr.Length; i++)
-r += "[" + i + "]" + arr[i] + "[/" + i + "]" + Environment.NewLine;
-return r;
+public static string arr2str(string[] arr)
+{
+return String.Join(Environment.NewLine,arr.Select((n,i)=>"[" + i + "]" + n + "[/" + i + "]"));
 }
 
 
@@ -106,9 +108,6 @@ public static object INPT_F(Type type)
 	if(type==typeof(int))
 		return long.Parse(inp);
 
-	if(type==typeof(string[]))
-		return Regex.Split(Environment.NewLine, inp);
-
 	return inp; //implicit string
 }
 
@@ -133,7 +132,7 @@ return start < end ? Enumerable.Range(start, end - start + 1) : Enumerable.Range
 
 public static string[] ROWSPLIT_F(object ob, string delimiter)
 {
-if (delimiter == "<newline>") delimiter = Environment.NewLine;
+if (delimiter == "<newline>") delimiter = System.Environment.NewLine;
 return ob.GetType() == typeof(string) ? Regex.Split(((string)ob), delimiter) : ((string[])ob).SelectMany(n => Regex.Split((n), delimiter)).ToArray();
 }
 
