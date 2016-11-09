@@ -100,7 +100,7 @@ namespace ListSharp
                     }
                 default:
                     {
-                        return $"output += SHOW_F({line}){Environment.NewLine};";
+                        return $"output += SHOW_F({line});{Environment.NewLine}";
                     }
             }
         }

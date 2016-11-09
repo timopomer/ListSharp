@@ -78,8 +78,6 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Threading;
 using System.Text.RegularExpressions;
-
-
 public class MainClass
 { 
 static void Main(string[] args){
@@ -117,7 +115,7 @@ string output = """";
             code += "}";
             code += Environment.NewLine;
 
-			int initialCodeLen = Regex.Split(code, Environment.NewLine).Length;
+			int initialCodeLen = Regex.Split(code, Environment.NewLine).Length-1;
             code += Properties.Resources.externalFunctions; //here we add all function depndecies
             code += "}";
 
