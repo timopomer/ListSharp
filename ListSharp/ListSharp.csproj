@@ -92,6 +92,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Variable.cs" />
+    <Compile Include="compiler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
