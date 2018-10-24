@@ -41,7 +41,7 @@ ListSharp comes pre equipped with powerful algorithmic tools for information ext
 
 ### Compiling a .ls script
 
-* Locate transpiler executeable, defult in /bin/Debug
+* Locate transpiler executeable, default in /bin/Debug
 
 #### On windows
 
